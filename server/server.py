@@ -48,5 +48,16 @@ def update_arrival_time(station_id: int, bus_id: int):
     """
     Get real-time bus location and arrival time to a given station
     """
-    
+
     return {"Arriving": "12:54:32", "Location": {"Lat": "33.4234242", "Lon": "34.334211"}}
+
+@app.post("/passenger/wait-for/")
+def passenger_wait_for_bus(station_id: str, bus_id: str):
+    """
+    Log that a passenger is waiting for a specific bus at a given station.
+    """
+
+    # Store the entry (in-memory for now)
+    #waiting_passengers.append(station_id, bus_id))
+
+    return {"message": "Passenger wait request logged successfully"}
