@@ -61,3 +61,60 @@ def passenger_wait_for_bus(station_id: str, bus_id: str):
     #waiting_passengers.append(station_id, bus_id))
 
     return {"message": "Passenger wait request logged successfully"}
+
+@app.post("/driver/drive/")
+def register_for_line(user_id: str, line_id: str, dep_time: str):
+    """
+    Register a driver for a specific line
+    """
+
+    # change the status of nahagos in this specific line
+
+    return {"message": "Line registered successfully"}
+
+@app.delete("/driver/drive")
+def delete_drive(user_id: str, line_id: str, dep_time: str):
+    """
+    Delete a drive 
+    """
+    # change the status of nahagos in this specific line
+
+    return {"message": "Drive was deleted successfully"}
+
+
+@app.get("/update-station-list/{last_updated_date}")
+def update_station_list(last_updated_date: str):
+    """
+    Check whether or not the station list is up to date, and if not sending changes
+    """
+     # Compare last_updated_date to last date the station list was updated
+     # If equal: return {"status": "Up to date"}
+     # else: return {"status": "Not up to date", "changes": []}
+
+@app.post("/driver/login")
+def driver_login(username: str, password: str):
+    """
+    Check if the username and the password are correct
+    """
+    return {"message", "200 OK"}
+
+@app.post("/passenger/login")
+def passenger_login(username: str, password: str):
+    """
+    Check if the username and the password are correct
+    """
+    return {"message", "200 OK"}
+
+@app.post("/driver/signup")
+def driver_signup(username: str, password: str):
+    """
+    Check if the username and the password can be register, and if so register
+    """
+    return {"message", "200 OK"}
+
+@app.post("/passenger/signup")
+def passenger_signup(username: str, password: str):
+    """
+    Check if the username and the password can be register, and if so register
+    """
+    return {"message", "200 OK"}
