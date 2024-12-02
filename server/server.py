@@ -24,15 +24,6 @@ def get_lines_starting(station_id: int):
 
 
 
-# @app.get("/lines/{line_id, station_id}")
-# def get_line_info(line_id: int, station_id:int):
-#     """
-#     Retrieve data about a given line: the stations it passes through and its departure times-table 
-#     """
-
-#     # todo: write the function
-
-
 @app.get("/lines-by-station/{station_id}")
 def get_real_time_lines(station_id: int):
     """
