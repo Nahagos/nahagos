@@ -99,13 +99,6 @@ def passenger_login(username: str, password: str):
     """
     return {"message", "200 OK"}
 
-@app.post("/driver/signup")
-def driver_signup(username: str, password: str):
-    """
-    Check if the username and the password can be register, and if so register
-    """
-    return {"message", "200 OK"}
-
 @app.post("/passenger/signup")
 def passenger_signup(username: str, password: str):
     """
