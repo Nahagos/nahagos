@@ -20,8 +20,8 @@ def get_lines_starting(station_id: int):
     Retrieve a list of bus lines that depart from a given station.
     """
 
-    line1 = {"line_id": 45634345}
-    line2= {"line_id": 12341523}
+    line1 = {45634345:{"line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "time_table":["12:40", "10:51", "..."]}}
+    line2= {123123:{"line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "time_table":["12:40", "10:51", "..."]}}
     return {"lines":[line1, line2]}
 
 
@@ -31,8 +31,8 @@ def get_real_time_lines(station_id: int):
     Retrives real-time arriving times at given station
     """   
 
-    line1 = {"line_id": 45634345, "bus_id": 1234, "Arrival Time": "12:41:23"}
-    line2= {"line_id": 4242234, "bus_id": 4432, "Arrival Time": "22:21:43"}
+    line1 = {45634345:{"line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}}
+    line2= {123123:{"line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}}
     return {"lines":[line1, line2]}
 
 
