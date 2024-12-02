@@ -79,8 +79,11 @@ def update_station_list(last_updated_date: str):
     Check whether or not the station list is up to date, and if not sending changes
     """
      # Compare last_updated_date to last date the station list was updated
-     # If equal: return {"status": "Up to date"}
-     # else: return {"status": "Not up to date", "changes": []}
+    up_to_date = True
+    if up_to_date: 
+        return {"status": "Up to date"}
+    else: 
+        return {"status": "Not up to date", "changes": []}
 
 @app.post("/driver/login")
 def driver_login(username: str, password: str):
