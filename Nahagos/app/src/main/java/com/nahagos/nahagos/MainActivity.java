@@ -11,11 +11,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
+import android.widget.EditText;
+import android.widget.Button;
+import android.util.Log;
 import android.os.Bundle;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.nahagos.nahagos.Networks;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -35,60 +37,37 @@ public class MainActivity extends AppCompatActivity {
         TextView titleText = findViewById(R.id.welcomeText);
 
         titleText.setText("Welcome to Nahagos!");
-        ImageView imgPoint = (ImageView)findViewById(R.id.imageView2);
+        ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
         imgPoint.setX(-7);
         imgPoint.setY(280);
 
+        EditText usernameObj = findViewById(R.id.usernameField);
+        EditText passwordObj = findViewById(R.id.passwordField);
 
         int port = 8000;
-        String ip = "172.20.20.36";
-        String url = "https://" + ip + ":" + port + "/login:";
-        String jsonBody = "{\"name\": \"talShahar\", \"password\": Aa12456}";
+        String ip = "172.20.10.5";
+
+        Button button = findViewById(R.id.loginButton); // Ensure a button exists in your layout
+        button.setOnClickListener(v -> {
+            // Get the text from EditText
+            String username = usernameObj.getText().toString();
+            String password = passwordObj.getText().toString();
+
+            // Print or use the variable
+            Log.d("MainActivity", "Entered Text: " + username + "|" + password);
+
+            String url = "http://" + ip + ":" + port + "/login:";
+            String base = "http://" + ip + ":" + port;
+            String jsonBody = "{\"name\": " + username + ", \"password\":" + password + "}";
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
+            Networks.makeHttpRequest(base);
+        });
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    }
-    private void makeHttpRequest() {
-        String urlString = "https://jsonplaceholder.typicode.com/posts"; // Example URL
-        HttpURLConnection connection = null;
-
-        try {
-            // Create URL object
-            URL url = new URL(urlString);
-
-            // Open connection
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET"); // or "POST", "PUT", etc.
-            connection.setConnectTimeout(5000); // 5 seconds timeout
-            connection.setReadTimeout(5000);
-
-            // Send the request
-            int responseCode = connection.getResponseCode();
-            Log.d("HTTP", "Response Code: " + responseCode);
-
-            // Read the response
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-
-                reader.close();
-                Log.d("HTTP", "Response: " + response.toString());
-            }
-
-        } catch (Exception e) {
-            Log.e("HTTP", "Error in HTTP request", e);
-        } finally {
-            if (connection != null) {
-                connection.disconnect(); // Close the connection
-            }
-        }
     }
 }
