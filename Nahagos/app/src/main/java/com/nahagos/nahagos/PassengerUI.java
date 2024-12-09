@@ -1,11 +1,18 @@
 package com.nahagos.nahagos;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.Bundle;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -14,6 +21,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.nahagos.nahagos.databinding.ActivityPassengerUiBinding;
 
 import org.json.JSONArray;
@@ -36,9 +44,16 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
     private JSONArray _stops;
 
-    private final float ZOOM_SHOW_STOPS=14F;
+    private boolean _gpsAccessGranted = false;
+
+    private FusedLocationProviderClient fusedLocationClient;
+
+
+    private final float ZOOM_SHOW_STOPS=14.5F;
 
     private ArrayList<Marker> _stopMarkers;
+    private LatLng ISRAEL;
+    private final float START_ZOOM = 8F;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +67,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         _stopMarkers = new ArrayList<Marker>();
+        ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
         //_db = SQLiteDatabase.openDatabase("file:///android_asset/stops.sql", null, 0);
 
         try {
@@ -59,6 +75,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
     }
 
     private JSONArray getStops() throws IOException, JSONException {
@@ -71,13 +89,25 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         return new JSONArray(output.toString());
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        LatLng startingPoint = null;
+        /*fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            startingPoint = new LatLng(location.getLatitude(), location.getLatitude());
+                        }
+                    }
+                });
+*/
+        if (startingPoint == null)
+            startingPoint = ISRAEL;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
-        // Add a marker in Sydney and move the camera
-        LatLng israel = new LatLng(30.974998182290868, 34.69264616803752);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 8F));
         mMap.setOnCameraMoveListener(() -> {
             CameraPosition pos = mMap.getCameraPosition();
             double lat = pos.target.latitude, lon = pos.target.longitude;
