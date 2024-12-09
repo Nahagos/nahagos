@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Response, Depends, Cookie
 from pydantic import BaseModel
+import uuid
 
 app = FastAPI()
 class Station(BaseModel):
@@ -7,7 +8,9 @@ class Station(BaseModel):
     name: str
     coords: tuple
 
+connected_users = {}
 
+connected_drivers = {}
 
 @app.get("/")
 def root():
@@ -31,8 +34,8 @@ def get_real_time_lines(station_id: int):
     Retrives real-time arriving times at given station
     """   
 
-    line1 = {45634345:{"line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}}
-    line2= {123123:{"line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}}
+    line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
+    line2= {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}
     return {"lines":[line1, line2]}
 
 
@@ -94,12 +97,17 @@ def update_station_list(last_updated_date: str):
 
 
 @app.post("/driver/login")
-def driver_login(username: str, password: str):
+def driver_login(username: str, password: str, id: str, response: Response):
     """
-    Check if the username and the password are correct
+    Check if the id, username and the password are correct
     """
-
-    return {"message", "200 OK"}
+    if db.login_passenger(id, username, password):
+        session_id = str(uuid.uuid4())  # Generate a unique session ID
+        connected_drivers[session_id] = {"id": id}
+        response.set_cookie(key="session_id", value=session_id, httponly=True)  # Set session ID in a secure cookie
+        return {"message": "Login successful"}
+    else:
+        raise HTTPException(status_code=404, detail="Session not found")
 
 
 @app.post("/passenger/login")
