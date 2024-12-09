@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response, Depends, Cookie
 from pydantic import BaseModel
+from datetime import datetime
 import uuid
 
 app = FastAPI()
@@ -12,6 +13,8 @@ connected_users = {}
 
 connected_drivers = {}
 
+registered_trips = {}
+
 @app.get("/")
 def root():
     return {"message": "Server Is Legit, V1.0.0"}
@@ -23,8 +26,8 @@ def get_lines_starting(station_id: int):
     Retrieve a list of bus lines that depart from a given station.
     """
 
-    line1 = {45634345:{"line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "time_table":["12:40", "10:51", "..."]}}
-    line2= {123123:{"line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "time_table":["12:40", "10:51", "..."]}}
+    line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
+    line2 = {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}
     return {"lines":[line1, line2]}
 
 
@@ -39,7 +42,7 @@ def get_real_time_lines(station_id: int):
     return {"lines":[line1, line2]}
 
 
-@app.get(" /update-arrival-time/{station_id, bus_id}")
+@app.get("/update-arrival-time/{station_id, bus_id}")
 def update_arrival_time(station_id: int, bus_id: int):
     """
     Get real-time bus location and arrival time to a given station
@@ -61,12 +64,29 @@ def passenger_wait_for_bus(station_id: str, bus_id: str):
 
 
 @app.post("/driver/drive/")
-def register_for_line(user_id: str, line_id: str, dep_time: str):
+def register_for_line(route_id: int, time: str, session_id: str = Cookie("session_id")):
     """
     Register a driver for a specific line
     """
+    # TODO: change the status of nahagos in this specific line and fix checks for validation of line
 
-    # TODO: change the status of nahagos in this specific line
+    driver = connected_drivers.get(session_id)
+    if not driver:
+        raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
+    if not db.check_line_day(route_id):
+        raise HTTPException(status_code=401, detail="Line isn't schedualed today")
+    # Check if the provided time is in the future
+    try:
+        departure_time = datetime.strptime(time, "%H:%M:%S")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid time format. Use 'HH:MM:SS'.")
+
+    if departure_time < datetime.now():
+        raise HTTPException(status_code=400, detail="Line has already left the station.")
+
+
+
+
 
     return {"message": "Line registered successfully"}
 
