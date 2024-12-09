@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
         ImageView imgPoint = (ImageView)findViewById(R.id.imageView2);
         imgPoint.setX(-7);
         imgPoint.setY(280);
+
+        int port = 8000;
+        String ip = "172.20.20.36";
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
