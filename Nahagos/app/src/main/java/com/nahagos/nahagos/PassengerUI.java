@@ -6,10 +6,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CursorAdapter;
+import android.widget.SearchView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -39,6 +44,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
     private GoogleMap mMap;
     private ActivityPassengerUiBinding binding;
+    private SearchView search;
 
     //private SQLiteDatabase _db;
 
@@ -75,8 +81,21 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        search = findViewById(R.id.searchView);
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //search.();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private JSONArray getStops() throws IOException, JSONException {
