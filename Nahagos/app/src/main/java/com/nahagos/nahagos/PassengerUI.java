@@ -34,8 +34,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
     private JSONArray _stops;
 
-    private final float ZOOM_SHOW_STOPS=10F;
-    private final float zoomRadius=0.09F;
+    private final float ZOOM_SHOW_STOPS=13F;
+    private final float ISRAEL_HEIGHT = 4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +58,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private JSONArray getStops() throws IOException, JSONException {
-        BufferedReader reader =new BufferedReader(new InputStreamReader(getAssets().open("bus_data/stops.json")));
+        BufferedReader reader =new BufferedReader(new InputStreamReader(getAssets().open("stops.json")));
         StringBuilder output = new StringBuilder();
         String tmp;
         while ((tmp = reader.readLine()) != null) {
@@ -67,16 +67,6 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         return new JSONArray(output.toString());
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -88,10 +78,11 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
             CameraPosition pos = mMap.getCameraPosition();
             if (pos.zoom >= ZOOM_SHOW_STOPS) {
                 double lat = pos.target.latitude, lon = pos.target.longitude;
+                double zoomRadius = Math.pow(2, 8- pos.zoom);
                 for (int i = 0; i < _stops.length(); i++) {
                     try {
-                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("lat")) < zoomRadius)
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(_stops.getJSONObject(i).getDouble("lat"), _stops.getJSONObject(i).getDouble("lon"))));
+                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("stop_lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("stop_lat")) < zoomRadius)
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(_stops.getJSONObject(i).getDouble("stop_lat"), _stops.getJSONObject(i).getDouble("stop_lon"))));
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
