@@ -1,56 +1,93 @@
 package com.nahagos.nahagos;
+
 import android.util.Log;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Networks {
-     public void makeHttpRequest(String urlString) {
+    private static final String TAG = "HTTP";
+
+    // Helper method to set up a connection
+    private static HttpURLConnection setupConnection(String urlString, String method) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(method);
+        connection.setConnectTimeout(5000); // 5sec timeout
+        connection.setReadTimeout(5000);
+
+        if ("POST".equalsIgnoreCase(method)) {
+            connection.setDoOutput(true); // Enable output for POST
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        }
+
+        return connection;
+    }
+
+    // Helper method to read response
+    private static String readResponse(HttpURLConnection connection) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+
+        reader.close();
+        return response.toString();
+    }
+
+    // Method for HTTP GET request
+    public static void httpGetReq(String urlString) {
         HttpURLConnection connection = null;
 
         try {
-            // Create URL object
-            URL url = new URL(urlString);
-
-            // Open connection
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET"); // or "POST", "PUT", etc.
-            connection.setConnectTimeout(5000); // 5 seconds timeout
-            connection.setReadTimeout(5000);
-
-            // Send the request
+            connection = setupConnection(urlString, "GET");
             int responseCode = connection.getResponseCode();
-            Log.d("HTTP", "Response Code: " + responseCode);
+            Log.d(TAG, "Response Code: " + responseCode);
 
-            // Read the response
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-
-                reader.close();
-                Log.d("HTTP", "Response: " + response.toString());
+                String response = readResponse(connection);
+                Log.d(TAG, "Response: " + response);
             }
-
         } catch (Exception e) {
-            Log.e("HTTP", "Error in HTTP request", e);
+            Log.e(TAG, "Error in HTTP GET request", e);
         } finally {
             if (connection != null) {
-                connection.disconnect(); // Close the connection
+                connection.disconnect();
             }
         }
     }
-}
 
+    public static void httpPostReq(String urlString, String postData) {
+        HttpURLConnection connection = null;
+
+        try {
+            connection = setupConnection(urlString, "POST");
+
+            // Write data to the output stream
+            try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
+                writer.write(postData);
+                writer.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            Log.d(TAG, "Response Code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                String response = readResponse(connection);
+                Log.d(TAG, "Response: " + response);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in HTTP POST request", e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
 }

@@ -59,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
             String url = "http://" + ip + ":" + port + "/login:";
             String base = "http://" + ip + ":" + port;
             String jsonBody = "{\"name\": " + username + ", \"password\":" + password + "}";
+
+
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
-            Networks.makeHttpRequest(base);
+            Networks.httpPostReq(url, jsonBody);
         });
 
 
