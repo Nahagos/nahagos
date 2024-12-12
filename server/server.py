@@ -40,15 +40,18 @@ def get_lines_starting(station_id: int):
     return {"lines":[line1, line2]}
 
 
-@app.get("/lines-by-station/{station_id}")
-def get_real_time_lines(station_id: int):
+@app.get("/lines-by-station/{stop_id}")
+def get_real_time_lines(stop_id: int):
     """
     Retrives real-time arriving times at given station
     """   
+    try:
+        return db.get_lines_by_station(stop_id)
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
-    line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
-    line2= {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}
-    return {"lines":[line1, line2]}
+    # line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
+    # line2= {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False} 
 
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
@@ -61,15 +64,19 @@ def update_arrival_time(station_id: int, bus_id: int):
 
 
 @app.post("/passenger/wait-for/")
-def passenger_wait_for_bus(station_id: int, route_id: int, ):
+def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str):
     """
     Log that a passenger is waiting for a specific bus at a given station.
     """
+    if db.check_stop_on_trip(stop_id, trip_id):
+        if registered_trips[trip_id] is not None:
+            registered_trips[trip_id][1].appdend(stop_id)
+            return {"message": "Passenger wait request logged successfully"}
+        raise HTTPException(status_code=401, detail="No Nahagos!")
 
-    # TODO: Store the entry (in-memory for now)
-    #waiting_passengers.append(station_id, bus_id))
-
-    return {"message": "Passenger wait request logged successfully"}
+    
+    raise HTTPException(status_code=401, detail="Stop is not in this lines route")
+    
 
 
 @app.post("/driver/drive/")
