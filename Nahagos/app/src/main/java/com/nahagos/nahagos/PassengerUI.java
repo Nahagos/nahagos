@@ -4,14 +4,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,10 +27,10 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
+
 
     private GoogleMap mMap;
     private ActivityPassengerUiBinding binding;
@@ -41,14 +39,15 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
     private JSONArray _stops;
 
-    private ArrayList<StopResult> _last_search_res;
+    private ArrayList<SearchStopResult> _last_search_res;
 
     private boolean _gpsAccessGranted = false;
 
-    private final float ZOOM_SHOW_STOPS=14.5F;
+    private final float ZOOM_SHOW_STOPS = 15.5F;
+    private final double H_TO_W_RATIO = 3;
 
     private ArrayList<Marker> _stopMarkers;
-    private LatLng ISRAEL;
+    private LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);;
     private final float START_ZOOM = 8F;
     private final float STOP_ZOOM = 15.5F;
 
@@ -64,7 +63,6 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         _stopMarkers = new ArrayList<Marker>();
-        ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
 
         suggestionList = findViewById(R.id.suggestions);
         _last_search_res = new ArrayList<>();
@@ -109,16 +107,16 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                     _last_search_res.clear();
                     for (int i = 0; i < stop_ids.size(); i++) {
                         try {
-                            _last_search_res.add(new StopResult(stop_ids.get(i), _stops.getJSONObject(stop_ids.get(i)).getString("stop_name")));
+                            _last_search_res.add(new SearchStopResult(stop_ids.get(i), _stops.getJSONObject(stop_ids.get(i)).getString("stop_name")));
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     }
                 }
 
-                ArrayAdapter<StopResult> adapter;
+                ArrayAdapter<SearchStopResult> adapter;
                 if (stop_ids.isEmpty()) {
-                    _last_search_res.add(new StopResult(-1, "לא נמצאה תחנה מתאימה"));
+                    _last_search_res.add(new SearchStopResult(-1, "לא נמצאה תחנה מתאימה"));
                     adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
                     suggestionList.setAdapter(adapter);
                 }
@@ -171,16 +169,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         LatLng startingPoint = null;
-        /*fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            startingPoint = new LatLng(location.getLatitude(), location.getLatitude());
-                        }
-                    }
-                });
-*/
+
         if (startingPoint == null)
             startingPoint = ISRAEL;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
@@ -191,7 +180,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
             double zoomRadius = Math.pow(2, 8 - pos.zoom);
             for (int i = 0; i < _stopMarkers.size(); i++) {
                 LatLng markerPos = _stopMarkers.get(i).getPosition();
-                if (Math.abs(lon-markerPos.longitude) >= zoomRadius || Math.abs(lat-markerPos.latitude) >= zoomRadius) {
+                if (Math.abs(lon-markerPos.longitude) >= zoomRadius || Math.abs(lat-markerPos.latitude) >= zoomRadius*H_TO_W_RATIO) {
                     _stopMarkers.get(i).remove();
                     _stopMarkers.remove(i);
                 }
