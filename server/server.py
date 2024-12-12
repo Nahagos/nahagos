@@ -9,6 +9,15 @@ class Station(BaseModel):
     name: str
     coords: tuple
 
+class PassengerRequest(BaseModel):
+    username: str
+    password: str
+
+class DriverLogin(BaseModel):
+
+    username: str
+    password: str
+
 connected_users = {}
 
 connected_drivers = {}
@@ -52,7 +61,7 @@ def update_arrival_time(station_id: int, bus_id: int):
 
 
 @app.post("/passenger/wait-for/")
-def passenger_wait_for_bus(station_id: str, bus_id: str):
+def passenger_wait_for_bus(station_id: int, route_id: int, ):
     """
     Log that a passenger is waiting for a specific bus at a given station.
     """
@@ -64,7 +73,7 @@ def passenger_wait_for_bus(station_id: str, bus_id: str):
 
 
 @app.post("/driver/drive/")
-def register_for_line(route_id: int, time: str, session_id: str = Cookie("session_id")):
+def register_for_line(trip_id: int, session_id: str = Cookie("cookies_and_milk")):
     """
     Register a driver for a specific line
     """
@@ -73,20 +82,10 @@ def register_for_line(route_id: int, time: str, session_id: str = Cookie("sessio
     driver = connected_drivers.get(session_id)
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
-    if not db.check_line_day(route_id):
-        raise HTTPException(status_code=401, detail="Line isn't schedualed today")
-    # Check if the provided time is in the future
-    try:
-        departure_time = datetime.strptime(time, "%H:%M:%S")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid time format. Use 'HH:MM:SS'.")
-
-    if departure_time < datetime.now():
-        raise HTTPException(status_code=400, detail="Line has already left the station.")
-
-
-
-
+    if not db.check_schedule(trip_id):
+        raise HTTPException(status_code=401, detail="Line isn't schedualed for you")
+    
+    registered_trips[trip_id] = driver, []
 
     return {"message": "Line registered successfully"}
 
@@ -116,43 +115,68 @@ def update_station_list(last_updated_date: str):
         return {"status": "Not up to date", "changes": []}
 
 
-@app.post("/driver/login")
-def driver_login(username: str, password: str, id: str, response: Response):
+@app.post("/driver/login/")
+def driver_login(driver: DriverLogin, response: Response):
     """
     Check if the id, username and the password are correct
     """
-    if db.login_driver(id, username, password):
+
+    if db.login_driver(driver.id, driver.username, driver.password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
         connected_drivers[session_id] = {"id": id}
-        response.set_cookie(key="session_id", value=session_id, httponly=True)  # Set session ID in a secure cookie
+        response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
-@app.post("/passenger/login")
-def passenger_login(username: str, password: str, response: Response):
+@app.post("/passenger/login/")
+def passenger_login(request: PassengerRequest, response: Response):
     """
     Check if the username and the password are correct
     """
-    if db.login_passenger(username, password):
-        session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = {"username": username}
-        response.set_cookie(key="session_id", value=session_id, httponly=True)  # Set session ID in a secure cookie
-        return {"message": "Login successful"}
-    else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    # Access the username and password from the request
+    username = request.username
+    password = request.password
+
+    # Uncomment the following code for actual login logic
+    # if db.login_passenger(username, password):
+    #     session_id = str(uuid.uuid4())
+    #     connected_drivers[session_id] = {"username": username}
+    #     response.set_cookie(key="session_id", value=session_id, httponly=True)
+    #     return {"message": "Login successful"}
+    # else:
+    #     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    session_id = str(uuid.uuid4())
+    response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)
+    return {"message": "Login successful"}
 
 
-@app.post("/passenger/signup")
-def passenger_signup(username: str, password: str, response: Response):
+
+@app.post("/passenger/signup/")
+def passenger_signup(request: PassengerRequest, response: Response):
     """
     Check if the username and the password can be register, and if so register
     """
+    username = request.username
+    password = request.password
     if db.signup_passenger(username, password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
         connected_drivers[session_id] = {"username": username}
-        response.set_cookie(key="session_id", value=session_id, httponly=True)  # Set session ID in a secure cookie
+        response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
     else:
         raise HTTPException(status_code=401, detail="Invalid signup")
+
+
+
+@app.get("/driver/schedule")
+def get_driver_schedule(session_id: str = Cookie("cookies_and_milk")):
+    """
+    Get daily schedule of driver
+    """
+    driver = connected_drivers.get(session_id)
+    if not driver:
+        raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
+    return db.get_driver_schedule(driver)
