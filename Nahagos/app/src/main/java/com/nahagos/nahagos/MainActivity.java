@@ -44,20 +44,13 @@ public class MainActivity extends AppCompatActivity {
         ServerAPI serverAPI = new ServerAPI(this);
         setContentView(R.layout.activity_main);
 
-
-        TextView titleText = findViewById(R.id.welcomeText);
-        titleText.setText("Welcome to Nahagos!");
         ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
-        imgPoint.setX(-7);
-        imgPoint.setY(280);
-
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
-
-
-
         EditText driverIdObj = findViewById(R.id.idDriver);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
+
+        // safe mode for networking in android
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
 
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -71,15 +64,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        Button button = findViewById(R.id.loginButton); // Ensure a button exists in your layout
+        Button button = findViewById(R.id.loginButton);
         button.setOnClickListener(v -> {
-            // Get the text from EditText
+
             String username  = usernameObj.getText().toString();
             String password  = passwordObj.getText().toString();
             String driverId  =  driverIdObj.getText().toString();
+
             if (username != null && password != null) {
                 Log.d("MainActivity","not null");
                 Log.d("MainActivity", Boolean.toString(isCheckedGlobal));
+
                 if (!isCheckedGlobal) {
                     serverAPI.passengerLogin(username, password);
                     Log.d("MainActivity","login");
