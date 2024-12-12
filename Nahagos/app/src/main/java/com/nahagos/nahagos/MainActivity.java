@@ -28,6 +28,10 @@ import org.json.JSONObject;
 import android.widget.CheckBox;
 import okhttp3.*;
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.ServerAPI;
+import android.content.Context;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
 
-        int port = 8000;
-        String ip = getString(R.string.server_ip);
+        ServerAPI serverAPI = new ServerAPI(this);
 
         EditText driverId = findViewById(R.id.idDriver);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     if (isChecked) {
                         Log.d("MainActivity", "kaki");
@@ -66,17 +70,7 @@ public class MainActivity extends AppCompatActivity {
             String username = usernameObj.getText().toString();
             String password = passwordObj.getText().toString();
 
-            // Print or use the variable
-            Log.d("MainActivity", "Entered Text: " + username + "|" + password);
-
-            String url = "http://" + ip + ":" + port + "/passenger/login";
-            String base = "http://" + ip + ":" + port;
-
-            String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-            Log.d("MainActivity", jsonBody);
-
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
-            Networks.httpPostReq(url, jsonBody);
+            serverAPI.login("username", "password");
         });
 
 
