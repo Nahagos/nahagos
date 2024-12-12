@@ -2,24 +2,26 @@ package com.nahagos.nahagos.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import org.jetbrains.annotations.NotNull;
 
 public class Tables {
-
-    /**
-     * stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, location_type, parent_station, zone_id
-     */
     @Entity
-    public static class Stops{
+    public static class Stops {
+        @PrimaryKey
         @ColumnInfo(name = "stop_id")
         public int stopId;
 
         @ColumnInfo(name = "stop_code")
-        public String stopCode;
+        public int stopCode;
 
         @ColumnInfo(name = "stop_name")
+        @NotNull
         public String stopName;
 
         @ColumnInfo(name = "stop_desc")
+        @NotNull
         public String stopDesc;
 
         @ColumnInfo(name = "stop_lat")
@@ -29,12 +31,18 @@ public class Tables {
         public double stopLon;
 
         @ColumnInfo(name = "location_type")
-        public int locationType;
+        public boolean is_central;
 
         @ColumnInfo(name = "parent_station")
-        public String parentStation;
+        public Integer parentStation;
 
         @ColumnInfo(name = "zone_id")
-        public String zoneId;
+        public int zoneId;
+
+        public Stops() {
+            stopName = "";
+            stopDesc = "";
+        }
     }
 }
+

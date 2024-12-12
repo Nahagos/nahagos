@@ -11,10 +11,15 @@ import androidx.room.RoomDatabase;
 import java.util.List;
 
 public class DBManager {
-    AppDatabase db;
-    StopsDao stopsDao;
-
     private static DBManager instance;
+    AppDatabase db;
+
+    private DBManager(android.content.Context context) {
+        db = Room.databaseBuilder(context,
+                        AppDatabase.class, "gtfs")
+                .createFromAsset("gtfs.db")
+                .build();
+    }
 
     public static DBManager getInstance(android.content.Context context) {
         if (instance == null) {
@@ -23,16 +28,10 @@ public class DBManager {
         return instance;
     }
 
-    private DBManager(android.content.Context context) {
-        db = Room.databaseBuilder(context,
-                AppDatabase.class, "db").build();
-        stopsDao = db.stopsDao();
+    public StopsDao stopsDao() {
+        return db.stopsDao();
     }
 
-    @Database(entities = {Tables.Stops.class}, version = 1)
-    public abstract static class AppDatabase extends RoomDatabase {
-        public abstract StopsDao stopsDao();
-    }
 
     @Dao
     public interface StopsDao {
@@ -53,5 +52,10 @@ public class DBManager {
 
         @Delete
         void delete(Tables.Stops stop);
+    }
+
+    @Database(entities = {Tables.Stops.class}, version = 1)
+    public abstract static class AppDatabase extends RoomDatabase {
+        public abstract StopsDao stopsDao();
     }
 }
