@@ -35,13 +35,17 @@ import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean isCheckedGlobal = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        TextView titleText = findViewById(R.id.welcomeText);
 
+        ServerAPI serverAPI = new ServerAPI(this);
+        setContentView(R.layout.activity_main);
+
+
+        TextView titleText = findViewById(R.id.welcomeText);
         titleText.setText("Welcome to Nahagos!");
         ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
         imgPoint.setX(-7);
@@ -50,27 +54,39 @@ public class MainActivity extends AppCompatActivity {
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
 
-        ServerAPI serverAPI = new ServerAPI(this);
 
-        EditText driverId = findViewById(R.id.idDriver);
+
+        EditText driverIdObj = findViewById(R.id.idDriver);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
+
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    isCheckedGlobal = isChecked;
                     if (isChecked) {
                         Log.d("MainActivity", "kaki");
-                        driverId.setVisibility(TextView.VISIBLE);
+                        driverIdObj.setVisibility(TextView.VISIBLE);
                     }
                     else{
-                        driverId.setVisibility(TextView.GONE);
+                        driverIdObj.setVisibility(TextView.GONE);
                     }
                 });
+
         Button button = findViewById(R.id.loginButton); // Ensure a button exists in your layout
         button.setOnClickListener(v -> {
             // Get the text from EditText
-            String username = usernameObj.getText().toString();
-            String password = passwordObj.getText().toString();
-
-            serverAPI.login("username", "password");
+            String username  = usernameObj.getText().toString();
+            String password  = passwordObj.getText().toString();
+            String driverId  =  driverIdObj.getText().toString();
+            if (username != null && password != null) {
+                Log.d("MainActivity","not null");
+                Log.d("MainActivity", Boolean.toString(isCheckedGlobal));
+                if (!isCheckedGlobal) {
+                    serverAPI.passengerLogin(username, password);
+                    Log.d("MainActivity","login");
+                }
+                else
+                    serverAPI.driverLogin(username, password, driverId);
+            }
         });
 
 
