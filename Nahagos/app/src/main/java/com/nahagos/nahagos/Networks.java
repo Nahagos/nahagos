@@ -11,6 +11,7 @@ import java.net.URL;
 public class Networks {
     private static final String TAG = "HTTP";
 
+
     // Helper method to set up a connection
     private static HttpURLConnection setupConnection(String urlString, String method) throws Exception {
         URL url = new URL(urlString);
@@ -21,7 +22,7 @@ public class Networks {
 
         if ("POST".equalsIgnoreCase(method)) {
             connection.setDoOutput(true); // Enable output for POST
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "application/json");
         }
 
         return connection;

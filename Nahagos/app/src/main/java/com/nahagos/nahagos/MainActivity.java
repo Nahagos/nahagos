@@ -24,6 +24,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.widget.TextView;
+import org.json.JSONObject;
+import android.widget.CheckBox;
 import okhttp3.*;
 import com.nahagos.nahagos.R;
 
@@ -45,8 +47,19 @@ public class MainActivity extends AppCompatActivity {
         EditText passwordObj = findViewById(R.id.passwordField);
 
         int port = 8000;
-        String ip = "172.20.10.5";
+        String ip = getString(R.string.server_ip);
 
+        EditText driverId = findViewById(R.id.idDriver);
+        CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
+        isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (isChecked) {
+                        Log.d("MainActivity", "kaki");
+                        driverId.setVisibility(TextView.VISIBLE);
+                    }
+                    else{
+                        driverId.setVisibility(TextView.GONE);
+                    }
+                });
         Button button = findViewById(R.id.loginButton); // Ensure a button exists in your layout
         button.setOnClickListener(v -> {
             // Get the text from EditText
@@ -56,10 +69,11 @@ public class MainActivity extends AppCompatActivity {
             // Print or use the variable
             Log.d("MainActivity", "Entered Text: " + username + "|" + password);
 
-            String url = "http://" + ip + ":" + port + "/login:";
+            String url = "http://" + ip + ":" + port + "/passenger/login";
             String base = "http://" + ip + ":" + port;
-            String jsonBody = "{\"name\": " + username + ", \"password\":" + password + "}";
 
+            String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
+            Log.d("MainActivity", jsonBody);
 
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
             Networks.httpPostReq(url, jsonBody);

@@ -10,9 +10,9 @@
     <!-- LinearLayout inside ConstraintLayout -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
-        android:background="@color/pink"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/pink"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,44 +27,48 @@
             android:id="@+id/welcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="232dp"
+            android:layout_marginBottom="236dp"
             android:text="Welcome to Nahagos!"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/usernameField"
             app:layout_constraintEnd_toEndOf="@+id/usernameField"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.646"
             app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
             android:id="@+id/usernameField"
-            android:layout_width="0dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="325dp"
+            android:layout_marginTop="324dp"
             android:hint="Enter Username"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/passwordField"
+            app:layout_constraintHorizontal_bias="0.469"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/passwordField"
-            android:layout_width="0dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Enter Password"
             android:inputType="textPassword"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/loginButton"
+            app:layout_constraintHorizontal_bias="0.468"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/usernameField" />
 
         <Button
             android:id="@+id/loginButton"
-            android:layout_width="379dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="72dp"
             android:text="Login"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/passwordField" />
 
         <ImageView
@@ -74,6 +78,31 @@
             app:srcCompat="@mipmap/ic_launcher"
             tools:layout_editor_absoluteX="-7dp"
             tools:layout_editor_absoluteY="121dp" />
+
+        <CheckBox
+            android:id="@+id/checkBoxIsDriver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="220dp"
+            android:text="driver?"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordField" />
+
+        <EditText
+            android:id="@+id/idDriver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+
+            android:hint="Enter driver id"
+            android:inputType="number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/passwordField" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
