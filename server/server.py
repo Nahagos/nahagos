@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Response, Depends, Cookie
 from pydantic import BaseModel
 from datetime import datetime
 import uuid
+from db import Database
 
 app = FastAPI()
 class Station(BaseModel):
@@ -23,6 +24,8 @@ connected_users = {}
 connected_drivers = {}
 
 registered_trips = {}
+
+db = Database("db.sql")
 
 @app.get("/")
 def root():
