@@ -27,6 +27,7 @@ registered_trips = {}
 
 db = Database("db.sql")
 
+
 @app.get("/")
 def root():
     return {"message": "Server Is Legit, V1.0.0"}
@@ -86,8 +87,7 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_mi
         raise HTTPException(status_code=401, detail="No Nahagos!")
 
     
-    raise HTTPException(status_code=401, detail="Stop is not in this lines route")
-    
+    raise HTTPException(status_code=401, detail="Stop is not in this lines route") 
 
 
 @app.post("/driver/drive/register/")
@@ -171,19 +171,13 @@ def passenger_login(request: PassengerRequest, response: Response):
     username = request.username
     password = request.password
 
-    # Uncomment the following code for actual login logic
-    # if db.login_passenger(username, password):
-    #     session_id = str(uuid.uuid4())
-    #     connected_drivers[session_id] = {"username": username}
-    #     response.set_cookie(key="session_id", value=session_id, httponly=True)
-    #     return {"message": "Login successful"}
-    # else:
-    #     raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    session_id = str(uuid.uuid4())
-    response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)
-    return {"message": "Login successful"}
-
+    if db.login_passenger(username, password):
+        session_id = str(uuid.uuid4())
+        connected_drivers[session_id] = {"username": username}
+        response.set_cookie(key="session_id", value=session_id, httponly=True)
+        return {"message": "Login successful"}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 @app.post("/passenger/signup/")
