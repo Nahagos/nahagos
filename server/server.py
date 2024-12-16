@@ -113,13 +113,23 @@ def update_station_list(last_updated_date: str):
     """
     Check whether or not the station list is up to date, and if not sending changes
     """
+    try:
+        # Validate date format
+        try:
+            last_updated_date = datetime.strptime(last_updated_date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
 
-     # TODO: Compare last_updated_date to last date the station list was updated
-    up_to_date = True
-    if up_to_date: 
-        return {"status": "Up to date"}
-    else: 
-        return {"status": "Not up to date", "changes": []}
+        # Query the database to check for diffs since the last_updated_date
+        diffs = db.get_diffs_since_date(last_updated_date)  # Custom function to fetch diffs
+
+        if not diffs:  # If no diffs are found, the station list is up-to-date
+            return {"status": "Up to date"}
+
+        return {"status": "Not up to date", "changes": diffs}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
 @app.post("/driver/login/")
