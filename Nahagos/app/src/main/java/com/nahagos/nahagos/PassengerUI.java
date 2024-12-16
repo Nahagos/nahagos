@@ -2,7 +2,6 @@ package com.nahagos.nahagos;
 
 import androidx.fragment.app.FragmentActivity;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -72,12 +71,12 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         search = findViewById(R.id.search);
         search.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                // Make search list visible or not based on whether the user is typing
                 suggestionList.setVisibility(hasFocus ? View.VISIBLE : View.INVISIBLE);
             }
         });
@@ -89,13 +88,9 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                ArrayList<Integer> stop_ids = new ArrayList<>();
-                try {
-                    stop_ids = searchStations(newText);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-
+                // If the length of the query is less than 2 there are too many stored stations to be searched.
+                // So it is better to just search all over again in the array from the JSON.
+                // Otherwise, search for q in all of the last searched objects, for optimization.
                 if (newText.length() > 2 && !_last_search_res.isEmpty() && _last_search_res.get(0).second.contains(newText.substring(0,newText.length()-1))) {
                     for (int j = 0; j < _last_search_res.size(); j++) {
                         if (!_last_search_res.get(j).second.contains(newText)) {
@@ -105,17 +100,15 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                 }
                 else {
                     _last_search_res.clear();
-                    for (int i = 0; i < stop_ids.size(); i++) {
-                        try {
-                            _last_search_res.add(new SearchStopResult(stop_ids.get(i), _stops.getJSONObject(stop_ids.get(i)).getString("stop_name")));
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
+                    try {
+                        _last_search_res = searchStations(newText);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
                 }
-
+                // This is the part of the code where we update the list of suggestions, based on the search results
                 ArrayAdapter<SearchStopResult> adapter;
-                if (stop_ids.isEmpty()) {
+                if (_last_search_res.isEmpty()) {
                     _last_search_res.add(new SearchStopResult(-1, "לא נמצאה תחנה מתאימה"));
                     adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
                     suggestionList.setAdapter(adapter);
@@ -128,6 +121,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
+        // When a list item (i.e. search result) is clicked, move to its place.
         suggestionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -144,16 +138,23 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         });
     }
 
-    ArrayList<Integer> searchStations(String q) throws JSONException {
-        ArrayList<Integer> out = new ArrayList<Integer>();
+    /*
+        The function searches for stations that have the q in their name, and returns their index in the list.
+    */
+    ArrayList<SearchStopResult> searchStations(String q) throws JSONException {
+        ArrayList<SearchStopResult> out = new ArrayList<>();
         for (int i = 0; i < _stops.length(); i++) {
             if (_stops.getJSONObject(i).getString("stop_name").contains(q)) {
-                out.add(i);
+                out.add(new SearchStopResult(i, _stops.getJSONObject(i).getString("stop_name")));
             }
         }
         return out;
     }
 
+    /*
+        The function gets the stops from the json file, and returns JSONArray of them.
+        To be changed, for SQL-suitable objects
+    */
     private JSONArray getStops() throws IOException, JSONException {
         BufferedReader reader =new BufferedReader(new InputStreamReader(getAssets().open("stops.json")));
         StringBuilder output = new StringBuilder();
@@ -164,20 +165,30 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         return new JSONArray(output.toString());
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         LatLng startingPoint = null;
 
+        // TODO: find passenger's GPS location and move to it
+
         if (startingPoint == null)
             startingPoint = ISRAEL;
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
         mMap.setOnCameraMoveListener(() -> {
+            /* if moved, you need to show the markers that are in the view.
+             how the algorithm works:
+             there is a list of stopmarkers, those are the markers that we show right now.
+             every time the screen moves, if the markers are not in range, delete them from the map (and our list)
+             then, if the zoom is big enough - search for stops that are in range of the screen, add to the list, and show them.
+             */
             CameraPosition pos = mMap.getCameraPosition();
             double lat = pos.target.latitude, lon = pos.target.longitude;
+            // That's the part that turns zoom level to latlon-matching size in map.
             double zoomRadius = Math.pow(2, 8 - pos.zoom);
+            // Search for markers that are shown in the map and not in range, and remove them.
             for (int i = 0; i < _stopMarkers.size(); i++) {
                 LatLng markerPos = _stopMarkers.get(i).getPosition();
                 if (Math.abs(lon-markerPos.longitude) >= zoomRadius || Math.abs(lat-markerPos.latitude) >= zoomRadius*H_TO_W_RATIO) {
@@ -185,10 +196,11 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                     _stopMarkers.remove(i);
                 }
             }
+            // if the zoom is big enough, search for stops that are in range, and show them on the map
             if (pos.zoom >= ZOOM_SHOW_STOPS) {
                 for (int i = 0; i < _stops.length(); i++) {
                     try {
-                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("stop_lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("stop_lat")) < zoomRadius)
+                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("stop_lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("stop_lat")) < zoomRadius*H_TO_W_RATIO)
                             _stopMarkers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(_stops.getJSONObject(i).getDouble("stop_lat"), _stops.getJSONObject(i).getDouble("stop_lon")))));
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
