@@ -80,13 +80,13 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str):
 
 
 @app.post("/driver/drive/")
-def register_for_line(trip_id: int, session_id: str = Cookie("cookies_and_milk")):
+def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     """
     Register a driver for a specific line
     """
     # TODO: change the status of nahagos in this specific line and fix checks for validation of line
 
-    driver = connected_drivers.get(session_id)
+    driver = connected_drivers.get(cookies_and_milk)
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
     if not db.check_schedule(trip_id):
@@ -109,7 +109,7 @@ def delete_drive(user_id: str, line_id: str, dep_time: str):
 
 
 @app.get("/update-station-list/{last_updated_date}")
-def update_station_list(last_updated_date: str):
+def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(None)):
     """
     Check whether or not the station list is up to date, and if not sending changes
     """
@@ -189,11 +189,11 @@ def passenger_signup(request: PassengerRequest, response: Response):
 
 
 @app.get("/driver/schedule")
-def get_driver_schedule(session_id: str = Cookie("cookies_and_milk")):
+def get_driver_schedule(cookies_and_milk: str = Cookie(None)):
     """
     Get daily schedule of driver
     """
-    driver = connected_drivers.get(session_id)
+    driver = connected_drivers.get(cookies_and_milk)
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
     return db.get_driver_schedule(driver)
