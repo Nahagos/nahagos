@@ -48,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText driverIdObj = findViewById(R.id.idDriver);
+        TextView emptyFields = findViewById(R.id.emptyFields_id);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
+
 
         // safe mode for networking in android
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
@@ -56,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     isCheckedGlobal = isChecked;
                     if (isChecked) {
-                        Log.d("MainActivity", "kaki");
                         driverIdObj.setVisibility(TextView.VISIBLE);
                     }
                     else{
@@ -67,20 +68,32 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.loginButton);
         button.setOnClickListener(v -> {
 
-            String username  = usernameObj.getText().toString();
-            String password  = passwordObj.getText().toString();
-            String driverId  =  driverIdObj.getText().toString();
+            String username  = usernameObj.getText().toString().trim();
+            String password  = passwordObj.getText().toString().trim();
+            String driverId  = driverIdObj.getText().toString().trim();
 
-            if (username != null && password != null) {
-                Log.d("MainActivity","not null");
+            if (!username.isEmpty() && !password.isEmpty()) {
+                Log.d("MainActivity", "not null");
                 Log.d("MainActivity", Boolean.toString(isCheckedGlobal));
+                emptyFields.setVisibility(TextView.GONE);
 
-                if (!isCheckedGlobal) {
-                    serverAPI.passengerLogin(username, password);
-                    Log.d("MainActivity","login");
+                if (isCheckedGlobal) {
+                    if (!driverId.isEmpty()) {
+                        emptyFields.setVisibility(TextView.GONE);
+                        serverAPI.driverLogin(username, password, driverId);
+                        Log.d("MainActivity", "login");
+                    }
+                    else {
+                        emptyFields.setVisibility(TextView.VISIBLE);
+                    }
                 }
-                else
-                    serverAPI.driverLogin(username, password, driverId);
+                else {
+                    emptyFields.setVisibility(TextView.GONE);
+                    serverAPI.passengerLogin(username, password);
+                }
+            }
+            else {
+                emptyFields.setVisibility(TextView.VISIBLE);
             }
         });
 

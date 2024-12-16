@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <!-- LinearLayout inside ConstraintLayout -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
@@ -104,6 +105,19 @@
             app:layout_constraintStart_toStartOf="parent"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/passwordField" />
+
+        <TextView
+            android:id="@+id/emptyFields_id"
+            android:layout_width="159dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="160dp"
+            android:text="make sure you fill all of your fields ಥ_ಥ"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+            app:layout_constraintStart_toStartOf="@+id/welcomeText" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
