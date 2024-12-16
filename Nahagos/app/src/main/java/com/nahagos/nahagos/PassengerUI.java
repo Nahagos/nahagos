@@ -2,6 +2,7 @@ package com.nahagos.nahagos;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.LocationRequest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +29,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+// GPS location imports
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
 
 
@@ -53,6 +59,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         binding = ActivityPassengerUiBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -170,7 +178,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         mMap = googleMap;
         LatLng startingPoint = null;
 
-        // TODO: find passenger's GPS location and move to it
+        LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+        Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (startingPoint == null)
             startingPoint = ISRAEL;
