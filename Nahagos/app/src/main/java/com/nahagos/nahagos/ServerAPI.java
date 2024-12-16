@@ -16,12 +16,10 @@ public class ServerAPI {
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
         Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody);
-
     }
     public void driverLogin(String username, String password, String id)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\","+"\"id\":\""+id+"\"}";
         Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody);
-
     }
 }

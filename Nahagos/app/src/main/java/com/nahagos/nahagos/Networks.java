@@ -53,6 +53,7 @@ public class Networks {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = readResponse(connection);
+
                 Log.d(TAG, "Response: " + response);
             }
         } catch (Exception e) {

@@ -26,7 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 import android.widget.TextView;
 import org.json.JSONObject;
 import android.widget.CheckBox;
-import okhttp3.*;
+import org.json.JSONException;
 import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.ServerAPI;
 import android.content.Context;
