@@ -44,10 +44,14 @@ def get_lines_starting(station_id: int):
 
 
 @app.get("/lines-by-station/{stop_id}")
-def get_real_time_lines(stop_id: int):
+def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     """
     Retrives real-time arriving times at given station
-    """   
+    """  
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
     try:
         return db.get_lines_by_station(stop_id)
     except Exception as e:
@@ -67,10 +71,14 @@ def update_arrival_time(station_id: int, bus_id: int):
 
 
 @app.post("/passenger/wait-for/")
-def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str):
+def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_milk:str = Cookie(None)):
     """
     Log that a passenger is waiting for a specific bus at a given station.
     """
+     # Validate user session
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
     if db.check_stop_on_trip(stop_id, trip_id):
         if registered_trips[trip_id] is not None:
             registered_trips[trip_id][1].appdend(stop_id)
@@ -82,7 +90,7 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str):
     
 
 
-@app.post("/driver/drive/")
+@app.post("/driver/drive/register/")
 def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     """
     Register a driver for a specific line
@@ -100,7 +108,7 @@ def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     return {"message": "Line registered successfully"}
 
 
-@app.delete("/driver/drive")
+@app.delete("/driver/drive/delete/")
 def delete_drive(user_id: str, line_id: str, dep_time: str):
     """
     Delete a drive 
@@ -117,6 +125,10 @@ def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(N
     Check whether or not the station list is up to date, and if not sending changes
     """
     try:
+        # Validate user session
+        if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+            raise HTTPException(status_code=401, detail="User not authenticated")
+        
         # Validate date format
         try:
             last_updated_date = datetime.strptime(last_updated_date, "%Y-%m-%d")
