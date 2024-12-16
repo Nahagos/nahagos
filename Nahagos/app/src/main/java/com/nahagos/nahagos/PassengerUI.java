@@ -3,6 +3,7 @@ package com.nahagos.nahagos;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.LocationRequest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +30,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+<<<<<<< HEAD
 public class PassengerUI extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+=======
+// GPS location imports
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
+public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
+>>>>>>> 2bb63f7 (Added GPS coordiants extractor)
 
 
     private GoogleMap mMap;
@@ -54,6 +64,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         binding = ActivityPassengerUiBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -173,7 +185,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
 
         LatLng startingPoint = null;
 
-        // TODO: find passenger's GPS location and move to it
+        LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+        Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (startingPoint == null)
             startingPoint = ISRAEL;
