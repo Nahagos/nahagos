@@ -1,6 +1,7 @@
 import sqlite3
 import hashlib
 from datetime import datetime
+import zipfile
 
 class Database:
     def __init__(self, db_name):
@@ -9,13 +10,16 @@ class Database:
         self.initialize_db(r"C:\Users\Epsilon\Downloads\israel-public-transportation.zip")
 
     def initialize_db(self, zip_path):
-        db.cursor.execute(
+        self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS passangers (
                 username TEXT NOT NULL PRIMARY KEY,
                 password TEXT NOT NULL
             );
-
+            """
+        )
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS drivers (
                 username TEXT NOT NULL,
                 password TEXT NOT NULL,
@@ -23,7 +27,11 @@ class Database:
                 name TEXT NOT NULL,
                 license_plate TEXT NOT NULL
             );
+            """
+        )
 
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS stops (
                 stop_desc TEXT PRIMARY KEY,
                 stop_name TEXT NOT NULL,
@@ -82,12 +90,12 @@ class Database:
         user = self.cursor.fetchone()
         return user is not None
 
-    def login_driver(self, username, password, driver_id)
+    def login_driver(self, username, password, driver_id):
         self.cursor.execute("SELECT * FROM drivers WHERE username = ? AND password = ? AND driver_id = ?", (username, hashlib.sha256(password.encode()), driver_id))
         user = self.cursor.fetchone()
         return user is not None
 
-    def check_line_day(route_id)
+    def check_line_day(self, route_id):
         self.cursor.execute("SELECT service_id FROM trips WHERE route_id = ?",(route_id,))
         service_id = self.cursor.fetchone()
         if not service_id:
@@ -97,21 +105,20 @@ class Database:
         service_id = self.cursor.fetchone()
         return service_id[0] == '1' 
 
-    def lines_from_station(stop_id):
+    def lines_from_station(self, stop_id):
         lines = []
         self.cursor.execute("SELECT trip_id, departure_time from stop_times where stop_id=? and departure_time < strftime('%H:%M:%S', 'now')", (stop_id,))
         trips = self.cursor.fetchall()
         for trip in trips:
             self.cursor.execute("SELECT service_id, route_id WHERE trip_id = ?", (trip[0],))
             route_details = self.cursor.fetchall()
-            line.appand(trip[0], trip[1], )
+            line.appand(trip[0], trip[1], route_details[0], route_details[1])
 
         
         
 
 if __name__ == "__main__":
     db = Database("users.db")
-    check_line_day('')
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
     db.close()
