@@ -96,6 +96,17 @@ class Database:
         self.cursor.execute("SELECT ? FROM calander WHERE service_id = ?",(current_day_name, service_id))
         service_id = self.cursor.fetchone()
         return service_id[0] == '1' 
+
+    def lines_from_station(stop_id):
+        lines = []
+        self.cursor.execute("SELECT trip_id, departure_time from stop_times where stop_id=? and departure_time < strftime('%H:%M:%S', 'now')", (stop_id,))
+        trips = self.cursor.fetchall()
+        for trip in trips:
+            self.cursor.execute("SELECT service_id, route_id WHERE trip_id = ?", (trip[0],))
+            route_details = self.cursor.fetchall()
+            line.appand(trip[0], trip[1], )
+
+        
         
 
 if __name__ == "__main__":
