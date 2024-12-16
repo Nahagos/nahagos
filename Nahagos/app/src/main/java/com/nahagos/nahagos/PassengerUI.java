@@ -1,5 +1,6 @@
 package com.nahagos.nahagos;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
@@ -28,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
+public class PassengerUI extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
 
     private GoogleMap mMap;
@@ -168,6 +169,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
+
         LatLng startingPoint = null;
 
         // TODO: find passenger's GPS location and move to it
@@ -200,8 +203,12 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
             if (pos.zoom >= ZOOM_SHOW_STOPS) {
                 for (int i = 0; i < _stops.length(); i++) {
                     try {
-                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("stop_lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("stop_lat")) < zoomRadius*H_TO_W_RATIO)
-                            _stopMarkers.add(mMap.addMarker(new MarkerOptions().position(new LatLng(_stops.getJSONObject(i).getDouble("stop_lat"), _stops.getJSONObject(i).getDouble("stop_lon")))));
+                        if (Math.abs(lon-_stops.getJSONObject(i).getDouble("stop_lon")) < zoomRadius && Math.abs(lat-_stops.getJSONObject(i).getDouble("stop_lat")) < zoomRadius*H_TO_W_RATIO) {
+                            _stopMarkers.add(mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(_stops.getJSONObject(i).getDouble("stop_lat"), _stops.getJSONObject(i).getDouble("stop_lon")))
+                                    .title(_stops.getJSONObject(i).getString("stop_name") + " | " + _stops.getJSONObject(i).getString("stop_code"))));
+
+                        }
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -210,4 +217,10 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         });
     }
 
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        // TODO: show lines arriving/planned for selected station.
+        return false;
+    }
 }
