@@ -15,7 +15,7 @@ class PassengerRequest(BaseModel):
     password: str
 
 class DriverLogin(BaseModel):
-
+    id: int
     username: str
     password: str
 
@@ -50,11 +50,12 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     Retrives real-time arriving times at given station
     """  
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+    if not cookies_and_milk:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     try:
-        return db.get_lines_by_station(stop_id)
+        list_lines = db.get_lines_by_station(stop_id)
+        return 
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -174,7 +175,7 @@ def passenger_login(request: PassengerRequest, response: Response):
     if db.login_passenger(username, password):
         session_id = str(uuid.uuid4())
         connected_drivers[session_id] = {"username": username}
-        response.set_cookie(key="session_id", value=session_id, httponly=True)
+        response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)
         return {"message": "Login successful"}
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")

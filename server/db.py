@@ -6,9 +6,10 @@ import os
 
 class Database:
     def __init__(self, db_name):
+        cool = not os.path.exists('db.sql')
         self.connection = sqlite3.connect(db_name)
         self.cursor = self.connection.cursor()
-        if not os.path.exists('users.db'):
+        if cool:
             self.initialize_db(r"C:\Users\Epsilon\Downloads\israel-public-transportation.zip")
         
     def parse_file(self, path, file_name):
@@ -45,7 +46,7 @@ class Database:
     def initialize_db(self, zip_path):
         self.cursor.execute(
             """
-            CREATE TABLE IF NOT EXISTS passangers (
+            CREATE TABLE IF NOT EXISTS passengers (
                 username TEXT NOT NULL PRIMARY KEY,
                 password TEXT NOT NULL
             );
@@ -56,12 +57,28 @@ class Database:
             CREATE TABLE IF NOT EXISTS drivers (
                 username TEXT NOT NULL,
                 password TEXT NOT NULL,
-                driver_id TEXT NOT NULL PRIMARY KEY,
+                driver_id INTEGER NOT NULL PRIMARY KEY,
                 name TEXT NOT NULL,
                 license_plate TEXT NOT NULL
             );
             """
         )
+
+       # Insert data into passengers table
+        self.cursor.execute("INSERT INTO passengers (username, password) VALUES (?, ?)", ("user1", hashlib.sha256("passwod123".encode()).hexdigest()))
+
+        # Insert data into drivers table
+        self.cursor.execute(
+            """
+            INSERT INTO drivers (username, password, driver_id, name, license_plate)
+            VALUES 
+                ('driver01', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', 'D001', 'Alice Johnson', 'ABC1234'),
+                ('driver02', '""" +  hashlib.sha256("passwod123".encode()).hexdigest()+ """', 'D002', 'Chris Lee', 'XYZ5678'),
+                ('driver03', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', 'D003', 'Maria Davis', 'LMN3456');
+            """
+        )
+
+
 
         dir_path = zip_path.replace(".zip", "\\")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -88,39 +105,54 @@ class Database:
 
         # Save (commit) the changes
         self.connection.commit()
+        self.close()
         
     def close(self):
         self.connection.close()
+    
+    def open(self):
+        self.connection = sqlite3.connect('db.sql')
+        self.cursor = self.connection.cursor()
 
-    def signup_passanger(self, username, password):
+    def signup_passenger(self, username, password):
         try:
-            self.cursor.execute("INSERT INTO passangers (username, password) VALUES (?, ?)", (username, hashlib.sha256(password.encode())))
+            self.open()
+            self.cursor.execute("INSERT INTO passengers (username, password) VALUES (?, ?)", (username, hashlib.sha256(password.encode()).hexdigest()))
             self.connection.commit()
+            self.close()
             return True
         except sqlite3.IntegrityError:
+            self.close()
             return False
 
-    def login_passanger(self, username, password):
-        self.cursor.execute("SELECT * FROM passangers WHERE username = ? AND password = ?", (username, hashlib.sha256(password.encode())))
+    def login_passenger(self, username, password):
+        self.open()
+        self.cursor.execute("SELECT * FROM passengers WHERE username = ? AND password = ?", (username, hashlib.sha256(password.encode()).hexdigest()))
         user = self.cursor.fetchone()
+        self.close()
         return user is not None
 
     def login_driver(self, username, password, driver_id):
-        self.cursor.execute("SELECT * FROM drivers WHERE username = ? AND password = ? AND driver_id = ?", (username, hashlib.sha256(password.encode()), driver_id))
+        self.open()
+        self.cursor.execute("SELECT * FROM drivers WHERE username = ? AND password = ? AND driver_id = ?", (username, hashlib.sha256(password.encode()).hexdigest(), driver_id))
         user = self.cursor.fetchone()
+        self.close()
         return user is not None
 
     def check_line_day(self, route_id):
+        self.open()
         self.cursor.execute("SELECT service_id FROM trips WHERE route_id = ?",(route_id,))
         service_id = self.cursor.fetchone()
         if not service_id:
+            self.close()
             return False                        # Wrong route_id
         current_day_name = datetime.now().strftime('%A').lower()
         self.cursor.execute("SELECT ? FROM calander WHERE service_id = ?",(current_day_name, service_id))
         service_id = self.cursor.fetchone()
+        self.close()
         return service_id[0] == '1' 
 
-    def lines_from_station(self, stop_id):
+    def get_lines_by_station(self, stop_id):
         # Get current day and hour
         now = datetime.now()
         current_day = now.weekday()  # Monday is 0, Sunday is 6
