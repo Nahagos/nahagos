@@ -3,6 +3,13 @@ package com.nahagos.nahagos;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.FusedLocationProviderClient;
 
 import android.location.LocationRequest;
 import android.os.Build;
@@ -182,7 +189,33 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this);
 
         LatLng startingPoint = null;
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new
+                    String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        FusedLocationProviderClient fusedLocationProviderClient = fusedLocationProviderClient =     LocationServices.getFusedLocationProviderClient(this);;
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    // Get the location
+                    Location location = task.getResult();
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                }
+            }
+            });
 
+
+
+            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
         //LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
         //Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
