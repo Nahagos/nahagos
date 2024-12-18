@@ -8,6 +8,8 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnSuccessListener;
+import android.util.Log;
+
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -19,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -61,7 +64,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
     private final double H_TO_W_RATIO = 3;
 
     private ArrayList<Marker> _stopMarkers;
-    private LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);;
+    private LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
     private final float START_ZOOM = 8F;
     private final float STOP_ZOOM = 15.5F;
 
@@ -209,7 +212,13 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
                     Location location = task.getResult();
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
+                    Log.d("PassengerUI",
+                            "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
                 }
+                else{
+                    Log.d("PassengerUI", "kakai");
+                }
+
             }
             });
 
