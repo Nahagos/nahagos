@@ -1,9 +1,11 @@
 package com.nahagos.nahagos;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
 import android.location.LocationRequest;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,6 +63,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     private final float START_ZOOM = 8F;
     private final float STOP_ZOOM = 15.5F;
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,8 +188,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
         LatLng startingPoint = null;
 
-        LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-        Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+        //Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (startingPoint == null)
             startingPoint = ISRAEL;
