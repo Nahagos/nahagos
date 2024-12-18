@@ -69,8 +69,9 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     private final double H_TO_W_RATIO = 3;
 
     private ArrayList<Marker> _stopMarkers;
+    public LatLng startingPoint = null;
     private LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
-    private final float START_ZOOM = 8F;
+    private final float START_ZOOM = 15.5F;
     private final float STOP_ZOOM = 15.5F;
 
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
@@ -196,7 +197,6 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
 
-        LatLng startingPoint = null;
         if (ActivityCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED &&
@@ -217,11 +217,14 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                     Location location = task.getResult();
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
+                    LatLng local_gps = new LatLng(30.974998182290868, 34.69264616803752);
+                    startingPoint = local_gps;
                     Log.d("PassengerUI",
                             "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
                 }
                 else{
                     Log.d("PassengerUI", "kakai");
+                    startingPoint = ISRAEL;
                 }
 
             }
