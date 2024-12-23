@@ -72,9 +72,9 @@ class Database:
             """
             INSERT INTO drivers (username, password, driver_id, name, license_plate)
             VALUES 
-                ('driver01', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', 'D001', 'Alice Johnson', 'ABC1234'),
-                ('driver02', '""" +  hashlib.sha256("passwod123".encode()).hexdigest()+ """', 'D002', 'Chris Lee', 'XYZ5678'),
-                ('driver03', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', 'D003', 'Maria Davis', 'LMN3456');
+                ('driver01', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '6151181', 'Alice Johnson', 'ABC1234'),
+                ('driver02', '""" +  hashlib.sha256("passwod123".encode()).hexdigest()+ """', '1455184', 'Chris Lee', 'XYZ5678'),
+                ('driver03', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '1522484', 'Maria Davis', 'LMN3456');
             """
         )
 
@@ -153,6 +153,7 @@ class Database:
         return service_id[0] == '1' 
 
     def get_lines_by_station(self, stop_id):
+        self.open()
         # Get current day and hour
         now = datetime.now()
         current_day = now.weekday()  # Monday is 0, Sunday is 6
@@ -183,7 +184,9 @@ class Database:
                             AND departure_time > "{current_time}" 
                             AND {day_column} = 1
                             """)
-        return self.cursor.fetchall()
+        lines = self.cursor.fetchall()
+        self.close()
+        return lines    
     
     def check_stop_on_trip(self, trip_id, stop_id):
         self.cursor.execute(f"""

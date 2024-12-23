@@ -50,7 +50,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     Retrives real-time arriving times at given station
     """  
     # validate user
-    if not cookies_and_milk:
+    if not cookies_and_milk or cookies_and_milk not in connected_users:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     try:
@@ -78,7 +78,7 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_mi
     Log that a passenger is waiting for a specific bus at a given station.
     """
      # Validate user session
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+    if not cookies_and_milk or cookies_and_milk not in connected_users:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     if db.check_stop_on_trip(trip_id, stop_id):
@@ -174,7 +174,7 @@ def passenger_login(request: PassengerRequest, response: Response):
 
     if db.login_passenger(username, password):
         session_id = str(uuid.uuid4())
-        connected_drivers[session_id] = {"username": username}
+        connected_users[session_id] = {"username": username}
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)
         return {"message": "Login successful"}
     else:
@@ -190,7 +190,7 @@ def passenger_signup(request: PassengerRequest, response: Response):
     password = request.password
     if db.signup_passenger(username, password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = {"username": username}
+        connected_users[session_id] = {"username": username}
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
     else:
