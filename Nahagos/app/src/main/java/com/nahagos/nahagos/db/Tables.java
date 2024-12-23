@@ -7,31 +7,31 @@ import androidx.room.PrimaryKey;
 import org.jetbrains.annotations.NotNull;
 
 public class Tables {
-    @Entity
-    public static class Stops {
+    @Entity(tableName = "stops")
+    public static class Stop {
         @PrimaryKey
         @ColumnInfo(name = "stop_id")
-        public int stopId;
+        public int id;
 
         @ColumnInfo(name = "stop_code")
-        public int stopCode;
+        public int code;
 
         @ColumnInfo(name = "stop_name")
         @NotNull
-        public String stopName;
+        public String name;
 
         @ColumnInfo(name = "stop_desc")
         @NotNull
-        public String stopDesc;
+        public String description;
 
         @ColumnInfo(name = "stop_lat")
-        public double stopLat;
+        public double lat;
 
         @ColumnInfo(name = "stop_lon")
-        public double stopLon;
+        public double lon;
 
         @ColumnInfo(name = "location_type")
-        public boolean is_central;
+        public boolean isCentral;
 
         @ColumnInfo(name = "parent_station")
         public Integer parentStation;
@@ -39,9 +39,9 @@ public class Tables {
         @ColumnInfo(name = "zone_id")
         public int zoneId;
 
-        public Stops() {
-            stopName = "";
-            stopDesc = "";
+        public Stop() {
+            name = "";
+            description = "";
         }
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DBManager {
     private static DBManager instance;
-    AppDatabase db;
+    private final AppDatabase db;
 
     private DBManager(android.content.Context context) {
         db = Room.databaseBuilder(context,
@@ -36,25 +36,25 @@ public class DBManager {
     @Dao
     public interface StopsDao {
         @Query("SELECT * FROM stops")
-        List<Tables.Stops> getAll();
+        List<Tables.Stop> getAll();
 
         @Query("SELECT * FROM stops WHERE stop_id IN (:stopIds)")
-        List<Tables.Stops> loadAllByIds(int[] stopIds);
+        List<Tables.Stop> loadAllByIds(int[] stopIds);
 
         @Query("SELECT * FROM stops WHERE stop_name LIKE :stopName LIMIT 1")
-        Tables.Stops findByName(String stopName);
+        Tables.Stop findByName(String stopName);
 
         @Query("SELECT * FROM stops WHERE stop_lat BETWEEN :lat1 AND :lat2 AND stop_lon BETWEEN :lon1 AND :lon2")
-        List<Tables.Stops> getStationsByLatLongRange(double lat1, double lat2, double lon1, double lon2);
+        List<Tables.Stop> getStationsByLatLongRange(double lat1, double lat2, double lon1, double lon2);
 
         @Insert
-        void insertAll(Tables.Stops... stops);
+        void insertAll(Tables.Stop... stops);
 
         @Delete
-        void delete(Tables.Stops stop);
+        void delete(Tables.Stop stop);
     }
 
-    @Database(entities = {Tables.Stops.class}, version = 1)
+    @Database(entities = {Tables.Stop.class}, version = 1)
     public abstract static class AppDatabase extends RoomDatabase {
         public abstract StopsDao stopsDao();
     }
