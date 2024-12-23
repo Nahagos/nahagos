@@ -81,7 +81,7 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_mi
     if not cookies_and_milk or cookies_and_milk not in connected_drivers:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
-    if db.check_stop_on_trip(stop_id, trip_id):
+    if db.check_stop_on_trip(trip_id, stop_id):
         if registered_trips[trip_id] is not None:
             registered_trips[trip_id][1].appdend(stop_id)
             return {"message": "Passenger wait request logged successfully"}
