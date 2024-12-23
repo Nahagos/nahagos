@@ -1,35 +1,18 @@
 package com.nahagos.nahagos;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import androidx.appcompat.app.AppCompatActivity;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import android.widget.EditText;
 import android.widget.Button;
-import android.util.Log;
-import android.os.Bundle;
 import android.widget.ImageView;
-import androidx.appcompat.app.AppCompatActivity;
-import com.nahagos.nahagos.Networks;
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.widget.TextView;
-import org.json.JSONObject;
 import android.widget.CheckBox;
-import org.json.JSONException;
-import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.ServerAPI;
-import android.content.Context;
+
 
 
 
@@ -73,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             String driverId  = driverIdObj.getText().toString().trim();
 
             if (!username.isEmpty() && !password.isEmpty()) {
-                Log.d("MainActivity", "not null");
                 Log.d("MainActivity", Boolean.toString(isCheckedGlobal));
                 emptyFields.setVisibility(TextView.GONE);
 
@@ -81,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
                     if (!driverId.isEmpty()) {
                         emptyFields.setVisibility(TextView.GONE);
                         serverAPI.driverLogin(username, password, driverId);
-                        Log.d("MainActivity", "login");
                     }
                     else {
                         emptyFields.setVisibility(TextView.VISIBLE);
