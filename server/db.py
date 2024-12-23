@@ -156,7 +156,6 @@ class Database:
         # Get current day and hour
         now = datetime.now()
         current_day = now.weekday()  # Monday is 0, Sunday is 6
-        current_hour = now.hour
 
         # Convert to the correct format for the SQL query
         day_mapping = {
@@ -173,7 +172,6 @@ class Database:
         current_time = now.strftime("%H:%M:%S")  # Get current time in HH:MM:SS format
 
         # Execute query with dynamic day and time
-        lines = []
         self.cursor.execute(f"""
                             SELECT trip_id, departure_time, route_long_name, route_short_name, agency_name
                             FROM stop_times 
@@ -186,6 +184,15 @@ class Database:
                             AND {day_column} = 1
                             """)
         return self.cursor.fetchall()
+    
+    def check_stop_on_trip(self, trip_id, stop_id):
+        self.cursor.execute(f"""
+                    SELECT stop_id
+                    FROM stop_times
+                    WHERE stop_id = ?,
+                    trip_id = ?
+                    """, (stop_id, trip_id))
+        return self.cursor.fetchall() is not None
 
         
 
