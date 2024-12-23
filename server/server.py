@@ -55,12 +55,12 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     
     try:
         list_lines = db.get_lines_by_station(stop_id)
-        return 
+        lines_json = []
+        for line in list_lines:
+            lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4]})            
+        return {"lines": lines_json}
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
-
-    # line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
-    # line2= {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False} 
 
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
