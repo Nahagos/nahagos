@@ -11,7 +11,6 @@ class Station(BaseModel):
     name: str
     coords: tuple
 
-
 class PassengerRequest(BaseModel):
     username: str
     password: str
@@ -28,7 +27,6 @@ connected_drivers = {}
 registered_trips = {}
 
 db = Database("db.sql")
-
 
 
 @app.get("/")
