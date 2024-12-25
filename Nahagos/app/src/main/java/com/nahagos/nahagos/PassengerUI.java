@@ -7,13 +7,12 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 import android.util.Log;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
-import android.location.LocationRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,8 +45,6 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
 =======
 // GPS location imports
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 
 public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
 >>>>>>> 2bb63f7 (Added GPS coordiants extractor)
@@ -86,7 +82,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.passenger_map);
         mapFragment.getMapAsync(this);
         _stopMarkers = new ArrayList<Marker>();
 
