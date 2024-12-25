@@ -64,22 +64,12 @@ class Database:
             """
         )
 
-       # Insert data into passengers table
-        self.cursor.execute("INSERT INTO passengers (username, password) VALUES (?, ?)", ("user1", hashlib.sha256("passwod123".encode()).hexdigest()))
-
-        # Insert data into drivers table
-        self.cursor.execute(
-            """
-            INSERT INTO drivers (username, password, driver_id, name, license_plate)
-            VALUES 
-                ('driver01', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '6151181', 'Alice Johnson', 'ABC1234'),
-                ('driver02', '""" +  hashlib.sha256("passwod123".encode()).hexdigest()+ """', '1455184', 'Chris Lee', 'XYZ5678'),
-                ('driver03', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '1522484', 'Maria Davis', 'LMN3456');
-            """
-        )
-
-
-
+        #adding default users        
+        self.signup_passenger("user1", "password123")
+        self.add_driver("driver01", "password123", "6151181", "Alice Johnson", "ABC1234")
+        self.add_driver("driver02", "password123", "1455184", "Chris Lee", "XYZ5678")
+        self.add_driver("driver03", "password123", "1522484", "Maria Davis", "LMN3456")
+        
         dir_path = zip_path.replace(".zip", "\\")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(dir_path)
@@ -106,6 +96,31 @@ class Database:
         # Save (commit) the changes
         self.connection.commit()
         self.close()
+        
+    def add_fake_users(self):
+        self.cursor.execute("INSERT INTO passengers (username, password) VALUES (?, ?)", ("user1", hashlib.sha256("passwod123".encode()).hexdigest()))
+        self.cursor.execute(
+            """
+            INSERT INTO drivers (username, password, driver_id, name, license_plate)
+            VALUES 
+                ('driver01', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '6151181', 'Alice Johnson', 'ABC1234'),
+                ('driver02', '""" +  hashlib.sha256("passwod123".encode()).hexdigest()+ """', '1455184', 'Chris Lee', 'XYZ5678'),
+                ('driver03', '""" +  hashlib.sha256("passwod123".encode()).hexdigest() +"""', '1522484', 'Maria Davis', 'LMN3456');
+            """
+        )
+        self.connection.commit()
+        
+    def add_driver(self, username, password, driver_id, name, license_plate):
+        try:
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            self.cursor.execute("""
+                INSERT INTO drivers (username, password, driver_id, name, license_plate)
+                VALUES (?, ?, ?, ?, ?)
+            """, (username, hashed_password, driver_id, name, license_plate))
+            self.connection.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
         
     def close(self):
         self.connection.close()
