@@ -4,11 +4,13 @@ from datetime import datetime
 import uuid
 from db import Database
 
+
 app = FastAPI()
 class Station(BaseModel):
     id: int
     name: str
     coords: tuple
+
 
 class PassengerRequest(BaseModel):
     username: str
@@ -26,6 +28,7 @@ connected_drivers = {}
 registered_trips = {}
 
 db = Database("db.sql")
+
 
 
 @app.get("/")
