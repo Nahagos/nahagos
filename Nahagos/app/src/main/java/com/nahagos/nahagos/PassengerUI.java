@@ -80,6 +80,7 @@ public class PassengerUI extends FragmentActivity {
 
         adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
 
+        suggestionList.setAdapter(adapter);
         try {
             _stops = getStops();
         } catch (JSONException | IOException e) {
@@ -117,9 +118,6 @@ public class PassengerUI extends FragmentActivity {
                 adapter.clear();
                 adapter.addAll(_lastSearchRes);
                 adapter.notifyDataSetChanged();
-
-                suggestionList.setAdapter(adapter);
-
                 return false;
             }
         });
