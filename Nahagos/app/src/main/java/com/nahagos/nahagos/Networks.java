@@ -2,8 +2,6 @@ package com.nahagos.nahagos;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -65,30 +63,26 @@ public class Networks {
     }
 
     // Method for HTTP GET request
-    public static <T> T httpGetReq(String urlString, Class<T> classOfT) {
+    public static String httpGetReq(String urlString) {
         HttpURLConnection connection = null;
-        Gson gson = new Gson();
 
         try {
-            // Setup connection
             connection = setupConnection(urlString, "GET");
             int responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Read response
                 String response = readResponse(connection);
                 Log.d(TAG, "Response: " + response);
-
-                // Convert response string into a Gson object
-                return gson.fromJson(response, classOfT);
-            } else {
+                return response;
+            }
+            else {
                 Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
-                return null;
+                return "Error: HTTP " + responseCode;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP GET request", e);
-            return null;
+            return "Error: " + e.getMessage();
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -96,12 +90,10 @@ public class Networks {
         }
     }
 
-    public static <T> T httpPostReq(String urlString, String postData, Class<T> classOfT) {
+    public static String httpPostReq(String urlString, String postData) {
         HttpURLConnection connection = null;
-        Gson gson = new Gson();
 
         try {
-            // Setup connection
             connection = setupConnection(urlString, "POST");
 
             // Write data to the output stream
@@ -117,23 +109,21 @@ public class Networks {
                 if (sessionCookie == null) {
                     saveCookies(connection);
                 }
-                // Read and parse the response
                 String response = readResponse(connection);
                 Log.d(TAG, "Response: " + response);
-                // Convert the response to the specified class type
-                return gson.fromJson(response, classOfT);
-            } else {
+                return response;
+            }
+            else {
                 Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
-                return null;
+                return "Error: HTTP " + responseCode; // Return error code if not OK;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP POST request", e);
-            return null;
+            return "Error: " + e.getMessage(); // Return exception message
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
     }
-
 }
