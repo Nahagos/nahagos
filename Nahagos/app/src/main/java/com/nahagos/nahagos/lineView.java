@@ -27,5 +27,6 @@ public class lineView extends AppCompatActivity {
         });
 
         stationsList = findViewById(R.id.stations_list);
+
     }
 }

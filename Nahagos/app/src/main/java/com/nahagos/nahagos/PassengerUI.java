@@ -133,11 +133,11 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
                 ArrayAdapter<SearchStopResult> adapter;
                 if (_last_search_res.isEmpty()) {
                     _last_search_res.add(new SearchStopResult(-1, "לא נמצאה תחנה מתאימה"));
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
+                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.suggestion_list_element, R.id.textView, _last_search_res);
                     suggestionList.setAdapter(adapter);
                 }
                 else {
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
+                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.suggestion_list_element, R.id.textView, _last_search_res);
                     suggestionList.setAdapter(adapter);
                 }
                 return false;
