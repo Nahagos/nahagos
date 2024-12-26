@@ -64,8 +64,8 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
     private final double H_TO_W_RATIO = 3;
 
     private ArrayList<Marker> _stopMarkers;
-    public LatLng startingPoint = null;
     private LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
+    public LatLng startingPoint = ISRAEL;
     private final float START_ZOOM = 15.5F;
     private final float STOP_ZOOM = 15.5F;
 
@@ -192,17 +192,14 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
 
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new
-                    String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED )
+        {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
         mMap.setMyLocationEnabled(true);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
+
         FusedLocationProviderClient fusedLocationProviderClient = fusedLocationProviderClient =     LocationServices.getFusedLocationProviderClient(this);;
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -212,29 +209,17 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
                     Location location = task.getResult();
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
-                    LatLng local_gps = new LatLng(30.974998182290868, 34.69264616803752);
-                    startingPoint = local_gps;
+
+                    startingPoint = new LatLng(latitude, longitude);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
                     Log.d("PassengerUI",
                             "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
-                }
-                else{
-                    Log.d("PassengerUI", "kakai");
-                    startingPoint = ISRAEL;
+
                 }
 
             }
             });
 
-
-
-            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
-        //LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-        //Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        if (startingPoint == null)
-            startingPoint = ISRAEL;
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
         mMap.setOnCameraMoveListener(() -> {
             /* if moved, you need to show the markers that are in the view.
