@@ -52,6 +52,7 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
     private GoogleMap mMap;
     private ActivityPassengerUiBinding binding;
     private SearchView search;
+    private ArrayAdapter<SearchStopResult> adapter;
     private ListView suggestionList;
 
     private JSONArray _stops;
@@ -87,7 +88,9 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
 
         suggestionList = findViewById(R.id.suggestions);
         _last_search_res = new ArrayList<>();
+        adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
 
+        suggestionList.setAdapter(adapter);
         try {
             _stops = getStops();
         } catch (JSONException | IOException e) {
@@ -129,16 +132,16 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback,
                     }
                 }
                 // This is the part of the code where we update the list of suggestions, based on the search results
-                ArrayAdapter<SearchStopResult> adapter;
-                if (_last_search_res.isEmpty()) {
+
+                if (_last_search_res.isEmpty())
                     _last_search_res.add(new SearchStopResult(-1, "לא נמצאה תחנה מתאימה"));
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
-                    suggestionList.setAdapter(adapter);
-                }
-                else {
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
-                    suggestionList.setAdapter(adapter);
-                }
+
+
+                adapter.clear();
+                adapter.addAll(_last_search_res);
+                adapter.notifyDataSetChanged();
+
+
                 return false;
             }
         });
