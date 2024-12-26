@@ -23,6 +23,14 @@ public class ServerAPI {
         Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody);
     }
 
+    // Register a new passenger - client method
+    public boolean passenger_signup(String username, String password)
+    {
+        String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
+        String response = Networks.httpPostReq(ROOT_URL + "/passenger/signup", jsonBody);
+        return !response.startsWith("Error");
+    }
+
     public void driverLogin(String username, String password, String id)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\","+"\"id\":\""+id+"\"}";
