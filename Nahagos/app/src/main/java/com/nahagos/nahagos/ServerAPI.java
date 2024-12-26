@@ -48,13 +48,41 @@ public class ServerAPI {
         }
     }
 
-    boolean wait_for_me(int trip_id, int stop_id)
+    //passenger method - wait for a passenger at a given station
+    public boolean wait_for_me(int trip_id, int stop_id)
     {
         String jsonBody = "{\"trip_id\": " + trip_id + ", \"stop_id\":" + stop_id + "}";
         String response = Networks.httpPostReq(ROOT_URL + "/passenger/wait-for/", jsonBody);
         return !response.startsWith("Error");
     }
 
+    //register for a line - driver method
+    public boolean register_for_line(int trip_id)
+    {
+        String jsonBody = "{\"trip_id\": " + trip_id + "}";
+        String response = Networks.httpPostReq(ROOT_URL + "/driver/drive/register/", jsonBody);
+        return !response.startsWith("Error");
+    }
 
+    //get driver schedule - driver method
+    public Gson get_driver_schedule()
+    {
+        String response = Networks.httpGetReq(ROOT_URL + "/driver/schedule");
+        if (response.startsWith("Error"))
+            return null;
+        else
+        {
+            try
+                {
+                Gson gson = new Gson();
+                return gson.fromJson(response, Gson.class);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "Error parsing response to Gson", e);
+                return null;
+            }
+        }
 
+    }
 }
