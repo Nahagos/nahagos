@@ -63,7 +63,7 @@ public class Networks {
     }
 
     // Method for HTTP GET request
-    public static void httpGetReq(String urlString) {
+    public static String httpGetReq(String urlString) {
         HttpURLConnection connection = null;
 
         try {
@@ -73,11 +73,16 @@ public class Networks {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = readResponse(connection);
-
                 Log.d(TAG, "Response: " + response);
+                return response;
+            }
+            else {
+                Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
+                return "Error: HTTP " + responseCode;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP GET request", e);
+            return "Error: " + e.getMessage();
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -85,7 +90,7 @@ public class Networks {
         }
     }
 
-    public static void httpPostReq(String urlString, String postData) {
+    public static String httpPostReq(String urlString, String postData) {
         HttpURLConnection connection = null;
 
         try {
@@ -106,9 +111,15 @@ public class Networks {
                 }
                 String response = readResponse(connection);
                 Log.d(TAG, "Response: " + response);
+                return response;
+            }
+            else {
+                Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
+                return "Error: HTTP " + responseCode; // Return error code if not OK;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP POST request", e);
+            return "Error: " + e.getMessage(); // Return exception message
         } finally {
             if (connection != null) {
                 connection.disconnect();
