@@ -46,23 +46,24 @@ import android.location.Location;
 
 public class PassengerUI extends FragmentActivity {
 
+    private final float ZOOM_SHOW_STOPS = 15.5F;
+    private static final int STOP_ID_NOT_FOUND = -1;
+    private final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
+    private final float START_ZOOM = 15.5F;
+    private final float STOP_ZOOM = 16.5F;
+
     private GoogleMap _map;
     private ActivityPassengerUiBinding binding;
+    private ArrayAdapter<SearchStopResult> adapter;
     private ListView suggestionList;
 
     private JSONArray _stops;
 
     private ArrayList<SearchStopResult> _lastSearchRes = new ArrayList<>();;
 
-
     private ArrayList<Marker> _stopMarkers = new ArrayList<Marker>();
-    public LatLng startingPoint = null;
+    public LatLng startingPoint = ISRAEL;
 
-    private final float ZOOM_SHOW_STOPS = 15.5F;
-    private static final int STOP_ID_NOT_FOUND = -1;
-    private final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
-    private final float START_ZOOM = 15.5F;
-    private final float STOP_ZOOM = 16.5F;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +78,10 @@ public class PassengerUI extends FragmentActivity {
         if (mapFragment != null)
             mapFragment.getMapAsync(this::onMapReady);
 
-
         suggestionList = findViewById(R.id.suggestions);
         SearchView search = findViewById(R.id.search);
 
-
+        adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
 
         try {
             _stops = getStops();
@@ -116,8 +116,13 @@ public class PassengerUI extends FragmentActivity {
                 if (_lastSearchRes.isEmpty()) {
                     _lastSearchRes.add(new SearchStopResult(STOP_ID_NOT_FOUND, getString(R.string.stop_not_found)));
                 }
-                ArrayAdapter<SearchStopResult> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
+
+                adapter.clear();
+                adapter.addAll(_last_search_res);
+                adapter.notifyDataSetChanged();
+
                 suggestionList.setAdapter(adapter);
+
                 return false;
             }
         });
@@ -171,17 +176,14 @@ public class PassengerUI extends FragmentActivity {
         _map = googleMap;
         _map.setOnMarkerClickListener(this::onMarkerClick);
 
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new
-                    String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED )
+        {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-        _map.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
+
         FusedLocationProviderClient fusedLocationProviderClient = fusedLocationProviderClient =     LocationServices.getFusedLocationProviderClient(this);;
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -191,31 +193,19 @@ public class PassengerUI extends FragmentActivity {
                     Location location = task.getResult();
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
-                    LatLng local_gps = new LatLng(30.974998182290868, 34.69264616803752);
-                    startingPoint = local_gps;
+
+                    startingPoint = new LatLng(latitude, longitude);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
                     Log.d("PassengerUI",
                             "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
-                }
-                else{
-                    Log.d("PassengerUI", "kakai");
-                    startingPoint = ISRAEL;
+
                 }
 
             }
             });
 
 
-
-            //_map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
-        //LocationManager locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-        //Location gps_loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        if (startingPoint == null)
-            startingPoint = ISRAEL;
-
-        _map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
-
-        _map.setOnCameraMoveListener(() -> {
+        mMap.setOnCameraMoveListener(() -> {
             /* if moved, you need to show the markers that are in the view.
              how the algorithm works:
              there is a list of stopmarkers, those are the markers that we show right now.
