@@ -26,7 +26,7 @@ public class ServerAPI {
     // Register a new passenger - client method
     public boolean passenger_signup(String username, String password)
     {
-        String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
+         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
         String response = Networks.httpPostReq(ROOT_URL + "/passenger/signup", jsonBody);
         return !response.startsWith("Error");
     }
@@ -92,5 +92,24 @@ public class ServerAPI {
             }
         }
 
+    }
+
+    //get stopping stations - driver method
+    public int[] get_stopping_stations(int trip_id)
+    {
+        String url = ROOT_URL + "/stopping-stations/" + trip_id;
+        String response = Networks.httpGetReq(url);
+        if (response.startsWith("Error:")) {
+            Log.e(TAG, response); // Log the error
+            return null; // Handle the error as needed (e.g., return null or notify the user)
+        }
+
+        try {
+            Gson gson = new Gson();
+            return gson.fromJson(response, int[].class); // Parse the JSON into Line[] array
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing response to int[]", e);
+            return null; // Handle parsing errors as needed
+        }
     }
 }
