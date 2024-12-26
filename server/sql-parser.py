@@ -18,7 +18,7 @@ The database includes the following tables:
 """
 
 
-def parse_file(cursor, path, file_name):
+def parse_file_and_create_DB(cursor, path, file_name):
     """
     Parse the CSV file and insert its data into the match table in the database.
 
@@ -158,10 +158,10 @@ def main():
     # Create tables and match them with data
     for file_name, columns in files_names.items():
         # Create table
-        cursor.execute("CREATE TABLE IF NOT EXISTS " + file_name + " (" + ", ".join([var for var in columns]) + ")")
+        cursor.execute("CREATE TABLE IF NOT EXISTS " + file_name + " (" + ", ".join(columns) + ")")
 
         # Parse and insert data from the matching CSV file
-        parse_file(cursor, os.path.join(dir_path, file_name + ".txt"), file_name)
+        parse_file_and_create_DB(cursor, os.path.join(dir_path, file_name + ".txt"), file_name)
 
         # save (commit) changes after processing each file
         conn.commit()
