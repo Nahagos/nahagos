@@ -92,6 +92,7 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_mi
     raise HTTPException(status_code=401, detail="Stop is not in this lines route") 
 
 
+
 @app.post("/driver/drive/register/")
 def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     """
@@ -137,6 +138,7 @@ def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(N
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
 
+
         # Query the database to check for diffs since the last_updated_date
         diffs = db.get_diffs_since_date(last_updated_date)  # Custom function to fetch diffs
 
@@ -148,6 +150,13 @@ def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(N
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+        if not diffs:  # If no diffs are found, the station list is up-to-date
+            return {"status": "Up to date"}
+
+        return {"status": "Not up to date", "changes": diffs}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.post("/driver/login/")
 def driver_login(driver: DriverLogin, response: Response):
@@ -226,4 +235,5 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         return {"stops": lines_json}
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
+
 

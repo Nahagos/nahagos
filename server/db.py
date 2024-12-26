@@ -65,12 +65,14 @@ class Database:
         )
         self.connection.commit()
         self.close()
+
         #adding default users        
         self.signup_passenger("user1", "password123")
         self.add_driver("driver01", "password123", "6151181", "Alice Johnson", "ABC1234")
         self.add_driver("driver02", "password123", "1455184", "Chris Lee", "XYZ5678")
         self.add_driver("driver03", "password123", "1522484", "Maria Davis", "LMN3456")
         self.open()
+
         dir_path = zip_path.replace(".zip", "\\")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(dir_path)
@@ -101,6 +103,7 @@ class Database:
     def add_driver(self, username, password, driver_id, name, license_plate):
         try:
             self.open()
+
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             self.cursor.execute("""
                 INSERT INTO drivers (username, password, driver_id, name, license_plate)
@@ -111,6 +114,7 @@ class Database:
             return True
         except sqlite3.IntegrityError:
             self.close()
+
             return False
         
     def close(self):
@@ -213,6 +217,7 @@ class Database:
         stops = self.cursor.fetchall()
         self.close()
         return stops
+
 
         
 
