@@ -208,3 +208,22 @@ def get_driver_schedule(cookies_and_milk: str = Cookie(None)):
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
     return db.get_driver_schedule(driver)
+
+@app.get("/stops-by-line/{trip_id}")
+def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
+    """
+    Retrives the stops for a specific line
+    """ 
+    # # validate user
+    # if not cookies_and_milk or cookies_and_milk not in connected_users:
+    #     raise HTTPException(status_code=401, detail="User not authenticated") 
+
+    try:
+        list_lines = db.get_stops_by_trip_id(trip_id)
+        lines_json = []
+        for line in list_lines:
+            lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": line[2], "stop_lat": line[3], "stop_lon": line[4]})            
+        return {"stops": lines_json}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
