@@ -1,7 +1,6 @@
 package com.nahagos.nahagos;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
@@ -14,7 +13,6 @@ import android.util.Log;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,7 +22,6 @@ import android.widget.SearchView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -59,9 +56,9 @@ public class PassengerUI extends FragmentActivity {
 
     private JSONArray _stops;
 
-    private ArrayList<SearchStopResult> _lastSearchRes = new ArrayList<>();;
+    private ArrayList<SearchStopResult> _lastSearchRes = new ArrayList<>();
 
-    private ArrayList<Marker> _stopMarkers = new ArrayList<Marker>();
+    private ArrayList<Marker> _stopMarkers = new ArrayList<>();
     public LatLng startingPoint = ISRAEL;
 
 
@@ -81,7 +78,7 @@ public class PassengerUI extends FragmentActivity {
         suggestionList = findViewById(R.id.suggestions);
         SearchView search = findViewById(R.id.search);
 
-        adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _last_search_res);
+        adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
 
         try {
             _stops = getStops();
@@ -118,7 +115,7 @@ public class PassengerUI extends FragmentActivity {
                 }
 
                 adapter.clear();
-                adapter.addAll(_last_search_res);
+                adapter.addAll(_lastSearchRes);
                 adapter.notifyDataSetChanged();
 
                 suggestionList.setAdapter(adapter);
@@ -181,8 +178,8 @@ public class PassengerUI extends FragmentActivity {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-        mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
+        _map.setMyLocationEnabled(true);
+        _map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
         FusedLocationProviderClient fusedLocationProviderClient = fusedLocationProviderClient =     LocationServices.getFusedLocationProviderClient(this);;
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -195,7 +192,7 @@ public class PassengerUI extends FragmentActivity {
                     double longitude = location.getLongitude();
 
                     startingPoint = new LatLng(latitude, longitude);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
+                    _map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
                     Log.d("PassengerUI",
                             "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
 
@@ -205,7 +202,7 @@ public class PassengerUI extends FragmentActivity {
             });
 
 
-        mMap.setOnCameraMoveListener(() -> {
+        _map.setOnCameraMoveListener(() -> {
             /* if moved, you need to show the markers that are in the view.
              how the algorithm works:
              there is a list of stopmarkers, those are the markers that we show right now.
