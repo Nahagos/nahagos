@@ -29,7 +29,8 @@ public class ServerAPI {
         Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody);
     }
 
-    public Line[] getLinesByStation(int stopId) {
+    //get lines from a given station - client method
+    public Line[] get_lines_by_station(int stopId) {
         String url = ROOT_URL + "/lines-by-station/" + stopId;
         String response = Networks.httpGetReq(url);
 
@@ -46,5 +47,14 @@ public class ServerAPI {
             return null; // Handle parsing errors as needed
         }
     }
+
+    boolean wait_for_me(int trip_id, int stop_id)
+    {
+        String jsonBody = "{\"trip_id\": " + trip_id + ", \"stop_id\":" + stop_id + "}";
+        String response = Networks.httpPostReq(ROOT_URL + "/passenger/wait-for/", jsonBody);
+        return !response.startsWith("Error");
+    }
+
+
 
 }
