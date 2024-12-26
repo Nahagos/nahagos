@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import android.location.Location;
 
 public class PassengerUI extends FragmentActivity {
+
     private GoogleMap _map;
     private ActivityPassengerUiBinding binding;
     private ListView suggestionList;
@@ -58,8 +59,7 @@ public class PassengerUI extends FragmentActivity {
     public LatLng startingPoint = null;
 
     private final float ZOOM_SHOW_STOPS = 15.5F;
-    private final double H_TO_W_RATIO = 3;
-
+    private static final int STOP_ID_NOT_FOUND = -1;
     private final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
     private final float START_ZOOM = 15.5F;
     private final float STOP_ZOOM = 16.5F;
@@ -104,35 +104,20 @@ public class PassengerUI extends FragmentActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // If the length of the query is less than 2 there are too many stored stations to be searched.
-                // So it is better to just search all over again in the array from the JSON.
-                // Otherwise, search for q in all of the last searched objects, for optimization.
-                if (newText.length() > 2 && !_lastSearchRes.isEmpty() && _lastSearchRes.get(0).second.contains(newText.substring(0,newText.length()-1))) {
-                    for (int j = 0; j < _lastSearchRes.size(); j++) {
-                        if (!_lastSearchRes.get(j).second.contains(newText)) {
-                            _lastSearchRes.remove(j);
-                        }
-                    }
+                // Search for q in the SQL, and update suggestion list as needed.
+                _lastSearchRes.clear();
+                try {
+                    _lastSearchRes = searchStations(newText);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
-                else {
-                    _lastSearchRes.clear();
-                    try {
-                        _lastSearchRes = searchStations(newText);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+
                 // This is the part of the code where we update the list of suggestions, based on the search results
-                ArrayAdapter<SearchStopResult> adapter;
                 if (_lastSearchRes.isEmpty()) {
-                    _lastSearchRes.add(new SearchStopResult(-1, "לא נמצאה תחנה מתאימה"));
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
-                    suggestionList.setAdapter(adapter);
+                    _lastSearchRes.add(new SearchStopResult(STOP_ID_NOT_FOUND, getString(R.string.stop_not_found)));
                 }
-                else {
-                    adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
-                    suggestionList.setAdapter(adapter);
-                }
+                ArrayAdapter<SearchStopResult> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.list_sample_element, R.id.textView, _lastSearchRes);
+                suggestionList.setAdapter(adapter);
                 return false;
             }
         });
@@ -141,11 +126,12 @@ public class PassengerUI extends FragmentActivity {
         suggestionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (_lastSearchRes.get((int) id).first == -1)
+                int stopId = _lastSearchRes.get((int) id).first;
+                if (stopId == STOP_ID_NOT_FOUND)
                     return;
 
                 try {
-                    JSONObject stop = _stops.getJSONObject(_lastSearchRes.get((int) id).first);
+                    JSONObject stop = _stops.getJSONObject(stopId);
                     _map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(stop.getDouble("stop_lat"), stop.getDouble("stop_lon")), STOP_ZOOM));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

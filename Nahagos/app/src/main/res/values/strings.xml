@@ -45,4 +45,5 @@
     </string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_passenger_ui">PassengerUI</string>
+    <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
 </resources>
