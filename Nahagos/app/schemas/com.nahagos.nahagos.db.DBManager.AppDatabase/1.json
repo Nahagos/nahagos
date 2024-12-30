@@ -2,50 +2,50 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "274f3e6eb97fac2275820d76e4e1b2a2",
+    "identityHash": "96ecee1a0767f41de759b96a4feb185e",
     "entities": [
       {
-        "tableName": "Stops",
+        "tableName": "stops",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stop_id` INTEGER NOT NULL, `stop_code` INTEGER NOT NULL, `stop_name` TEXT NOT NULL, `stop_desc` TEXT NOT NULL, `stop_lat` REAL NOT NULL, `stop_lon` REAL NOT NULL, `location_type` INTEGER NOT NULL, `parent_station` INTEGER, `zone_id` INTEGER NOT NULL, PRIMARY KEY(`stop_id`))",
         "fields": [
           {
-            "fieldPath": "stopId",
+            "fieldPath": "id",
             "columnName": "stop_id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "stopCode",
+            "fieldPath": "code",
             "columnName": "stop_code",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "stopName",
+            "fieldPath": "name",
             "columnName": "stop_name",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "stopDesc",
+            "fieldPath": "description",
             "columnName": "stop_desc",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "stopLat",
+            "fieldPath": "lat",
             "columnName": "stop_lat",
             "affinity": "REAL",
             "notNull": true
           },
           {
-            "fieldPath": "stopLon",
+            "fieldPath": "lon",
             "columnName": "stop_lon",
             "affinity": "REAL",
             "notNull": true
           },
           {
-            "fieldPath": "is_central",
+            "fieldPath": "isCentral",
             "columnName": "location_type",
             "affinity": "INTEGER",
             "notNull": true
@@ -76,7 +76,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '274f3e6eb97fac2275820d76e4e1b2a2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96ecee1a0767f41de759b96a4feb185e')"
     ]
   }
 }
