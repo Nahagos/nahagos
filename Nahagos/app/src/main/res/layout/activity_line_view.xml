@@ -18,13 +18,13 @@
         map:layout_constraintTop_toTopOf="parent">
 
         <ListView
-            android:id="@+id/stations_list"
+            android:id="@+id/stops_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </ScrollView>
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/lineview_toolbar"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
