@@ -144,7 +144,7 @@ public class ServerAPI {
     // get info about a given line - driver method
     public Gson get_line_info(int trip_id)
     {
-        String response = Networks.httpGetReq(ROOT_URL + "/driver/line-info/" + trip_id);
+        String response = Networks.httpGetReq(ROOT_URL + "/line-info/" + trip_id);
         if (response.startsWith("Error"))
         {
             Log.e(TAG, response); // Log the error
