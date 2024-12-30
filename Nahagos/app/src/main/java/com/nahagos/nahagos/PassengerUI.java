@@ -42,11 +42,11 @@ import android.location.Location;
 
 public class PassengerUI extends FragmentActivity {
 
-    private final float ZOOM_SHOW_STOPS = 15.5F;
+    private static final float ZOOM_SHOW_STOPS = 15.5F;
     private static final int STOP_ID_NOT_FOUND = -1;
-    private final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
-    private final float START_ZOOM = 15.5F;
-    private final float STOP_ZOOM = 16.5F;
+    private static final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
+    private static final float START_ZOOM = 15.5F;
+    private static final float STOP_ZOOM = 16.5F;
 
     private GoogleMap map;
     private ArrayAdapter<SearchStopResult> adapter;
@@ -56,7 +56,7 @@ public class PassengerUI extends FragmentActivity {
 
     private ArrayList<SearchStopResult> lastSearchRes = new ArrayList<>();
 
-    private ArrayList<Marker> stopMarkers = new ArrayList<>();
+    private final ArrayList<Marker> stopMarkers = new ArrayList<>();
     public LatLng startingPoint = ISRAEL;
 
 
@@ -64,7 +64,7 @@ public class PassengerUI extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        com.nahagos.nahagos.databinding.ActivityPassengerUiBinding binding = ActivityPassengerUiBinding.inflate(getLayoutInflater());
+        ActivityPassengerUiBinding binding = ActivityPassengerUiBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -181,8 +181,6 @@ public class PassengerUI extends FragmentActivity {
 
                 startingPoint = new LatLng(latitude, longitude);
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
-                Log.d("PassengerUI",
-                        "KAKIIIIIIIIIIIIIIIIII Latitude: " + latitude + ", Longitude: " + longitude);
 
             }
             });
