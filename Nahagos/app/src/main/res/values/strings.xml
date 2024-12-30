@@ -45,6 +45,8 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_passenger_ui">PassengerUI</string>
+    <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
     <string name="title_activity_register">register</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
