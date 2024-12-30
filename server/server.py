@@ -36,18 +36,7 @@ def root():
 
 def update_last_active(driver_cookie):
 	connected_drivers[driver_cookie][1] = datetime.now()
-
-
-@app.get("/lines-from-station/{station_id}")
-def get_lines_starting(station_id: int):
-    """
-    Retrieve a list of bus lines that depart from a given station.
-    """
-
-    line1 = {"line_id": 12342332, "line_num": 18, "name":"Tel aviv to jerualem", "operator":"Eged", "schedualed_arrival_time":"12:45","live_arrival_time":"12:48:30", "Nahagos":True}
-    line2 = {"line_id": 123423, "line_num": 32, "name":"Haifa to jerualem", "operator":"Metropolin", "schedualed_arrival_time":"10:40","live_arrival_time":None, "Nahagos":False}
-    return {"lines":[line1, line2]}
-
+ 
 
 @app.get("/lines-by-station/{stop_id}")
 def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
@@ -173,7 +162,8 @@ def driver_login(driver: DriverLogin, response: Response):
 
     if db.login_driver(driver.id, driver.username, driver.password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = [id]
+        connected_drivers[session_id] = [id, None, None]
+        
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
     else:
@@ -220,6 +210,7 @@ def get_driver_schedule(cookies_and_milk: str = Cookie(None)):
     """
     Get daily schedule of driver
     """
+    update_last_active(connected_drivers)
     driver = connected_drivers.get(cookies_and_milk)
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
@@ -253,7 +244,7 @@ def where_to_stop(cookies_and_milk :str = Cookie(None)):
     Retrives the stops that a specific driver need to stop
     """
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_users:
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     update_last_active(cookies_and_milk)
