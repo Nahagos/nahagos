@@ -22,9 +22,9 @@ class DriverLogin(BaseModel):
 
 connected_users = {}
 
-connected_drivers = {}
+connected_drivers = {}      # driver_cookie : driver_id, last_action, trip_id
 
-registered_trips = {}
+registered_trips = {}       # trip_id : [stops_list]
 
 db = Database("db.sql")
 
@@ -32,6 +32,10 @@ db = Database("db.sql")
 @app.get("/")
 def root():
     return {"message": "Server Is Legit, V1.0.0"}
+
+
+def update_last_active(driver_cookie):
+	connected_drivers[driver_cookie][1] = datetime.now()
 
 
 @app.get("/lines-from-station/{station_id}")
@@ -74,7 +78,7 @@ def update_arrival_time(station_id: int, bus_id: int):
 
 
 @app.post("/passenger/wait-for/")
-def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_milk:str = Cookie(None)):
+def passenger_wait_for_bus(stop_id: int, trip_id: int, cookies_and_milk:str = Cookie(None)):
     """
     Log that a passenger is waiting for a specific bus at a given station.
     """
@@ -83,8 +87,8 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, time: str, cookies_and_mi
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     if db.check_stop_on_trip(trip_id, stop_id):
-        if registered_trips[trip_id] is not None:
-            registered_trips[trip_id][1].appdend(stop_id)
+        if trip_id in registered_trips.keys:
+            registered_trips[trip_id].add(stop_id)
             return {"message": "Passenger wait request logged successfully"}
         raise HTTPException(status_code=401, detail="No Nahagos!")
 
@@ -103,10 +107,13 @@ def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     driver = connected_drivers.get(cookies_and_milk)
     if not driver:
         raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
+    
+    update_last_active(cookies_and_milk)
+    
     if not db.check_schedule(trip_id):
         raise HTTPException(status_code=401, detail="Line isn't schedualed for you")
     
-    registered_trips[trip_id] = driver, []
+    registered_trips[trip_id] = set()
 
     return {"message": "Line registered successfully"}
 
@@ -166,7 +173,7 @@ def driver_login(driver: DriverLogin, response: Response):
 
     if db.login_driver(driver.id, driver.username, driver.password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = {"id": id}
+        connected_drivers[session_id] = [id]
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
     else:
@@ -223,9 +230,10 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     """
     Retrives the stops for a specific line
     """ 
-    # # validate user
-    # if not cookies_and_milk or cookies_and_milk not in connected_users:
-    #     raise HTTPException(status_code=401, detail="User not authenticated") 
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_users:
+        raise HTTPException(status_code=401, detail="User not authenticated") 
+
 
     try:
         list_lines = db.get_stops_by_trip_id(trip_id)
@@ -235,5 +243,22 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         return {"stops": lines_json}
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+    
+
+
+@app.get("/driver/where-to-stop/")
+def where_to_stop(cookies_and_milk :str = Cookie(None)):
+    """
+    Retrives the stops that a specific driver need to stop
+    """
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_users:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    update_last_active(cookies_and_milk)
+    if connected_drivers[cookies_and_milk][2]:
+        return {'stops': registered_trips[connected_drivers[cookies_and_milk][2]]}
+    return  {'stops' : []}
 
 
