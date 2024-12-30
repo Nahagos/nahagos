@@ -75,9 +75,12 @@ public class ServerAPI {
     //get driver schedule - driver method
     public Gson get_driver_schedule()
     {
-        String response = Networks.httpGetReq(ROOT_URL + "/driver/schedule");
+        String response = Networks.httpGetReq(ROOT_URL + "/driver/schedule/");
         if (response.startsWith("Error"))
+        {
+            Log.e(TAG, response); // Log the error
             return null;
+        }
         else
         {
             try
@@ -95,9 +98,9 @@ public class ServerAPI {
     }
 
     //get stopping stations - driver method
-    public int[] get_stopping_stations(int trip_id)
+    public int[] get_stopping_stations()
     {
-        String url = ROOT_URL + "/stopping-stations/" + trip_id;
+        String url = ROOT_URL + "/driver/where-to-stop/";
         String response = Networks.httpGetReq(url);
         if (response.startsWith("Error:")) {
             Log.e(TAG, response); // Log the error
@@ -106,10 +109,35 @@ public class ServerAPI {
 
         try {
             Gson gson = new Gson();
-            return gson.fromJson(response, int[].class); // Parse the JSON into Line[] array
+            return gson.fromJson(response, int[].class); // Parse the JSON into int[] array
         } catch (Exception e) {
             Log.e(TAG, "Error parsing response to int[]", e);
             return null; // Handle parsing errors as needed
+        }
+    }
+
+    // get line stops - client method
+    public Gson get_stops_by_line(int trip_id)
+    {
+        String url = ROOT_URL + "/stops-by-line/" + trip_id;
+        String response = Networks.httpGetReq(url);
+        if (response.startsWith("Error:")) {
+            Log.e(TAG, response); // Log the error
+            return null; // Handle the error as needed (e.g., return null or notify the user)
+        }
+
+        else
+        {
+            try
+            {
+                Gson gson = new Gson();
+                return gson.fromJson(response, Gson.class);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "Error parsing response to Gson", e);
+                return null;
+            }
         }
     }
 }
