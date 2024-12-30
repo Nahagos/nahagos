@@ -37,7 +37,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 
-// GPS location imports
 import android.location.Location;
 
 public class PassengerUI extends FragmentActivity {
