@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import uuid
 from db import Database
-
+import threading
 
 app = FastAPI()
 class Station(BaseModel):
@@ -27,6 +27,19 @@ connected_drivers = {}      # driver_cookie : driver_id, last_action, trip_id
 registered_trips = {}       # trip_id : [stops_list]
 
 db = Database("db.sql")
+
+def driver_connectivity():
+    for driver, properties in connected_drivers.items():
+        if (datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
+            del registered_trips[properties[2]]
+            del connected_drivers[driver]
+
+@app.on_event("startup")
+def start_daemon_thread():
+    # Create and start the daemon thread
+    daemon_thread = threading.Thread(target=driver_connectivity, daemon=True)
+    daemon_thread.start()
+    print("Daemon thread started!")
 
 
 @app.get("/")
