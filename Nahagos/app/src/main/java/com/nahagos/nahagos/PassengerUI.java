@@ -40,15 +40,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-<<<<<<< HEAD
-public class PassengerUI extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-=======
-// GPS location imports
 import android.location.Location;
 
 public class PassengerUI extends FragmentActivity implements OnMapReadyCallback {
->>>>>>> 2bb63f7 (Added GPS coordiants extractor)
-
 
     private GoogleMap mMap;
     private ActivityPassengerUiBinding binding;
@@ -191,7 +185,6 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMarkerClickListener(this);
 
         if (ActivityCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) !=
@@ -274,10 +267,4 @@ public class PassengerUI extends FragmentActivity implements OnMapReadyCallback 
         });
     }
 
-
-    @Override
-    public boolean onMarkerClick(@NonNull Marker marker) {
-        // TODO: show lines arriving/planned for selected station.
-        return false;
-    }
 }
