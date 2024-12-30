@@ -54,7 +54,7 @@ public class PassengerUI extends FragmentActivity {
 
     private JSONArray stops;
 
-    private ArrayList<SearchStopResult> lastSearchRes = new ArrayList<>();
+    private final ArrayList<SearchStopResult> lastSearchRes = new ArrayList<>();
 
     private final ArrayList<Marker> stopMarkers = new ArrayList<>();
     public LatLng startingPoint = ISRAEL;
@@ -101,7 +101,7 @@ public class PassengerUI extends FragmentActivity {
                 // Search for q in the SQL, and update suggestion list as needed.
                 lastSearchRes.clear();
                 try {
-                    lastSearchRes = searchStations(newText);
+                    lastSearchRes.addAll(searchStations(newText));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
