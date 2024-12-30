@@ -117,7 +117,7 @@ public class ServerAPI {
     }
 
     // get line stops - client method
-    public Gson get_stops_by_line(int trip_id)
+    public StopTime[] get_stops_by_line(int trip_id)
     {
         String url = ROOT_URL + "/stops-by-line/" + trip_id;
         String response = Networks.httpGetReq(url);
@@ -131,6 +131,30 @@ public class ServerAPI {
             try
             {
                 Gson gson = new Gson();
+                return gson.fromJson(response, StopTime[].class);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "Error parsing response to Gson", e);
+                return null;
+            }
+        }
+    }
+
+    // get info about a given line - driver method
+    public Gson get_line_info(int trip_id)
+    {
+        String response = Networks.httpGetReq(ROOT_URL + "/driver/line-info/" + trip_id);
+        if (response.startsWith("Error"))
+        {
+            Log.e(TAG, response); // Log the error
+            return null;
+        }
+        else
+        {
+            try
+            {
+                Gson gson = new Gson();
                 return gson.fromJson(response, Gson.class);
             }
             catch (Exception e)
@@ -139,5 +163,6 @@ public class ServerAPI {
                 return null;
             }
         }
+
     }
 }
