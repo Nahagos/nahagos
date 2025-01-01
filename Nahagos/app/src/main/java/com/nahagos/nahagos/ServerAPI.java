@@ -5,6 +5,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.nahagos.nahagos.Networks;
 
 public class ServerAPI {
@@ -17,7 +20,7 @@ public class ServerAPI {
     private final String GET_DRIVER_SCHEDULE_URL = "/driver/schedule/";
     private final String GET_STOPPING_STATIONS_URL = "/driver/where-to-stop/";
     private final String GET_STOPS_BY_LINE_URL = "/stops-by-line/";
-    private final String GET_LINE_INFO_URL = "/line-info/";
+    private final String GET_LINE_SHAPE = "/line-shape/";
     private final String ROOT_URL;
 
     // Constructor accepting Context
@@ -149,10 +152,10 @@ public class ServerAPI {
         }
     }
 
-    // get info about a given line - driver method
-    public Gson get_line_info(int trip_id)
+    // get shape of a given line - driver method
+    public Point[] get_line_shape(int trip_id)
     {
-        String response = Networks.httpGetReq(ROOT_URL + GET_LINE_INFO_URL + trip_id);
+        String response = Networks.httpGetReq(ROOT_URL + GET_LINE_SHAPE + trip_id);
         if (response.startsWith("Error"))
         {
             Log.e(TAG, response); // Log the error
@@ -160,17 +163,19 @@ public class ServerAPI {
         }
         else
         {
-            try
-            {
+            try {
                 Gson gson = new Gson();
-                return gson.fromJson(response, Gson.class);
-            }
-            catch (Exception e)
-            {
-                Log.e(TAG, "Error parsing response to Gson", e);
+                JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+                if (!jsonResponse.has("Shape")) {
+                    Log.e(TAG, "Missing 'Shape' field in response");
+                    return null;
+                }
+
+                return gson.fromJson(jsonResponse.getAsJsonArray("Shape"), Point[].class);
+            } catch (JsonSyntaxException e) {
+                Log.e(TAG, "Error parsing 'Shape' field", e);
                 return null;
             }
         }
-
     }
 }
