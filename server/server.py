@@ -48,7 +48,7 @@ def root():
 
 
 def update_last_active(driver_cookie):
-	connected_drivers[driver_cookie][1] = datetime.now()
+    connected_drivers[driver_cookie][1] = datetime.now()
  
 
 @app.get("/lines-by-station/{stop_id}")
@@ -172,8 +172,7 @@ def driver_login(driver: DriverLogin, response: Response):
     """
     Check if the id, username and the password are correct
     """
-
-    if db.login_driver(driver.id, driver.username, driver.password):
+    if db.login_driver(driver.username, driver.password, driver.id):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
         connected_drivers[session_id] = [driver.id, None, None]
         
@@ -216,18 +215,6 @@ def passenger_signup(request: PassengerRequest, response: Response):
     else:
         raise HTTPException(status_code=401, detail="Invalid signup")
 
-
-
-@app.get("/driver/schedule")
-def get_driver_schedule(cookies_and_milk: str = Cookie(None)):
-    """
-    Get daily schedule of driver
-    """
-    update_last_active(connected_drivers)
-    driver = connected_drivers.get(cookies_and_milk)
-    if not driver:
-        raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
-    return db.get_driver_schedule(driver)
 
 @app.get("/stops-by-line/{trip_id}")
 def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
@@ -273,6 +260,7 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
     if not cookies_and_milk or cookies_and_milk not in connected_drivers:
         raise HTTPException(status_code=401, detail="User not authenticated") 
 
+    update_last_active(cookies_and_milk)
     try:
         list_lines = db.get_driver_schedule(connected_drivers[cookies_and_milk][0])
         lines_json = []
