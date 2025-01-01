@@ -2,33 +2,24 @@ package com.nahagos.nahagos;
 
 import androidx.annotation.NonNull;
 
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
-import android.util.Log;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -75,7 +66,7 @@ public class PassengerUI extends FragmentActivity {
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.passenger_map);
         if (mapFragment != null)
             mapFragment.getMapAsync(this::onMapReady);
 
@@ -91,7 +82,6 @@ public class PassengerUI extends FragmentActivity {
             throw new RuntimeException(e);
         }
 
-        search = findViewById(R.id.search);
         search.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
                 // Make search list visible or not based on whether the user is typing
             suggestionList.setVisibility(hasFocus ? View.VISIBLE : View.INVISIBLE);
@@ -178,7 +168,7 @@ public class PassengerUI extends FragmentActivity {
         map.setMyLocationEnabled(true);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);;
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener((task) -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 // Get the location
