@@ -14,8 +14,6 @@ import android.widget.TextView;
 import android.widget.CheckBox;
 
 
-
-
 public class MainActivity extends AppCompatActivity {
 
     private boolean isCheckedGlobal = false;
