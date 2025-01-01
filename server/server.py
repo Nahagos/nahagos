@@ -175,7 +175,7 @@ def driver_login(driver: DriverLogin, response: Response):
 
     if db.login_driver(driver.id, driver.username, driver.password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = [id, None, None]
+        connected_drivers[session_id] = [driver.id, None, None]
         
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         return {"message": "Login successful"}
@@ -249,8 +249,6 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         raise HTTPException(status_code=401, detail=str(e))
 
     
-
-
 @app.get("/driver/where-to-stop/")
 def where_to_stop(cookies_and_milk :str = Cookie(None)):
     """
@@ -265,4 +263,22 @@ def where_to_stop(cookies_and_milk :str = Cookie(None)):
         return {'stops': registered_trips[connected_drivers[cookies_and_milk][2]]}
     return  {'stops' : []}
 
+
+@app.get("/driver/schedule/")
+def get_schedule(cookies_and_milk :str = Cookie(None)):
+    """
+    Retrives the schedule for a specific driver
+    """ 
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+        raise HTTPException(status_code=401, detail="User not authenticated") 
+
+    try:
+        list_lines = db.get_driver_schedule(connected_drivers[cookies_and_milk][0])
+        lines_json = []
+        for line in list_lines:
+            lines_json.append({line[0]: [{"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]}]})            
+        return lines_json
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
