@@ -2,35 +2,65 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/line_view_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PassengerUI">
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="65dp"
-        android:background="#404040"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="90dp"
+        android:background="#F08C8C"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent">
 
         <ListView
             android:id="@+id/stops_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+            android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/lineview_toolbar"
-        android:layout_width="409dp"
+        </ListView>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/start_drive_btn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="התחל נסיעה"
+        android:visibility="invisible"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/nahagos_img"
+        android:layout_width="111dp"
+        android:layout_height="90dp"
+        android:src="@drawable/driver"
         map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/line_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        map:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="<"
+        map:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
 
