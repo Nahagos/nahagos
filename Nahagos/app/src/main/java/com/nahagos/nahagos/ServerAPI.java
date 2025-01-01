@@ -8,9 +8,17 @@ import com.google.gson.Gson;
 import com.nahagos.nahagos.Networks;
 
 public class ServerAPI {
-    private String PASSENGER_LOGIN_URL = "/passenger/login/";
-    private String DRIVER_LOGIN_URL = "/driver/login/";
-    private String ROOT_URL;
+    private final String PASSENGER_LOGIN_URL = "/passenger/login/";
+    private final String DRIVER_LOGIN_URL = "/driver/login/";
+    private final String REGISTER_URL = "/passenger/register/";
+    private final String GET_LINES_BY_STATION_URL = "/lines-by-station/";
+    private final String WAIT_FOR_ME_URL = "/passenger/wait-for/";
+    private final String REGISTER_FOR_LINE_URL = "/driver/register-for/";
+    private final String GET_DRIVER_SCHEDULE_URL = "/driver/schedule/";
+    private final String GET_STOPPING_STATIONS_URL = "/driver/where-to-stop/";
+    private final String GET_STOPS_BY_LINE_URL = "/stops-by-line/";
+    private final String GET_LINE_INFO_URL = "/line-info/";
+    private final String ROOT_URL;
 
     // Constructor accepting Context
     public ServerAPI(Context context) {
@@ -27,7 +35,7 @@ public class ServerAPI {
     public boolean passenger_signup(String username, String password)
     {
          String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        String response = Networks.httpPostReq(ROOT_URL + "/passenger/signup", jsonBody);
+        String response = Networks.httpPostReq(ROOT_URL + REGISTER_URL, jsonBody);
         return !response.startsWith("Error");
     }
 
@@ -39,7 +47,7 @@ public class ServerAPI {
 
     //get lines from a given station - client method
     public Line[] get_lines_by_station(int stopId) {
-        String url = ROOT_URL + "/lines-by-station/" + stopId;
+        String url = ROOT_URL + GET_LINES_BY_STATION_URL + stopId;
         String response = Networks.httpGetReq(url);
 
         if (response.startsWith("Error:")) {
@@ -60,7 +68,7 @@ public class ServerAPI {
     public boolean wait_for_me(int trip_id, int stop_id)
     {
         String jsonBody = "{\"trip_id\": " + trip_id + ", \"stop_id\":" + stop_id + "}";
-        String response = Networks.httpPostReq(ROOT_URL + "/passenger/wait-for/", jsonBody);
+        String response = Networks.httpPostReq(ROOT_URL + WAIT_FOR_ME_URL, jsonBody);
         return !response.startsWith("Error");
     }
 
@@ -68,14 +76,14 @@ public class ServerAPI {
     public boolean register_for_line(int trip_id)
     {
         String jsonBody = "{\"trip_id\": " + trip_id + "}";
-        String response = Networks.httpPostReq(ROOT_URL + "/driver/drive/register/", jsonBody);
+        String response = Networks.httpPostReq(ROOT_URL + REGISTER_FOR_LINE_URL, jsonBody);
         return !response.startsWith("Error");
     }
 
     //get driver schedule - driver method
     public Gson get_driver_schedule()
     {
-        String response = Networks.httpGetReq(ROOT_URL + "/driver/schedule/");
+        String response = Networks.httpGetReq(ROOT_URL + GET_DRIVER_SCHEDULE_URL);
         if (response.startsWith("Error"))
         {
             Log.e(TAG, response); // Log the error
@@ -100,7 +108,7 @@ public class ServerAPI {
     //get stopping stations - driver method
     public int[] get_stopping_stations()
     {
-        String url = ROOT_URL + "/driver/where-to-stop/";
+        String url = ROOT_URL + GET_STOPPING_STATIONS_URL;
         String response = Networks.httpGetReq(url);
         if (response.startsWith("Error:")) {
             Log.e(TAG, response); // Log the error
@@ -119,7 +127,7 @@ public class ServerAPI {
     // get line stops - client method
     public StopTime[] get_stops_by_line(int trip_id)
     {
-        String url = ROOT_URL + "/stops-by-line/" + trip_id;
+        String url = ROOT_URL + GET_STOPS_BY_LINE_URL + trip_id;
         String response = Networks.httpGetReq(url);
         if (response.startsWith("Error:")) {
             Log.e(TAG, response); // Log the error
@@ -144,7 +152,7 @@ public class ServerAPI {
     // get info about a given line - driver method
     public Gson get_line_info(int trip_id)
     {
-        String response = Networks.httpGetReq(ROOT_URL + "/line-info/" + trip_id);
+        String response = Networks.httpGetReq(ROOT_URL + GET_LINE_INFO_URL + trip_id);
         if (response.startsWith("Error"))
         {
             Log.e(TAG, response); // Log the error
