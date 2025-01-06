@@ -106,15 +106,19 @@ def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
     """
     # TODO: change the status of nahagos in this specific line and fix checks for validation of line
 
-    driver = connected_drivers.get(cookies_and_milk)
-    if not driver:
-        raise HTTPException(status_code=401, detail="Unauthorized. Please log in as a driver.")
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+        raise HTTPException(status_code=401, detail="User not authenticated") 
     
     update_last_active(cookies_and_milk)
     
     if not db.check_schedule(trip_id):
         raise HTTPException(status_code=401, detail="Line isn't schedualed for you")
     
+    if connected_drivers[cookies_and_milk][2]:
+        raise HTTPException(status_code=401, detail="You already registered for a trip")
+    
+    connected_drivers[cookies_and_milk][2] = trip_id
     registered_trips[trip_id] = set()
 
     return {"message": "Line registered successfully"}
@@ -137,9 +141,9 @@ def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(N
     Check whether or not the station list is up to date, and if not sending changes
     """
     try:
-        # Validate user session
-        if not cookies_and_milk or cookies_and_milk not in connected_drivers:
-            raise HTTPException(status_code=401, detail="User not authenticated")
+        # validate user
+        if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+            raise HTTPException(status_code=401, detail="User not authenticated") 
         
         # Validate date format
         try:
@@ -222,8 +226,8 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     Retrives the stops for a specific line
     """ 
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_users:
-        raise HTTPException(status_code=401, detail="User not authenticated") 
+    #if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+     #   raise HTTPException(status_code=401, detail="User not authenticated") 
 
 
     try:
@@ -266,7 +270,25 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
         lines_json = []
         for line in list_lines:
             lines_json.append({line[0]: [{"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]}]})            
-        return lines_json
+        return {"data" : lines_json}
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
+
+@app.get("/line-shape/{trip_id}")
+def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
+    """
+    Retrives the shape for a specific trip
+    """ 
+    # validate user
+    if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+        raise HTTPException(status_code=401, detail="User not authenticated") 
+
+    try:
+        list_lines = db.get_trip_shape(trip_id)
+        lines_json = []
+        for line in list_lines:
+            lines_json.append({"lat" : line[0], "lon" : line[1]})            
+        return {"Shape" : lines_json}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))

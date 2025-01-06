@@ -49,7 +49,7 @@ class Database:
         #adding default users        
         self.signup_passenger("user1", "password123")
         self.add_driver("driver01", "password123", 6151181, "Alice Johnson", "ABC1234")
-        self.add_driver("driver02", "password123", 1455184, "Chris Lee", "XYZ5678")
+        self.add_driver("driver02", "driver02", 1234567, "Chris Lee", "XYZ5678")
         self.add_driver("driver03", "password123", 1522484, "Maria Davis", "LMN3456")
         self.add_things_to_schedule()
         self.open()
@@ -135,30 +135,21 @@ class Database:
             return False
         
     def add_things_to_schedule(self):
-        self.add_to_schedule('fake_line', 6151181, '1', '1', 'sunday', '06:00')
-        self.add_to_schedule('fake_line', 1522484, '3', '2', 'monday', '07:30')
-        self.add_to_schedule('fake_line', 6151181, '4', '2', 'monday', '19:00')
-        self.add_to_schedule('fake_line', 1455184, '5', '3', 'tuesday', '08:00')
-        self.add_to_schedule('fake_line', 1522484, '6', '3', 'tuesday', '20:00')
-        self.add_to_schedule('fake_line', 6151181, '7', '4', 'wednesday', '09:00')
-        self.add_to_schedule('fake_line', 1455184, '8', '4', 'wednesday', '21:00')
-        self.add_to_schedule('fake_line', 1522484, '9', '5', 'thursday', '10:00')
-        self.add_to_schedule('fake_line', 6151181, '10', '5', 'thursday', '22:00')
-        self.add_to_schedule('fake_line', 1455184, '11', '6', 'friday', '11:00')
-        self.add_to_schedule('fake_line', 1522484, '12', '6', 'friday', '23:00')
-        self.add_to_schedule('fake_line', 6151181, '13', '7', 'saturday', '12:00')
-        self.add_to_schedule('fake_line', 1455184, '14', '7', 'saturday', '00:00')
-        self.add_to_schedule('fake_line', 1522484, '15', '1', 'sunday', '06:30')
-        self.add_to_schedule('fake_line', 6151181, '16', '1', 'sunday', '18:30')
-        self.add_to_schedule('fake_line', 1455184, '17', '2', 'monday', '07:30')
-        self.add_to_schedule('fake_line', 1522484, '18', '2', 'monday', '19:30')
-        self.add_to_schedule('fake_line', 6151181, '19', '3', 'tuesday', '08:30')
-        self.add_to_schedule('fake_line', 1455184, '20', '3', 'tuesday', '20:30')
-        self.add_to_schedule('fake_line', 1522484, '21', '4', 'wednesday', '09:30')
-        self.add_to_schedule('fake_line', 6151181, '22', '4', 'wednesday', '21:30')
-        self.add_to_schedule('fake_line', 1455184, '23', '5', 'thursday', '10:30')
-        self.add_to_schedule('fake_line', 1522484, '24', '5', 'thursday', '22:30')
-        self.add_to_schedule('fake_line', 6151181, '25', '6', 'friday', '06:00')
+        self.add_to_schedule('fake_line', 6151181, '12', '5656648_311224', 'sunday', '06:40')
+        self.add_to_schedule('fake_line', 1234567, '8', '17332096_261224', 'sunday', '18:00')
+        self.add_to_schedule('fake_line', 1522484, '8', '2568376_261224', 'sunday', '17:20')
+        self.add_to_schedule('fake_line', 6151181, '8', '2568332_011224', 'sunday', '10:55')
+        self.add_to_schedule('fake_line', 1234567, '8', '17332309_261224', 'sunday', '07:50')
+        self.add_to_schedule('fake_line', 1522484, '8', '13077356_011224', 'sunday', '18:40')
+        self.add_to_schedule('fake_line', 6151181, '46', '27660227_261224', 'sunday', '08:30')
+        self.add_to_schedule('fake_line', 1234567, '46', '3148_261224', 'sunday', '08:05')
+        self.add_to_schedule('fake_line', 1522484, '46', '47974694_251224', 'sunday', '06:40')
+        self.add_to_schedule('fake_line', 6151181, '56', '26493025_311224', 'sunday', '15:45')
+        self.add_to_schedule('fake_line', 1234567, '57', '584632122_011224', 'sunday', '13:45')
+        self.add_to_schedule('fake_line', 1522484, '57', '585422673_011224', 'sunday', '10:45')
+        self.add_to_schedule('fake_line', 6151181, '57', '3559_261224', 'sunday', '12:35')
+        self.add_to_schedule('fake_line', 1234567, '57', '56445279_261224', 'sunday', '12:20')
+
 
         
     def add_to_schedule(self, name, driver_id, line, trip_id, day, hour):
@@ -276,13 +267,30 @@ class Database:
         schedule = self.cursor.fetchall()
         self.close()
         return schedule
-
-        
+    
+    def get_trip_shape(self, trip_id):
+        self.open()
+        self.cursor.execute('SELECT shape_id FROM trips where trip_id = ?', (trip_id,))
+        shape_id = self.cursor.fetchone()
+        if shape_id:
+            self.cursor.execute('SELECT shape_pt_lat, shape_pt_lon FROM shapes where shape_id = ?', (shape_id[0],))
+            shape = self.cursor.fetchall()
+        else:
+            shape = []
+        self.close()
+        return shape
+    
+    def check_schedule(self, trip_id, driver_id):
+        self.open()
+        self.cursor.execute('SELECT * FROM schedule where trip_id = ? and driver_id = ?', (trip_id, driver_id))
+        res = self.cursor.fetchone()
+        self.close()
+        return res is not None
         
 
 if __name__ == "__main__":
     db = Database("db.sql")
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
-    print(db.get_driver_schedule(6151181))
+    print(db.check_schedule('5656648_311224', 6151181))
     db.close()
