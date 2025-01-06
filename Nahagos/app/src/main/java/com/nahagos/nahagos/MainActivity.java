@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!driverId.isEmpty()) {
                         emptyFields.setVisibility(TextView.GONE);
                         serverAPI.driverLogin(username, password, driverId);
+                        serverAPI.get_driver_schedule();
                     }
                     else {
                         emptyFields.setVisibility(TextView.VISIBLE);
