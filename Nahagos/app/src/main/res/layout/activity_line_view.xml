@@ -41,6 +41,7 @@
         android:layout_width="111dp"
         android:layout_height="90dp"
         android:src="@drawable/driver"
+        android:visibility="invisible"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
 
@@ -55,11 +56,11 @@
         map:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/back_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:text="<"
+        android:text="חזור"
         map:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent" />

@@ -8,7 +8,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.nahagos.nahagos.Networks;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ServerAPI {
     private final String PASSENGER_LOGIN_URL = "/passenger/login/";
@@ -76,7 +79,7 @@ public class ServerAPI {
     }
 
     //register for a line - driver method
-    public boolean register_for_line(int trip_id)
+    public boolean register_for_line(String trip_id)
     {
         String jsonBody = "{\"trip_id\": " + trip_id + "}";
         String response = Networks.httpPostReq(ROOT_URL + REGISTER_FOR_LINE_URL, jsonBody);
@@ -128,26 +131,28 @@ public class ServerAPI {
     }
 
     // get line stops - client method
-    public StopTime[] get_stops_by_line(int trip_id)
+    public StopTime[] get_stops_by_line(String trip_id)
     {
         String url = ROOT_URL + GET_STOPS_BY_LINE_URL + trip_id;
         String response = Networks.httpGetReq(url);
         if (response.startsWith("Error:")) {
             Log.e(TAG, response); // Log the error
-            return null; // Handle the error as needed (e.g., return null or notify the user)
+            return new StopTime[0]; // Handle the error as needed (e.g., return null or notify the user)
         }
 
         else
         {
             try
             {
-                Gson gson = new Gson();
-                return gson.fromJson(response, StopTime[].class);
+                StopTime[] out = new Gson().fromJson(response, StopTime[].class);
+                if (out == null)
+                    out = new StopTime[0];
+                return out;
             }
             catch (Exception e)
             {
                 Log.e(TAG, "Error parsing response to Gson", e);
-                return null;
+                return new StopTime[0];
             }
         }
     }

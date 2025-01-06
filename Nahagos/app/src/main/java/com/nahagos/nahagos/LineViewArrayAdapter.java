@@ -8,18 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Button;
+import android.util.Pair;
 
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
-public class LineViewArrayAdapter extends ArrayAdapter<StopTime> {
+public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> {
     private final Context context;
     private final boolean isDriver;
     private final int enableStopButton;
 
-    public LineViewArrayAdapter(@NonNull Context c, int resource, @NonNull ArrayList<StopTime> stops, boolean isDriver, int stopId) {
+    public LineViewArrayAdapter(@NonNull Context c, int resource, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId) {
         super(c, R.layout.line_view_stop_element, stops);
         context = c;
         this.isDriver = isDriver;
@@ -36,17 +37,19 @@ public class LineViewArrayAdapter extends ArrayAdapter<StopTime> {
         TextView stopTime = convertView.findViewById(R.id.stop_time);
         Button stopButton = convertView.findViewById(R.id.stop_btn);
 
-        StopTime current = getItem(position);
+        Pair<StopTime, Boolean> current = getItem(position);
         if (current == null)
             return convertView;
 
+        stopButton.setEnabled(!isDriver && current.first.stop_id == enableStopButton);
 
-        stopButton.setEnabled(!isDriver && !current.toStop && current.stopId == enableStopButton);
-        //stopButton.setBackgroundColor(Color.parseColor(current.toStop ? "#FFFFFF" : "#000000"));
+        if (isDriver && current.second) {
+            stopButton.setVisibility(View.VISIBLE);
+        }
 
-        String stopNameId = current.stopName + " | " + current.stopId;
+        String stopNameId = current.first.stop_name + " | " + current.first.stop_id;
         stopName.setText(stopNameId);
-        stopTime.setText(current.time);
+        stopTime.setText(current.first.time);
         return convertView;
     }
 }

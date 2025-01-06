@@ -1,13 +1,17 @@
 package com.nahagos.nahagos;
 
-//import android.content.Intent;
+import android.app.MediaRouteButton;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
@@ -21,10 +25,13 @@ import android.widget.TextView;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class lineView extends AppCompatActivity {
 
-    private final ArrayList<StopTime> stops = new ArrayList<>();
+    private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
     private final int lineId = 0;
     private int myStop = -1;
@@ -49,14 +56,28 @@ public class lineView extends AppCompatActivity {
             return insets;
         });
 
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
+
         ListView stopsList = findViewById(R.id.stops_list);
         Button startDriveBtn = findViewById(R.id.start_drive_btn);
+        Button backBtn = findViewById(R.id.back_btn);
         ConstraintLayout layout = findViewById(R.id.line_view_layout);
         TextView title = findViewById(R.id.line_title);
-        Intent intent = getIntent();
+        ImageView nahagosImg = findViewById(R.id.nahagos_img);
 
-        layout.setBackgroundColor(Color.parseColor(intent.getStringExtra("lineColor")));
-        title.setText(intent.getStringExtra("lineName"));
+        Intent intent = getIntent();
+        ServerAPI sapi = new ServerAPI(this);
+
+        backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+        String lineColor = intent.getStringExtra("lineColor");
+        if (lineColor != null && !lineColor.isEmpty())
+            layout.setBackgroundColor(Color.parseColor(lineColor));
+
+        String lineName = intent.getStringExtra("lineName");
+        if (lineName == null || lineName.isEmpty())
+            lineName = "Error! line name not found";
+        title.setText(lineName);
 
         mainHandler = new Handler(Looper.getMainLooper());
 
@@ -68,50 +89,66 @@ public class lineView extends AppCompatActivity {
             }
         }
         else {
-            myStop = intent.getIntExtra("stopId", 1234);
+            myStop = intent.getIntExtra("stopId", 37352);
+            nahagosImg.setVisibility(intent.getBooleanExtra("nahagosOnline", false) ? View.VISIBLE : View.INVISIBLE);
         }
+
         stops.clear();
 
-        ArrayList<StopTime> tmpstops = new ArrayList<>();
-        tmpstops.add(new StopTime("16:19", 1234, "חיפה", false));
-        tmpstops.add(new StopTime("17:14", 1255, "מקום בארץ", true));
-        tmpstops.add(new StopTime("18:11", 1289, "מקום שהוא עדיין בארץ", false));
-        tmpstops.add(new StopTime("20:13", 5324, "טבריה", false));
+        String trip_id = intent.getStringExtra("trip_id");
+        if (trip_id == null || trip_id.isEmpty())
+            trip_id = "1_238970";
+        stops.addAll(Arrays.stream(sapi.get_stops_by_line(trip_id)).map((st) -> {
+            return new Pair<StopTime, Boolean>(st, false);
+        }).collect(Collectors.toList()));
 
-        stops.addAll(tmpstops);
-        //stops.addAll(ServerAPI.get_stops_by_line(intent.getIntExtra("trip_id", 0)));
         stationsAdapter = new LineViewArrayAdapter(getBaseContext(), R.layout.line_view_stop_element, stops, isDriver, myStop);
         stopsList.setAdapter(stationsAdapter);
 
+        String finalTrip_id = trip_id;
         startDriveBtn.setOnClickListener((v) -> {
+            boolean worked = true;
             if (isDriver && canStartDrive) {
                 driveStarted = true;
-                // TODO: send server that this driver is the Nahagos of this drive.
-                listenForStoppingUpdates();
+                worked = sapi.register_for_line(finalTrip_id);
+                listenForStoppingUpdates(intent.getStringExtra("trip_id"), sapi);
+
+                if (worked)
+                    nahagosImg.setVisibility(View.VISIBLE);
             }
             // if the user is not the driver, or he can't start a drive, the button shouldn't be visible.
             // of course, the same thing is true if the driver can start a drive, and has started it.
-            startDriveBtn.setVisibility(View.INVISIBLE);
+            // anyway - don't show the button.
+            if (!worked)
+                startDriveBtn.setVisibility(View.INVISIBLE);
         });
     }
 
-    private void listenForStoppingUpdates() {
+    private void listenForStoppingUpdates(String trip_id, ServerAPI sapi) {
+        if (trip_id == null || trip_id.isEmpty()) {
+            trip_id = "1_238970";
+        }
+        String finalTrip_id = trip_id;
+
         serverListeningThread = new Thread(() -> {
             try {
-                boolean t = true;
+//                boolean t = true;
                 while (!Thread.interrupted()) {
                     stops.clear();
-                    //stops.addAll(ServerAPI.get_stops_by_line(intent.getIntExtra("trip_id", 0)));
-                    ArrayList<StopTime> tmpstops = new ArrayList<>();
-                    tmpstops.add(new StopTime("16:19", 1234, "חיפה", t));
-                    tmpstops.add(new StopTime("17:14", 1255, "מקום בארץ", !t));
-                    tmpstops.add(new StopTime("18:11", 1289, "מקום שהוא עדיין בארץ", t));
-                    tmpstops.add(new StopTime("20:13", 5324, "טבריה", t));
-                    stops.addAll(tmpstops);
+                    stops.addAll(Arrays.stream(sapi.get_stops_by_line(finalTrip_id)).map((st) -> {
+                        return new Pair<StopTime, Boolean>(st, false);
+                    }).collect(Collectors.toList()));
+
+//                    ArrayList<StopTime> tmpstops = new ArrayList<>();
+//                    tmpstops.add(new StopTime("16:19", 1234, "חיפה", t));
+//                    tmpstops.add(new StopTime("17:14", 1255, "מקום בארץ", !t));
+//                    tmpstops.add(new StopTime("18:11", 1289, "מקום שהוא עדיין בארץ", t));
+//                    tmpstops.add(new StopTime("20:13", 5324, "טבריה", t));
+//                    stops.addAll(tmpstops);
 
                     mainHandler.post(() -> stationsAdapter.notifyDataSetChanged());
 
-                    t = !t;
+                    //t = !t;
 
                     Thread.sleep(1000);
                 }
