@@ -12,14 +12,14 @@ public class ServerAPI {
         ROOT_URL = "http://" + context.getString(R.string.server_ip) + ":8000";
     }
 
-    public void passengerLogin(String username, String password)
+    public boolean passengerLogin(String username, String password)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody);
+        return Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody) == 200;
     }
-    public void driverLogin(String username, String password, String id)
+    public boolean driverLogin(String username, String password, String id)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\","+"\"id\":\""+id+"\"}";
-        Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody);
+        return Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody) == 200;
     }
 }
