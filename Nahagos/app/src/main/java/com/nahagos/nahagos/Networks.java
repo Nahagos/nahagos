@@ -15,6 +15,9 @@ public class Networks {
 
     private static String sessionCookie; // To store the session cookie
 
+    private static final Gson gson = new Gson();
+
+
     // Helper method to set up a connection
     private static HttpURLConnection setupConnection(String urlString, String method) throws Exception {
         URL url = new URL(urlString);
@@ -67,7 +70,6 @@ public class Networks {
     // Method for HTTP GET request
     public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
         HttpURLConnection connection = null;
-        Gson gson = new Gson();
 
         try {
             // Setup connection
@@ -98,8 +100,6 @@ public class Networks {
 
     public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
-        Gson gson = new Gson();
-
         try {
             // Setup connection
             connection = setupConnection(requestUrl, "POST");
