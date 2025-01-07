@@ -10,13 +10,15 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.nahagos.nahagos.Networks;
 
+
+
 public class ServerAPI {
     private final String PASSENGER_LOGIN_URL = "/passenger/login/";
     private final String DRIVER_LOGIN_URL = "/driver/login/";
     private final String REGISTER_URL = "/passenger/register/";
     private final String GET_LINES_BY_STATION_URL = "/lines-by-station/";
     private final String WAIT_FOR_ME_URL = "/passenger/wait-for/";
-    private final String REGISTER_FOR_LINE_URL = "/driver/register-for/";
+    private final String REGISTER_FOR_LINE_URL = "/driver/drive/register/";
     private final String GET_DRIVER_SCHEDULE_URL = "/driver/schedule/";
     private final String GET_STOPPING_STATIONS_URL = "/driver/where-to-stop/";
     private final String GET_STOPS_BY_LINE_URL = "/stops-by-line/";
@@ -58,7 +60,8 @@ public class ServerAPI {
     public Line[] get_lines_by_station(int stopId) {
         String url = ROOT_URL + GET_LINES_BY_STATION_URL + stopId;
         Line[] response = Networks.httpGetReq(url, Line[].class);
-
+        if (response == null)
+            return new Line[0];
         return response;
     }
 
@@ -90,21 +93,27 @@ public class ServerAPI {
     {
         String url = ROOT_URL + GET_STOPPING_STATIONS_URL;
         int[] response = Networks.httpGetReq(url, int[].class);
+        if (response == null)
+            return new int[0];
         return response;
     }
 
     // get line stops - client method
-    public StopTime[] get_stops_by_line(int trip_id)
+    public StopTime[] get_stops_by_line(String trip_id)
     {
         String url = ROOT_URL + GET_STOPS_BY_LINE_URL + trip_id;
         StopTime[] response = Networks.httpGetReq(url, StopTime[].class);
+        if (response == null)
+            return new StopTime[0];
         return  response;
     }
 
     // get shape of a given line - driver method
-    public Point[] get_line_shape(int trip_id)
+    public Point[] get_line_shape(String trip_id)
     {
         Point[] response = Networks.httpGetReq(ROOT_URL + GET_LINE_SHAPE + trip_id, Point[].class);
-        return response;
+        if (response == null)
+            return new Point[0];
+        return response  ;
     }
 }
