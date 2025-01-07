@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.datatypes;
 
 public class StopTime {
     public String time;

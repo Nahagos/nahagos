@@ -6,11 +6,8 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.nahagos.nahagos.Networks;
-
+import com.nahagos.nahagos.datatypes.Line;
+import com.nahagos.nahagos.datatypes.StopTime;
 
 
 public class ServerAPI {
