@@ -65,13 +65,13 @@ public class Networks {
     }
 
     // Method for HTTP GET request
-    public static <T> T httpGetReq(String urlString, Class<T> classOfT) {
+    public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
         HttpURLConnection connection = null;
         Gson gson = new Gson();
 
         try {
             // Setup connection
-            connection = setupConnection(urlString, "GET");
+            connection = setupConnection(requestUrl, "GET");
             int responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
 
@@ -81,7 +81,7 @@ public class Networks {
                 Log.d(TAG, "Response: " + response);
 
                 // Convert response string into a Gson object
-                return gson.fromJson(response, classOfT);
+                return gson.fromJson(response, responseType);
             } else {
                 Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
                 return null;
@@ -96,13 +96,13 @@ public class Networks {
         }
     }
 
-    public static <T> T httpPostReq(String urlString, String postData, Class<T> classOfT) {
+    public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
         Gson gson = new Gson();
 
         try {
             // Setup connection
-            connection = setupConnection(urlString, "POST");
+            connection = setupConnection(requestUrl, "POST");
 
             // Write data to the output stream
             try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
@@ -121,7 +121,7 @@ public class Networks {
                 String response = readResponse(connection);
                 Log.d(TAG, "Response: " + response);
                 // Convert the response to the specified class type
-                return gson.fromJson(response, classOfT);
+                return gson.fromJson(response, responseType);
             } else {
                 Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
                 return null;
