@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -109,11 +110,11 @@ public class ServerAPI {
     }
 
     // get shape of a given line - driver method
-    public Point[] get_line_shape(String trip_id)
+    public LatLng[] get_line_shape(String trip_id)
     {
-        Point[] response = Networks.httpGetReq(ROOT_URL + GET_LINE_SHAPE + trip_id, Point[].class);
+        LatLng[] response = Networks.httpGetReq(ROOT_URL + GET_LINE_SHAPE + trip_id, LatLng[].class);
         if (response == null)
-            return new Point[0];
-        return response  ;
+            return new LatLng[0];
+        return response;
     }
 }
