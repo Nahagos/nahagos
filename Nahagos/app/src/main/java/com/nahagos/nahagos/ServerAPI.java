@@ -71,9 +71,9 @@ public class ServerAPI {
     }
 
     //passenger method - wait for a passenger at a given station
-    public boolean wait_for_me(int trip_id, int stop_id)
+    public boolean wait_for_me(String trip_id, int stop_id)
     {
-        String jsonBody = "{\"trip_id\": " + trip_id + ", \"stop_id\":" + stop_id + "}";
+        String jsonBody = "{\"trip_id\": \"" + trip_id + "\", \"stop_id\":" + stop_id + "}";
         String response = Networks.httpPostReq(ROOT_URL + WAIT_FOR_ME_URL, jsonBody);
         return !response.startsWith("Error");
     }

@@ -25,12 +25,23 @@
         app:layout_constraintEnd_toStartOf="@+id/stop_name"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/stopping_img"
+        android:layout_width="80dp"
+        android:layout_height="31dp"
+        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        app:layout_constraintEnd_toEndOf="@+id/stop_btn"
+        app:layout_constraintStart_toStartOf="@+id/stop_btn"
+        app:layout_constraintTop_toTopOf="@+id/stop_btn"
+        app:srcCompat="@drawable/hand" />
+
     <Button
         android:id="@+id/stop_btn"
         android:layout_width="99dp"
         android:layout_height="42dp"
         android:layout_marginStart="20dp"
-        android:text="עצור"
+        android:foregroundGravity="center|fill"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

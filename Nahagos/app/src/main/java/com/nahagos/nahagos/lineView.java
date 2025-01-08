@@ -1,9 +1,7 @@
 package com.nahagos.nahagos;
 
-import android.app.MediaRouteButton;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.ImageFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,10 +24,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
-public class lineView extends AppCompatActivity {
+public class LineView extends AppCompatActivity implements StopButtonListener {
 
     private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
@@ -44,6 +42,9 @@ public class lineView extends AppCompatActivity {
 
     private Handler mainHandler;
     private Thread serverListeningThread;
+
+    private ServerAPI sapi;
+    private String trip_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +66,8 @@ public class lineView extends AppCompatActivity {
         TextView title = findViewById(R.id.line_title);
         ImageView nahagosImg = findViewById(R.id.nahagos_img);
 
+        sapi = new ServerAPI(this);
         Intent intent = getIntent();
-        ServerAPI sapi = new ServerAPI(this);
 
         backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
@@ -76,7 +77,7 @@ public class lineView extends AppCompatActivity {
 
         String lineName = intent.getStringExtra("lineName");
         if (lineName == null || lineName.isEmpty())
-            lineName = "Error! line name not found";
+            lineName = "יבנה 12";
         title.setText(lineName);
 
         mainHandler = new Handler(Looper.getMainLooper());
@@ -89,20 +90,20 @@ public class lineView extends AppCompatActivity {
             }
         }
         else {
-            myStop = intent.getIntExtra("stopId", 37352);
+            myStop = intent.getIntExtra("stopId", 15784);
             nahagosImg.setVisibility(intent.getBooleanExtra("nahagosOnline", false) ? View.VISIBLE : View.INVISIBLE);
         }
 
         stops.clear();
 
-        String trip_id = intent.getStringExtra("trip_id");
+        trip_id = intent.getStringExtra("trip_id");
         if (trip_id == null || trip_id.isEmpty())
-            trip_id = "1_238970";
+            trip_id = "5656648_311224";
         stops.addAll(Arrays.stream(sapi.get_stops_by_line(trip_id)).map((st) -> {
             return new Pair<StopTime, Boolean>(st, false);
         }).collect(Collectors.toList()));
 
-        stationsAdapter = new LineViewArrayAdapter(getBaseContext(), R.layout.line_view_stop_element, stops, isDriver, myStop);
+        stationsAdapter = new LineViewArrayAdapter(this, R.layout.line_view_stop_element, stops, isDriver, myStop, trip_id);
         stopsList.setAdapter(stationsAdapter);
 
         String finalTrip_id = trip_id;
@@ -126,29 +127,25 @@ public class lineView extends AppCompatActivity {
 
     private void listenForStoppingUpdates(String trip_id, ServerAPI sapi) {
         if (trip_id == null || trip_id.isEmpty()) {
-            trip_id = "1_238970";
+            trip_id = "5656648_311224";
         }
         String finalTrip_id = trip_id;
 
         serverListeningThread = new Thread(() -> {
             try {
-//                boolean t = true;
                 while (!Thread.interrupted()) {
-                    stops.clear();
-                    stops.addAll(Arrays.stream(sapi.get_stops_by_line(finalTrip_id)).map((st) -> {
-                        return new Pair<StopTime, Boolean>(st, false);
-                    }).collect(Collectors.toList()));
-
-//                    ArrayList<StopTime> tmpstops = new ArrayList<>();
-//                    tmpstops.add(new StopTime("16:19", 1234, "חיפה", t));
-//                    tmpstops.add(new StopTime("17:14", 1255, "מקום בארץ", !t));
-//                    tmpstops.add(new StopTime("18:11", 1289, "מקום שהוא עדיין בארץ", t));
-//                    tmpstops.add(new StopTime("20:13", 5324, "טבריה", t));
-//                    stops.addAll(tmpstops);
+                    ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(sapi.get_stopping_stations()).boxed().collect(Collectors.toList()));
+                    stops.forEach(n -> {
+                                // This step is just for illustration; in real cases, it might mutate elements
+                                // in the original list if it were not final.
+                                if (toStopStations.stream().anyMatch((i) -> {
+                                return i == n.first.stop_id;})) {
+                                    Pair<StopTime, Boolean> newN = new Pair<>(n.first, true);
+                                    stops.set(stops.indexOf(n), newN);  // Update original list
+                                }
+                            });
 
                     mainHandler.post(() -> stationsAdapter.notifyDataSetChanged());
-
-                    //t = !t;
 
                     Thread.sleep(1000);
                 }
@@ -174,5 +171,12 @@ public class lineView extends AppCompatActivity {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
+    }
+
+    @Override
+    public boolean onButtonClicked(int stopId) {
+        if (sapi != null)
+            return sapi.wait_for_me(trip_id, stopId);
+        return false;
     }
 }
