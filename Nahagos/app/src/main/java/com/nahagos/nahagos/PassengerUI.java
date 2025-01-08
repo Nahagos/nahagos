@@ -169,12 +169,7 @@ public class PassengerUI extends FragmentActivity {
     }
 
     public boolean onStopClick(Stop stop) {
-        // TODO: show lines arriving/planned for selected station.
-        System.out.println("PassengerUI.onStopClick");
-        System.out.println("marker = [" + stop + "]");
-
         LocationDetailsBottomSheet.newInstance(stop).show(getSupportFragmentManager(), "location_details");
-
         return false;
     }
 }
