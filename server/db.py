@@ -242,13 +242,16 @@ class Database:
         return lines    
     
     def check_stop_on_trip(self, trip_id, stop_id):
+        self.open()
         self.cursor.execute(f"""
                     SELECT stop_id
                     FROM stop_times
-                    WHERE stop_id = ?,
+                    WHERE stop_id = ? AND
                     trip_id = ?
                     """, (stop_id, trip_id))
-        return self.cursor.fetchall() is not None
+        res = self.cursor.fetchall()
+        self.close()
+        return res is not None
     
     def get_stops_by_trip_id(self, trip_id):
         self.open()
@@ -282,10 +285,13 @@ class Database:
     
     def check_schedule(self, trip_id, driver_id):
         self.open()
-        self.cursor.execute('SELECT * FROM schedule where trip_id = ? and driver_id = ?', (trip_id, driver_id))
+        self.cursor.execute('SELECT day FROM schedule where trip_id = ? and driver_id = ?', (trip_id, driver_id))
         res = self.cursor.fetchone()
         self.close()
         return res is not None
+        if not res:
+            return False
+        return res[0] == datetime.now().strftime("%A").lower()
         
 
 if __name__ == "__main__":

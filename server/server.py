@@ -19,6 +19,13 @@ class DriverLogin(BaseModel):
     id: int
     username: str
     password: str
+    
+class DriverRegister(BaseModel):
+    trip_id : str
+
+class PassengerWait(BaseModel):
+    trip_id: str
+    stop_id: int
 
 connected_users = {}
 
@@ -28,7 +35,7 @@ registered_trips = {}       # trip_id : [stops_list]
 
 db = Database("db.sql")
 
-def driver_connectivity():
+def driver_connectivity():                          #need to fix
     for driver, properties in connected_drivers.items():
         if (datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
             del registered_trips[properties[2]]
@@ -50,6 +57,22 @@ def root():
 def update_last_active(driver_cookie):
     connected_drivers[driver_cookie][1] = datetime.now()
  
+@app.get("/end-trip/")
+def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
+    """
+    The driver informs the server that the trip is over
+    """
+    # validate user
+    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    #checks if the driver was on a trip
+    if connected_drivers[cookies_and_milk] in None:
+        raise HTTPException(status_code=401, detail="No trip to end")
+    
+    del registered_trips[connected_drivers[cookies_and_milk]]
+    connected_drivers[cookies_and_milk] = None
+    return {"message": "The trip ended successfully"}
 
 @app.get("/lines-by-station/{stop_id}")
 def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
@@ -64,8 +87,8 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
         for line in list_lines:
-            lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4]})            
-        return {"lines": lines_json}
+            lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : line[0] in registered_trips})            
+        return lines_json
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -80,17 +103,17 @@ def update_arrival_time(station_id: int, bus_id: int):
 
 
 @app.post("/passenger/wait-for/")
-def passenger_wait_for_bus(stop_id: int, trip_id: int, cookies_and_milk:str = Cookie(None)):
+def passenger_wait_for_bus(wait_for : PassengerWait, cookies_and_milk:str = Cookie(None)):
     """
     Log that a passenger is waiting for a specific bus at a given station.
     """
      # Validate user session
-    if not cookies_and_milk or cookies_and_milk not in connected_users:
-        raise HTTPException(status_code=401, detail="User not authenticated")
+    # if not cookies_and_milk or cookies_and_milk not in connected_users:
+    #     raise HTTPException(status_code=401, detail="User not authenticated")
     
-    if db.check_stop_on_trip(trip_id, stop_id):
-        if trip_id in registered_trips.keys:
-            registered_trips[trip_id].add(stop_id)
+    if db.check_stop_on_trip(wait_for.trip_id, wait_for.stop_id):
+        if wait_for.trip_id in registered_trips.keys():
+            registered_trips[wait_for.trip_id].add(wait_for.stop_id)
             return {"message": "Passenger wait request logged successfully"}
         raise HTTPException(status_code=401, detail="No Nahagos!")
 
@@ -100,26 +123,27 @@ def passenger_wait_for_bus(stop_id: int, trip_id: int, cookies_and_milk:str = Co
 
 
 @app.post("/driver/drive/register/")
-def register_for_line(trip_id: int, cookies_and_milk: str = Cookie(None)):
+def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None)):
     """
     Register a driver for a specific line
     """
     # TODO: change the status of nahagos in this specific line and fix checks for validation of line
 
+    
     # validate user
     if not cookies_and_milk or cookies_and_milk not in connected_drivers:
         raise HTTPException(status_code=401, detail="User not authenticated") 
     
     update_last_active(cookies_and_milk)
     
-    if not db.check_schedule(trip_id):
+    if not db.check_schedule(reg.trip_id, connected_drivers[cookies_and_milk][0]):
         raise HTTPException(status_code=401, detail="Line isn't schedualed for you")
     
     if connected_drivers[cookies_and_milk][2]:
         raise HTTPException(status_code=401, detail="You already registered for a trip")
     
-    connected_drivers[cookies_and_milk][2] = trip_id
-    registered_trips[trip_id] = set()
+    connected_drivers[cookies_and_milk][2] = reg.trip_id
+    registered_trips[reg.trip_id] = set()
 
     return {"message": "Line registered successfully"}
 
@@ -235,7 +259,7 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         lines_json = []
         for line in list_lines:
             lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": line[2], "stop_lat": line[3], "stop_lon": line[4]})            
-        return {"stops": lines_json}
+        return lines_json
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -251,8 +275,8 @@ def where_to_stop(cookies_and_milk :str = Cookie(None)):
     
     update_last_active(cookies_and_milk)
     if connected_drivers[cookies_and_milk][2]:
-        return {'stops': registered_trips[connected_drivers[cookies_and_milk][2]]}
-    return  {'stops' : []}
+        return registered_trips[connected_drivers[cookies_and_milk][2]]
+    return  []
 
 
 @app.get("/driver/schedule/")
@@ -267,10 +291,18 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
     update_last_active(cookies_and_milk)
     try:
         list_lines = db.get_driver_schedule(connected_drivers[cookies_and_milk][0])
-        lines_json = []
+        days = {
+            "sunday": [],
+            "monday": [],
+            "tuesday": [],
+            "wednesday": [],
+            "thursday": [],
+            "friday": [],
+            "saturday": []
+        }
         for line in list_lines:
-            lines_json.append({line[0]: [{"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]}]})            
-        return {"data" : lines_json}
+            days[line[0]].append({"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]})
+        return days
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -289,6 +321,9 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
         lines_json = []
         for line in list_lines:
             lines_json.append({"lat" : line[0], "lon" : line[1]})            
-        return {"Shape" : lines_json}
+        return lines_json
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
+    
+    
+    
