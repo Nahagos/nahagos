@@ -63,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
                     if (!driverId.isEmpty()) {
                         emptyFields.setVisibility(TextView.GONE);
                         serverAPI.driverLogin(username, password, driverId);
-                        serverAPI.get_driver_schedule();
-                        serverAPI.get_line_shape("5656648_311224");
-                        serverAPI.register_for_line("5656648_311224");
-                        serverAPI.get_stopping_stations();
+                        serverAPI.getDriverSchedule();
+                        serverAPI.getLineShape("5656648_311224");
+                        serverAPI.registerForLine("5656648_311224");
+                        serverAPI.getStoppingStations();
                     }
                     else {
                         emptyFields.setVisibility(TextView.VISIBLE);
@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     emptyFields.setVisibility(TextView.GONE);
                     serverAPI.passengerLogin(username, password);
-                    serverAPI.get_stops_by_line("5656648_311224");
-                    serverAPI.get_lines_by_station(1);
+                    serverAPI.getStopsByLine("5656648_311224");
+                    serverAPI.getLinesByStation(1);
                 }
             }
             else {
