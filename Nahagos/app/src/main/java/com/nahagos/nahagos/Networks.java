@@ -15,7 +15,7 @@ import java.net.URL;
 public class Networks {
     private static final String TAG = "HTTP";
 
-    private static String sessionCookie; // To store the session cookie
+    private static String sessionCookie;
 
     private static final Gson gson = new Gson();
 
@@ -25,15 +25,15 @@ public class Networks {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
-        connection.setConnectTimeout(5000); // 5sec timeout
+        connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
         if (sessionCookie != null) {
-            connection.setRequestProperty("Cookie", sessionCookie); // Send the session cookie
+            connection.setRequestProperty("Cookie", sessionCookie);
         }
 
         if ("POST".equalsIgnoreCase(method)) {
-            connection.setDoOutput(true); // Enable output for POST
+            connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
         }
 
