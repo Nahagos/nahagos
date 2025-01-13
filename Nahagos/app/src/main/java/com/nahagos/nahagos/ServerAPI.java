@@ -11,8 +11,9 @@ import com.nahagos.nahagos.datatypes.Schedule;
 import com.nahagos.nahagos.datatypes.StopTime;
 
 
+
 public class ServerAPI {
-    private static final String ROOT_URL= "http://" + R.string.server_ip + ":8000";
+    private static final String ROOT_URL = "http://" + BuildConfig.SERVER_IP + ":8000";
     public enum Endpoint {
         PASSENGER_LOGIN("/passenger/login/"),
         DRIVER_LOGIN("/driver/login/"),
