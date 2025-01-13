@@ -66,16 +66,16 @@ public class ServerAPI {
     public boolean wait_for_me(String trip_id, int stop_id)
     {
         String jsonBody = "{\"trip_id\": \"" + trip_id + "\", \"stop_id\":" + stop_id + "}";
-        String response = Networks.httpPostReq(ROOT_URL + WAIT_FOR_ME_URL, jsonBody);
-        return !response.startsWith("Error");
+        int response = Networks.httpPostReq(ROOT_URL + WAIT_FOR_ME_URL, jsonBody);
+        return response == 200;
     }
 
     //register for a line - driver method
     public boolean register_for_line(String trip_id)
     {
         String jsonBody = "{\"trip_id\": " + trip_id + "}";
-        String response = Networks.httpPostReq(ROOT_URL + REGISTER_FOR_LINE_URL, jsonBody);
-        return !response.startsWith("Error");
+        int response = Networks.httpPostReq(ROOT_URL + REGISTER_FOR_LINE_URL, jsonBody);
+        return response == 200;
     }
 
     //get driver schedule - driver method

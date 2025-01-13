@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 
+import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
