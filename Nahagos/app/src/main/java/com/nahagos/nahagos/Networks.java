@@ -108,7 +108,6 @@ public class Networks {
         return httpGetReq(requestUrl, responseType, null);
     }
 
-
     public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
         try {
@@ -147,4 +146,39 @@ public class Networks {
         }
     }
 
+    public static boolean httpPostReq(String requestUrl, String postData) {
+        HttpURLConnection connection = null;
+        try {
+            // Setup connection
+            connection = setupConnection(requestUrl, "POST");
+
+            // Write data to the output stream
+            try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
+                writer.write(postData);
+                writer.flush();
+            }
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+            Log.d(TAG, "Response Code: " + responseCode);
+
+            // Check if the response is 200 OK or 201 Created
+            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                if (sessionCookie == null) {
+                    saveCookies(connection);
+                }
+                return true;
+            } else {
+                Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in HTTP POST request", e);
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
 }

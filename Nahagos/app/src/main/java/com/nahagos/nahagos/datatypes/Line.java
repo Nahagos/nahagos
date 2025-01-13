@@ -3,13 +3,13 @@ package com.nahagos.nahagos.datatypes;
 public class Line {
     public String trip_id;       // Identifier for the trip
     public String name;         // Name of the line
-    public int line_num;         // Line number
+    public String line_num;         // Line number
     public String departure;    // Departure time
     public String operator;     // Operator of the line
     public boolean isNahagos;   // Whether it is Nahagos line or not
 
     // Constructor
-    public Line(String trip_id, String name, int line_num, String departure, String operator, boolean isNahagos) {
+    public Line(String trip_id, String name, String line_num, String departure, String operator, boolean isNahagos) {
         this.trip_id = trip_id;
         this.name = name;
         this.line_num = line_num;

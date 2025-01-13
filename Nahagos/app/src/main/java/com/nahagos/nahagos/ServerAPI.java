@@ -48,15 +48,12 @@ public class ServerAPI {
     // Register a new passenger - client method
     public static boolean passengerSignup(String username, String password) {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        Gson response = Networks.httpPostReq(Endpoint.REGISTER.getUrl(), jsonBody, Gson.class);
-        return response != null;
+        return Networks.httpPostReq(Endpoint.REGISTER.getUrl(), jsonBody);
     }
 
     public static boolean driverLogin(String username, String password, String id) {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"," + "\"id\":\"" + id + "\"}";
-        Gson response = Networks.httpPostReq(Endpoint.DRIVER_LOGIN.getUrl(), jsonBody, Gson.class);
-        Log.d(TAG, "login response: " + response);
-        return response != null;
+        return Networks.httpPostReq(Endpoint.DRIVER_LOGIN.getUrl(), jsonBody);
 
     }
 
@@ -71,15 +68,13 @@ public class ServerAPI {
     //passenger method - wait for a passenger at a given station
     public static boolean waitForMe(String trip_id, int stop_id) {
         String jsonBody = "{\"trip_id\": \"" + trip_id + "\", \"stop_id\":" + stop_id + "}";
-        Gson response = Networks.httpPostReq(Endpoint.WAIT_FOR_ME.getUrl(), jsonBody, Gson.class);
-        return response != null;
+        return Networks.httpPostReq(Endpoint.WAIT_FOR_ME.getUrl(), jsonBody);
     }
 
     //register for a line - driver method
     public static boolean registerForLine(String trip_id) {
         String jsonBody = "{\"trip_id\": \"" + trip_id + "\"}";
-        Gson response = Networks.httpPostReq(Endpoint.REGISTER_FOR_LINE.getUrl(), jsonBody, Gson.class);
-        return response != null;
+        return Networks.httpPostReq(Endpoint.REGISTER_FOR_LINE.getUrl(), jsonBody);
     }
 
     //get driver schedule - driver method
