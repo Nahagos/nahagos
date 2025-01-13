@@ -1,7 +1,17 @@
 package com.nahagos.nahagos;
 
+import androidx.annotation.NonNull;
+
+import androidx.fragment.app.FragmentActivity;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.maps.model.LatLngBounds;
+
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.FusedLocationProviderClient;
+
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -55,9 +65,11 @@ public class PassengerUI extends FragmentActivity {
         setContentView(binding.getRoot());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) mapFragment.getMapAsync(this::onMapReady);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.passenger_map);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this::onMapReady);
         dbManager = new DBManager(this);
 
         suggestionList = findViewById(R.id.suggestions);

@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nahagos"
         tools:targetApi="31">
-
+        
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAVP3301xjln7j0QfadNhBXgh2zQktvk48" />
@@ -33,6 +33,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".LineView"
+            android:exported="true" />
+
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="false"
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name=".register"
+            android:exported="false"
+            android:label="@string/title_activity_register"
+            android:theme="@style/Theme.Nahagos" />
         <activity
             android:name=".PassengerUI"
             android:exported="true"
