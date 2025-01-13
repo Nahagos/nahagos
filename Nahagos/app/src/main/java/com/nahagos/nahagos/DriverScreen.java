@@ -19,12 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
-import java.util.Map;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
-
 
 public class DriverScreen extends AppCompatActivity {
     private HashMap<String, List<line_info>> schedule = new HashMap<>();
