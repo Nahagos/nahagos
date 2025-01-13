@@ -24,7 +24,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 public class LineView extends AppCompatActivity implements StopButtonListener {
