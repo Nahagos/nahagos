@@ -90,9 +90,10 @@ public class Networks {
         }
     }
 
-    public static String httpPostReq(String urlString, String postData) {
-        HttpURLConnection connection = null;
+    public static int httpPostReq(String urlString, String postData) {
 
+        HttpURLConnection connection = null;
+        int responseCode = -1;
         try {
             connection = setupConnection(urlString, "POST");
 
@@ -102,7 +103,7 @@ public class Networks {
                 writer.flush();
             }
 
-            int responseCode = connection.getResponseCode();
+            responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
 
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
@@ -124,6 +125,7 @@ public class Networks {
             if (connection != null) {
                 connection.disconnect();
             }
+            return responseCode;
         }
     }
 }

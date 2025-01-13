@@ -31,24 +31,16 @@ public class ServerAPI {
         ROOT_URL = "http://" + context.getString(R.string.server_ip) + ":8000";
     }
 
-    public void passengerLogin(String username, String password)
+    public boolean passengerLogin(String username, String password)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody);
+        return Networks.httpPostReq(ROOT_URL + PASSENGER_LOGIN_URL, jsonBody) == 200;
     }
 
-    // Register a new passenger - client method
-    public boolean passenger_signup(String username, String password)
-    {
-         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        String response = Networks.httpPostReq(ROOT_URL + REGISTER_URL, jsonBody);
-        return !response.startsWith("Error");
-    }
-
-    public void driverLogin(String username, String password, String id)
+    public boolean driverLogin(String username, String password, String id)
     {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\","+"\"id\":\""+id+"\"}";
-        Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody);
+        return Networks.httpPostReq(ROOT_URL + DRIVER_LOGIN_URL, jsonBody) == 200;
     }
 
     //get lines from a given station - client method
