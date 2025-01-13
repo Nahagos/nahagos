@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response, Depends, Cookie
 from pydantic import BaseModel
-from datetime import datetime
+import datetime 
 import uuid
 from db import Database
 import threading
@@ -46,7 +46,7 @@ def driver_connectivity():
         drivers_lock.acquire()
         trips_lock.acquire()
         for driver, properties in connected_drivers.items():
-            if (datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
+            if (datetime.datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
                 del registered_trips[properties[2]]
                 del connected_drivers[driver]
         drivers_lock.release()
@@ -67,7 +67,7 @@ def root():
 
 
 def update_last_active(driver_cookie):
-    connected_drivers[driver_cookie][1] = datetime.now()
+    connected_drivers[driver_cookie][1] = datetime.datetime.now()
  
 @app.get("/end-trip/")
 def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
