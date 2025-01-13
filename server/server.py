@@ -407,7 +407,7 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
         list_lines = db.get_trip_shape(trip_id)
         lines_json = []
         for line in list_lines:
-            lines_json.append({"lat" : line[0], "lon" : line[1]})   
+            lines_json.append({"lat" : line[0], "lng" : line[1]})   
         db_lock.release()         
         return lines_json
     except Exception as e:
