@@ -52,11 +52,9 @@ public class DriverScreen extends AppCompatActivity {
                         allDrives.addAll(drives);
                     }
 
-                    if (allDrives != null && !allDrives.isEmpty()) {
-                        for (line_info drive : allDrives) {
-                            DrivesAdapter adapter = new DrivesAdapter(allDrives, DriverScreen.this);
-                            recyclerView.setAdapter(adapter);
-                        }
+                    if (!allDrives.isEmpty()) {
+                        DrivesAdapter adapter = new DrivesAdapter(allDrives, DriverScreen.this);
+                        recyclerView.setAdapter(adapter);
                     }
                     else
                     {
@@ -110,7 +108,7 @@ public class DriverScreen extends AppCompatActivity {
             return true;
         } else {
             Toast.makeText(this, "No drives for " + day, Toast.LENGTH_SHORT).show();
-            return Boolean.FALSE;
+            return false;
         }
     }
 
