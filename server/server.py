@@ -103,14 +103,17 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         users_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
+    db_lock.acquire()
     try:
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
         for line in list_lines:
             lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : line[0] in registered_trips})            
+        db_lock.release()
         users_lock.release()
         return lines_json
     except Exception as e:
+        db_lock.release()
         users_lock.release()
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -317,10 +320,10 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     
     try:
         list_lines = db.get_stops_by_trip_id(trip_id)
-        db_lock.release()
         lines_json = []
         for line in list_lines:
             lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": line[2], "stop_lat": line[3], "stop_lon": line[4]})            
+        db_lock.release()
         return lines_json
     except Exception as e:
         db_lock.release()
