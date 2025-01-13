@@ -1,5 +1,7 @@
 package com.nahagos.nahagos.db;
 
+import android.content.Context;
+
 import androidx.room.Dao;
 import androidx.room.Database;
 import androidx.room.Delete;
@@ -8,24 +10,19 @@ import androidx.room.Query;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.nahagos.nahagos.db.Tables.Stop;
+
 import java.util.List;
 
 public class DBManager {
-    private static DBManager instance;
     private final AppDatabase db;
 
-    private DBManager(android.content.Context context) {
+    public DBManager(Context context) {
         db = Room.databaseBuilder(context,
                         AppDatabase.class, "gtfs")
                 .createFromAsset("gtfs.db")
+                .allowMainThreadQueries()
                 .build();
-    }
-
-    public static DBManager getInstance(android.content.Context context) {
-        if (instance == null) {
-            instance = new DBManager(context);
-        }
-        return instance;
     }
 
     public StopsDao stopsDao() {
@@ -34,27 +31,35 @@ public class DBManager {
 
 
     @Dao
-    public interface StopsDao {
+    public static abstract class StopsDao {
         @Query("SELECT * FROM stops")
-        List<Tables.Stop> getAll();
+        public abstract List<Stop> getAll();
 
         @Query("SELECT * FROM stops WHERE stop_id IN (:stopIds)")
-        List<Tables.Stop> loadAllByIds(int[] stopIds);
-
-        @Query("SELECT * FROM stops WHERE stop_name LIKE :stopName LIMIT 1")
-        Tables.Stop findByName(String stopName);
+        public abstract List<Stop> searchByIds(int[] stopIds);
 
         @Query("SELECT * FROM stops WHERE stop_lat BETWEEN :lat1 AND :lat2 AND stop_lon BETWEEN :lon1 AND :lon2")
-        List<Tables.Stop> getStationsByLatLongRange(double lat1, double lat2, double lon1, double lon2);
+        public abstract List<Stop> searchByLatLongRange_sql(double lat1, double lat2, double lon1, double lon2);
+
+        public List<Stop> searchByLatLongRange(double lat1, double lat2, double lon1, double lon2) {
+            return searchByLatLongRange_sql(Math.min(lat1, lat2), Math.max(lat1, lat2), Math.min(lon1, lon2), Math.max(lon1, lon2));
+        }
+
+        @Query("SELECT * FROM stops WHERE stop_name LIKE '%' || :name || '%' LIMIT :limit")
+        public abstract List<Stop> searchByName(String name, int limit);
+
+        public List<Stop> searchByName(String name) {
+            return searchByName(name, 10);
+        }
 
         @Insert
-        void insertAll(Tables.Stop... stops);
+        public abstract void insertAll(Stop... stops);
 
         @Delete
-        void delete(Tables.Stop stop);
+        public abstract void delete(Stop stop);
     }
 
-    @Database(entities = {Tables.Stop.class}, version = 1)
+    @Database(entities = {Stop.class}, version = 1)
     public abstract static class AppDatabase extends RoomDatabase {
         public abstract StopsDao stopsDao();
     }

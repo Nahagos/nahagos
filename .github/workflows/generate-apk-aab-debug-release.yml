@@ -6,12 +6,17 @@ env:
   subfolder: Nahagos
 
 on:
-
+  pull_request:
+      - 'main'
+      - 'dev'
+      - 'app'
+      - 'application/**'
   push:
-    pull_request:
-      - '*'
     branches:
       - 'application/**'
+      - 'app'
+      - 'dev'
+      - 'main'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

@@ -107,7 +107,7 @@ public class DriverScreen extends AppCompatActivity {
                 DrivesAdapter adapter = new DrivesAdapter(drives, DriverScreen.this);
                 recyclerView.setAdapter(adapter);
             }
-            return Boolean.TRUE;
+            return true;
         } else {
             Toast.makeText(this, "No drives for " + day, Toast.LENGTH_SHORT).show();
             return Boolean.FALSE;
