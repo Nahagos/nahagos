@@ -74,7 +74,7 @@ public class Networks {
     public static <T> T httpGetReq(String requestUrl, Class<T> responseType, JsonDeserializer<T> deserializer) {
         Gson gson = deserializer != null
                 ? new GsonBuilder().registerTypeAdapter(responseType, deserializer).create()
-                : new Gson();
+                : Networks.gson;
 
         HttpURLConnection connection = null;
         try {
@@ -82,12 +82,11 @@ public class Networks {
             connection = setupConnection(requestUrl, "GET");
             int responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
+            // Read response
+            String response = readResponse(connection);
+            Log.d(TAG, "Response: " + response);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Read response
-                String response = readResponse(connection);
-                Log.d(TAG, "Response: " + response);
-
                 // Deserialize
                 return gson.fromJson(response, responseType);
             } else {

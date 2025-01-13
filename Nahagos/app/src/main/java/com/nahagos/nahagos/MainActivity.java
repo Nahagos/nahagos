@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        ServerAPI serverAPI = new ServerAPI(this);
         setContentView(R.layout.activity_main);
 
         ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
@@ -62,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
                 if (isCheckedGlobal) {
                     if (!driverId.isEmpty()) {
                         emptyFields.setVisibility(TextView.GONE);
-                        serverAPI.driverLogin(username, password, driverId);
-                        serverAPI.getDriverSchedule();
-                        serverAPI.getLineShape("5656648_311224");
-                        serverAPI.registerForLine("5656648_311224");
-                        serverAPI.getStoppingStations();
+                        ServerAPI.driverLogin(username, password, driverId);
+                        ServerAPI.getDriverSchedule();
+                        ServerAPI.getLineShape("5656648_311224");
+                        ServerAPI.registerForLine("5656648_311224");
+                        ServerAPI.getStoppingStations();
                     }
                     else {
                         emptyFields.setVisibility(TextView.VISIBLE);
@@ -74,9 +73,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     emptyFields.setVisibility(TextView.GONE);
-                    serverAPI.passengerLogin(username, password);
-                    serverAPI.getStopsByLine("5656648_311224");
-                    serverAPI.getLinesByStation(1);
+                    ServerAPI.passengerLogin(username, password);
+                    ServerAPI.getStopsByLine("5656648_311224");
+                    ServerAPI.getLinesByStation(1);
+                    ServerAPI.waitForMe("5656648_311224", 15782);
                 }
             }
             else {
