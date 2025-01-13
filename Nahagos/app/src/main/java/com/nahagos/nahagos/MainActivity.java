@@ -1,5 +1,7 @@
 package com.nahagos.nahagos;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -15,7 +17,6 @@ import android.widget.CheckBox;
 
 
 
-
 public class MainActivity extends AppCompatActivity {
 
     private boolean isCheckedGlobal = false;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         ServerAPI serverAPI = new ServerAPI(this);
         setContentView(R.layout.activity_main);
 
+        Intent maps = new Intent(this, PassengerUI.class);
         ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
@@ -35,17 +37,18 @@ public class MainActivity extends AppCompatActivity {
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
 
 
+
         // safe mode for networking in android
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
 
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     isCheckedGlobal = isChecked;
-                    if (isChecked) {
+                    if (isChecked)
                         driverIdObj.setVisibility(TextView.VISIBLE);
-                    }
-                    else{
+                    
+                    else
                         driverIdObj.setVisibility(TextView.GONE);
-                    }
+
                 });
 
         Button button = findViewById(R.id.loginButton);
@@ -77,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
                     serverAPI.passengerLogin(username, password);
                     serverAPI.getStopsByLine("5656648_311224");
                     serverAPI.getLinesByStation(1);
+                    if (serverAPI.passengerLogin(username, password))
+                        startActivity(maps);
                 }
             }
             else {

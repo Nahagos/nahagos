@@ -18,6 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:focusable="true"
+        android:iconifiedByDefault="false"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent">
@@ -28,6 +30,7 @@
         android:id="@+id/suggestions"
         android:layout_width="wrap_content"
         android:layout_height="189dp"
+        android:background="#999B9B9B"
         android:visibility="invisible"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"

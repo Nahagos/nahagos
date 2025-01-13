@@ -122,7 +122,7 @@ public class Networks {
                 writer.flush();
             }
 
-            int responseCode = connection.getResponseCode();
+            responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
 
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
@@ -145,6 +145,7 @@ public class Networks {
             if (connection != null) {
                 connection.disconnect();
             }
+            return responseCode;
         }
     }
 
