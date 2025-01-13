@@ -3,6 +3,8 @@ package com.nahagos.nahagos;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -68,22 +70,25 @@ public class Networks {
     }
 
     // Method for HTTP GET request
-    public static <T> T httpGetReq(String urlString, Class<T> classOfT) {
-        HttpURLConnection connection = null;
+    // Method with deserializer (used when needed)
+    public static <T> T httpGetReq(String requestUrl, Class<T> responseType, JsonDeserializer<T> deserializer) {
+        Gson gson = deserializer != null
+                ? new GsonBuilder().registerTypeAdapter(responseType, deserializer).create()
+                : Networks.gson;
 
+        HttpURLConnection connection = null;
         try {
             // Setup connection
-            connection = setupConnection(urlString, "GET");
+            connection = setupConnection(requestUrl, "GET");
             int responseCode = connection.getResponseCode();
             Log.d(TAG, "Response Code: " + responseCode);
+            // Read response
+            String response = readResponse(connection);
+            Log.d(TAG, "Response: " + response);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Read response
-                String response = readResponse(connection);
-                Log.d(TAG, "Response: " + response);
-
-                // Convert response string into a Gson object
-                return gson.fromJson(response, classOfT);
+                // Deserialize
+                return gson.fromJson(response, responseType);
             } else {
                 Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
                 return null;
@@ -98,11 +103,17 @@ public class Networks {
         }
     }
 
-    public static <T> T httpPostReq(String urlString, String postData, Class<T> classOfT) {
+    // Method without deserializer (default)
+    public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
+        return httpGetReq(requestUrl, responseType, null);
+    }
+
+
+    public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
         try {
             // Setup connection
-            connection = setupConnection(urlString, "POST");
+            connection = setupConnection(requestUrl, "POST");
 
             // Write data to the output stream
             try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
@@ -121,7 +132,7 @@ public class Networks {
                 String response = readResponse(connection);
                 Log.d(TAG, "Response: " + response);
                 // Convert the response to the specified class type
-                return gson.fromJson(response, classOfT);
+                return gson.fromJson(response, responseType);
             } else {
                 Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
                 return null;
