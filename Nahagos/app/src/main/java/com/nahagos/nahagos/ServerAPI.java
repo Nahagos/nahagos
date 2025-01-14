@@ -40,9 +40,7 @@ public class ServerAPI {
 
     public static boolean passengerLogin(String username, String password) {
         String jsonBody = "{\"username\": \"" + username + "\", \"password\":\"" + password + "\"}";
-        Gson response = Networks.httpPostReq(Endpoint.PASSENGER_LOGIN.getUrl(), jsonBody, Gson.class);
-        Log.d(TAG, "login response: " + response);
-        return response != null;
+        return Networks.httpPostReq(Endpoint.PASSENGER_LOGIN.getUrl(), jsonBody);
 
     }
 

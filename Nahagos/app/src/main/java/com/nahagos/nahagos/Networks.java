@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
+import com.nahagos.nahagos.datatypes.Schedule;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,6 +19,9 @@ public class Networks {
     private static String sessionCookie;
 
     private static final Gson gson = new Gson();
+    private static final Gson scheduleGson = new GsonBuilder()
+            .registerTypeAdapter(Schedule.class, Schedule.getDeserializer())
+            .create();
 
 
     // Helper method to set up a connection
@@ -71,11 +75,7 @@ public class Networks {
 
     // Method for HTTP GET request
     // Method with deserializer (used when needed)
-    public static <T> T httpGetReq(String requestUrl, Class<T> responseType, JsonDeserializer<T> deserializer) {
-        Gson gson = deserializer != null
-                ? new GsonBuilder().registerTypeAdapter(responseType, deserializer).create()
-                : Networks.gson;
-
+    public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
         HttpURLConnection connection = null;
         try {
             // Setup connection
@@ -88,7 +88,10 @@ public class Networks {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 // Deserialize
-                return gson.fromJson(response, responseType);
+                if(responseType == Schedule.class)
+                    return scheduleGson.fromJson(response, responseType);
+                else
+                    return gson.fromJson(response, responseType);
             } else {
                 Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
                 return null;
@@ -103,10 +106,6 @@ public class Networks {
         }
     }
 
-    // Method without deserializer (default)
-    public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
-        return httpGetReq(requestUrl, responseType, null);
-    }
 
     public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
