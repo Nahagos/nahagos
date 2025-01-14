@@ -45,10 +45,13 @@ def driver_connectivity():
     while True:
         drivers_lock.acquire()
         trips_lock.acquire()
+        del_drivers = []
         for driver, properties in connected_drivers.items():
             if (datetime.datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
                 del registered_trips[properties[2]]
-                del connected_drivers[driver]
+                del_drivers.append(driver)
+        for driver in del_drivers:
+            del connected_drivers[driver]
         drivers_lock.release()
         trips_lock.release()
         time.sleep(10)
@@ -407,7 +410,7 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
         list_lines = db.get_trip_shape(trip_id)
         lines_json = []
         for line in list_lines:
-            lines_json.append({"lat" : line[0], "lng" : line[1]})   
+            lines_json.append({"latitude" : line[0], "longitude" : line[1]})   
         db_lock.release()         
         return lines_json
     except Exception as e:
