@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.activities;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,10 +20,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm;
+import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.databinding.ActivityPassengerUiBinding;
 import com.nahagos.nahagos.db.DBManager;
 import com.nahagos.nahagos.db.Tables.Stop;
-import com.nahagos.nahagos.linechoose.LocationDetailsBottomSheet;
+import com.nahagos.nahagos.fragments.LocationDetailsBottomSheet;
 
 import java.util.ArrayList;
 import java.util.List;

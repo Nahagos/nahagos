@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.nahagos.nahagos.DriverScreen.Line;
+import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.activities.DriverScreen.Line;
 
 import java.util.List;
 

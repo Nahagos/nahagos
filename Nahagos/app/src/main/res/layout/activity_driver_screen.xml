@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BFFBBBBE"
-    tools:context=".DriverScreen">
+    tools:context=".activities.DriverScreen">
 
     <!-- Guidelines for responsive layout -->
     <androidx.constraintlayout.widget.Guideline
