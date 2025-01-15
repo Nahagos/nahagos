@@ -30,7 +30,7 @@ class Database:
             zip_path = os.path.join(tmp_dir, "gtfs.zip")
             
             # Download GTFS ZIP file
-            response = requests.get(url, stream=True)
+            response = requests.get(url, stream=True, verify=False)
             if response.status_code == 200:
                 with open(zip_path, 'wb') as f:
                     f.write(response.content)
