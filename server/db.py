@@ -52,7 +52,7 @@ class Database:
         self.add_things_to_schedule()
         self.open()
 
-        dir_path = zip_path.replace(".zip", "\\")
+        dir_path = zip_path.replace(".zip", "/")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(dir_path)
 
