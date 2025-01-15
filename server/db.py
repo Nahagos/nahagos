@@ -1,8 +1,13 @@
+import os
+import requests
+from pathlib import Path
+import tempfile
 import sqlite3
 import hashlib
 from datetime import datetime
 import zipfile
-import os
+
+
 
 class Database:
     def __init__(self, db_name):
@@ -10,7 +15,47 @@ class Database:
         self.connection = sqlite3.connect(db_name)
         self.cursor = self.connection.cursor()
         if cool:
-            self.initialize_db(r"C:\Users\Epsilon\Downloads\israel-public-transportation.zip")
+            self.download_and_init_gtfs()
+            
+    def download_and_init_gtfs(self):
+        """
+        Downloads the Israel public transportation GTFS file,
+        initializes the database, and cleans up the downloaded file.
+        """
+        url = "https://gtfs.mot.gov.il/gtfsfiles/israel-public-transportation.zip"
+        
+        try:
+            # Create a temporary file to store the download
+            with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as temp_file:
+                print("Downloading GTFS file...")
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+                
+                # Write the content to the temporary file
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        temp_file.write(chunk)
+                
+                temp_file_path = temp_file.name
+            
+            # Initialize the database with the downloaded file
+            print("Initializing database...")
+            self.initialize_db(temp_file_path)
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading GTFS file: {e}")
+            raise
+        except Exception as e:
+            print(f"Error during database initialization: {e}")
+            raise
+        finally:
+            # Clean up the temporary file
+            try:
+                if 'temp_file_path' in locals():
+                    os.unlink(temp_file_path)
+                    print("Temporary GTFS file deleted")
+            except Exception as e:
+                print(f"Error deleting temporary file: {e}")
         
     def parse_file(self, path, file_name):
         """
