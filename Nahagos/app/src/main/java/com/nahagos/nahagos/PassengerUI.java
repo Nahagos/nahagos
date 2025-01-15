@@ -100,21 +100,10 @@ public class PassengerUI extends FragmentActivity {
             if (stop == null) return;
             if (stop.id == STOP_ID_NOT_FOUND) return;
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(stop.getPosition(), STOP_ZOOM));
-            // expand the relevant marker
-            long time = System.currentTimeMillis();
-            var x = clusterManager.getMarkerCollection().getMarkers().stream()
-                    .filter(marker -> Objects.equals(stop.getTitle(), marker.getTitle()))
-                    .findFirst();
-
-            x.ifPresent(marker -> {
-                clusterManager.onMarkerClick(marker);
-                System.out.println("Time to expand marker: " + (System.currentTimeMillis() - time));
-            });
-
-
-
             suggestionList.setVisibility(View.INVISIBLE);
             search.clearFocus();
+
+            onStopClick(stop);
         });
     }
 
