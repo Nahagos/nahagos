@@ -9,13 +9,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nahagos.nahagos.DriverScreen.Line;
+
 import java.util.List;
 
 public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewHolder> {
-    private final List<line_info> drives;
+    private final List<Line> drives;
     private final Context context;
 
-    public DrivesAdapter(List<line_info> drives, Context context) {
+    public DrivesAdapter(List<Line> drives, Context context) {
         this.drives = drives;
         this.context = context;
     }
@@ -29,9 +31,9 @@ public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewH
 
     @Override
     public void onBindViewHolder(@NonNull DriveViewHolder holder, int position) {
-        line_info drive = drives.get(position);
-        holder.titleTextView.setText(drive.getLineNum() + " - " + drive.getLineDescription());
-        holder.subtitleTextView.setText("Departure time: " + drive.getDepartureTime() + "\nArrival time: " + drive.getArrivalTime());
+        Line drive = drives.get(position);
+        holder.titleTextView.setText(drive.lineNum + " - " + drive.lineDescription);
+        holder.subtitleTextView.setText("Departure time: " + drive.departureTime + "\nArrival time: " + drive.arrivalTime);
     }
 
     @Override
