@@ -242,7 +242,7 @@ def driver_login(driver: DriverLogin, response: Response):
     drivers_lock.acquire()
     if db.login_driver(driver.username, driver.password, driver.id):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_drivers[session_id] = [driver.id, None, None]
+        connected_drivers[session_id] = [driver.id, datetime.datetime.now(), None]
         
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         db_lock.release()
