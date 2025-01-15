@@ -38,13 +38,8 @@ class Database:
             else:
                 raise Exception("Failed to download GTFS file. HTTP Status Code:", response.status_code)
             
-            # Extract ZIP file
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(tmp_dir)
-                print("GTFS file extracted successfully.")
-            
             # Initialize database with extracted files
-            self.initialize_db(tmp_dir)
+            self.initialize_db(zip_path)
 
     def initialize_db(self, zip_path):
         self.create_tables()
