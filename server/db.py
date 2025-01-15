@@ -22,71 +22,29 @@ class Database:
         Downloads the Israel public transportation GTFS file,
         initializes the database, and cleans up the downloaded file.
         """
+        # URL for GTFS data
         url = "https://gtfs.mot.gov.il/gtfsfiles/israel-public-transportation.zip"
         
-        try:
-            # Create a temporary file to store the download
-            with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as temp_file:
-                print("Downloading GTFS file...")
-                response = requests.get(url, stream=True)
-                response.raise_for_status()
-                
-                # Write the content to the temporary file
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        temp_file.write(chunk)
-                
-                temp_file_path = temp_file.name
+        # Temporary directory for downloading and extracting files
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "gtfs.zip")
             
-            # Initialize the database with the downloaded file
-            print("Initializing database...")
-            self.initialize_db(temp_file_path)
+            # Download GTFS ZIP file
+            response = requests.get(url, stream=True)
+            if response.status_code == 200:
+                with open(zip_path, 'wb') as f:
+                    f.write(response.content)
+                print("GTFS file downloaded successfully.")
+            else:
+                raise Exception("Failed to download GTFS file. HTTP Status Code:", response.status_code)
             
-        except requests.exceptions.RequestException as e:
-            print(f"Error downloading GTFS file: {e}")
-            raise
-        except Exception as e:
-            print(f"Error during database initialization: {e}")
-            raise
-        finally:
-            # Clean up the temporary file
-            try:
-                if 'temp_file_path' in locals():
-                    os.unlink(temp_file_path)
-                    print("Temporary GTFS file deleted")
-            except Exception as e:
-                print(f"Error deleting temporary file: {e}")
-        
-    def parse_file(self, path, file_name):
-        """
-        Parse the file and insert the data into the database
-        :param cursor: cursor object
-        :param path: path to the file to read data from
-        :param file_name: table name
-        :return: none
-        """
-        # Open the files in read mode and convert them to sql format
-        with open(path, 'r', encoding="utf8") as file:
-            # Read first line in the file
-            line1 = file.readline().strip()
-
-            # Read each line in the file and save list of params to insert:
-            request = ("INSERT INTO %s VALUES (" + ("?, " * len(line1.split(",")))[:-2] + ")") % (file_name)
-            request_params = []
-
-            print("line1", line1)
-            for line in file:
-                # parse each line
-
-                line = line.strip().split(",")
-                for var in line:
-                    if var == '':
-                        var = None
-
-                request_params += [line]
-
-            # Insert a row of data
-            self.cursor.executemany(request, request_params)
+            # Extract ZIP file
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(tmp_dir)
+                print("GTFS file extracted successfully.")
+            
+            # Initialize database with extracted files
+            self.initialize_db(tmp_dir)
 
     def initialize_db(self, zip_path):
         self.create_tables()
