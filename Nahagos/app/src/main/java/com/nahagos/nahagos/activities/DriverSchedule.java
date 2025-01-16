@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.adapters.DrivesAdapter;
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.datatypes.Line;
+import com.nahagos.nahagos.server.ServerAPI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,32 +76,12 @@ public class DriverSchedule extends AppCompatActivity {
     }
 
     private List<List<Line>> get_schedule_from_server() {
-        return Arrays.asList(
-            List.of(new Line("1", "101", "Jerusalem to Tel Aviv", "08:00", "08:30"), new Line("1", "103", "modi'in to Kfar Saba", "08:00", "08:30")),
-            List.of(new Line("2", "202", "Tel Aviv Center to Jerusalem", "09:00", "08:30"), new Line("2", "202", "Jerusalem to Petah Tikva", "09:00", "08:30"), new Line("2", "202", "sderot to Tal Shahar", "09:00", "08:30")),
-            List.of(new Line("3", "303", "Dimona to Beer Sheva", "10:00", "08:30"), new Line("2", "202", "Tal Shahar to modi'in", "09:00", "08:30")),
-            List.of(new Line("4", "404", "Petah Tikva to Kfar Saba", "11:00", "08:30"), new Line("2", "202", "Petah Tikva to Beer Sheva", "09:00", "08:30")),
-            List.of(new Line("5", "505", "modi'in to Dimona", "12:00", "08:30")),
-            List.of(new Line("6", "606", "Jerusalem to Beer Sheva", "13:00", "08:30"), new Line("4", "404", "Hoshaia to Tal Shahar", "11:00", "08:30"), new Line("4", "404", "Tal Shahar to Sderot", "11:00", "08:30")),
-            List.of(new Line("7", "707", "Kfar Saba to Petah Tikva", "14:00", "08:30"))
-        );
+        Line[][] rawSchedule = ServerAPI.getDriverSchedule(); // Assuming this returns Line[][]
+        return Arrays.stream(rawSchedule) // Stream the outer array
+                .map(Arrays::asList)     // Convert each inner array (Line[]) to a List<Line>
+                .collect(Collectors.toList()); // Collect into a List<List<Line>>
     }
 
-    public static class Line {
-        public String tripId, lineNum, lineDescription, departureTime, arrivalTime;
 
-        public Line(String tripId, String lineNum, String lineDescription, String departureTime, String arrivalTime) {
-            this.tripId = tripId;
-            this.lineNum = lineNum;
-            this.lineDescription = lineDescription;
-            this.departureTime = departureTime;
-            this.arrivalTime = arrivalTime;
-        }
 
-        @NonNull
-        @Override
-        public String toString() {
-            return lineNum + " - " + lineDescription + " - " + departureTime + " - " + arrivalTime;
-        }
-    }
 }

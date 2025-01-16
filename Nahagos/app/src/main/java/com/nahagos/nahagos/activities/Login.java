@@ -22,7 +22,6 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ServerAPI serverAPI = new ServerAPI(this);
         setContentView(R.layout.activity_main);
 
         Intent stationsMapActivity = new Intent(this, StationsMap.class),
@@ -51,10 +50,10 @@ public class Login extends AppCompatActivity {
 
                 new Thread(() -> {
                     if (isDriverGlobal) {
-                        if (serverAPI.driverLogin(username, password, driverId))
-                            runOnUiThread(() -> startActivity(stationsMapActivity));
-                    } else if (serverAPI.passengerLogin(username, password))
-                        runOnUiThread(() -> startActivity(driverScheduleActivity));
+                        if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId)))
+                            runOnUiThread(() -> startActivity(driverScheduleActivity));
+                    } else if (ServerAPI.passengerLogin(username, password))
+                        runOnUiThread(() -> startActivity(stationsMapActivity));
                 }).start();
             } else {
                 emptyFields.setVisibility(TextView.VISIBLE);
