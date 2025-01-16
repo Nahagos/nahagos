@@ -142,8 +142,6 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
                 while (!Thread.interrupted()) {
                     ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(sapi.get_stopping_stations()).boxed().collect(Collectors.toList()));
                     stops.forEach(n -> {
-                                // This step is just for illustration; in real cases, it might mutate elements
-                                // in the original list if it were not final.
                                 if (toStopStations.stream().anyMatch((i) -> {
                                 return i == n.first.stop_id;})) {
                                     Pair<StopTime, Boolean> newN = new Pair<>(n.first, true);
