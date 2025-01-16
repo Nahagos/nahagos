@@ -172,6 +172,7 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     drivers_lock.acquire()
     db_lock.acquire()
     # validate user
+
     if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         db_lock.release()
@@ -347,7 +348,6 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
         drivers_lock.release()
         raise HTTPException(status_code=401, detail=str(e))
 
-
 @app.get("/line-shape/{trip_id}")
 def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
     """
@@ -356,7 +356,7 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
     drivers_lock.acquire()
     users_lock.acquire()
     # validate user
-    if (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+    if cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users:
         drivers_lock.release()
         users_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated") 
