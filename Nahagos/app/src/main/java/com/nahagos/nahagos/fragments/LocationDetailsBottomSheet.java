@@ -46,7 +46,7 @@ public class LocationDetailsBottomSheet extends BottomSheetDialogFragment {
         TextView locationName = view.findViewById(R.id.location_name);
         TextView locationDetails = view.findViewById(R.id.location_details);
 
-        locationName.setText(stop.getTitle());
+        locationName.setText(stop.getTitle() + " (" + stop.id + ")");
         locationDetails.setText(getString(R.string.location_details, String.valueOf(stop.lat), String.valueOf(stop.lon)));
 
         var lines = new ArrayList<Line>();
