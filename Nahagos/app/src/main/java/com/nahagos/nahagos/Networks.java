@@ -4,14 +4,15 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.nahagos.nahagos.datatypes.Schedule;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class Networks {
     private static final String TAG = "HTTP";
@@ -19,22 +20,16 @@ public class Networks {
     private static String sessionCookie;
 
     private static final Gson gson = new Gson();
-    private static final Gson scheduleGson = new GsonBuilder()
-            .registerTypeAdapter(Schedule.class, Schedule.getDeserializer())
-            .create();
 
-
-    // Helper method to set up a connection
-    private static HttpURLConnection setupConnection(String urlString, String method) throws Exception {
+    public static HttpURLConnection setupConnection(String urlString, String method) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
-        if (sessionCookie != null) {
+        if (sessionCookie != null)
             connection.setRequestProperty("Cookie", sessionCookie);
-        }
 
         if ("POST".equalsIgnoreCase(method)) {
             connection.setDoOutput(true);
@@ -44,65 +39,44 @@ public class Networks {
         return connection;
     }
 
-    // Helper method to read response
-    private static String readResponse(HttpURLConnection connection) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
+    private static String readResponse(HttpURLConnection connection) {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder responseBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null)
+                responseBuilder.append(line);
+            return responseBuilder.toString();
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading response", e);
+            return null;
         }
-
-        reader.close();
-        return response.toString();
     }
 
-    // Helper method to save cookies
     private static void saveCookies(HttpURLConnection connection) {
         String cookieHeader = connection.getHeaderField("Set-Cookie");
-        if (cookieHeader != null) {
-            String[] cookies = cookieHeader.split(";");
-            for (String cookie : cookies) {
-                if (cookie.startsWith("cookies_and_milk=")) {
-                    sessionCookie = cookie;
-                    Log.d(TAG, "Session Cookie saved: " + sessionCookie);
-                    break;
-                }
-            }
-        }
+        if (cookieHeader == null) return;
+        Arrays.stream(cookieHeader.split(";")).filter(cookie -> cookie.startsWith("cookies_and_milk=")).findFirst().ifPresent(cookie -> {
+            sessionCookie = cookie;
+            Log.d(TAG, "Session Cookie saved: " + sessionCookie);
+        });
     }
 
-    // Method for HTTP GET request
-    // Method with deserializer (used when needed)
     public static <T> T httpGetReq(String requestUrl, Class<T> responseType) {
         HttpURLConnection connection = null;
         try {
-            // Setup connection
             connection = setupConnection(requestUrl, "GET");
             int responseCode = connection.getResponseCode();
-            Log.d(TAG, "Response Code: " + responseCode);
-            // Read response
             String response = readResponse(connection);
-            Log.d(TAG, "Response: " + response);
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Deserialize
-                if(responseType == Schedule.class)
-                    return scheduleGson.fromJson(response, responseType);
-                else
-                    return gson.fromJson(response, responseType);
-            } else {
-                Log.e(TAG, "HTTP GET request failed with response code: " + responseCode);
-                return null;
-            }
+            if (responseCode != HttpURLConnection.HTTP_OK)
+                throw new IOException("HTTP GET request to " + requestUrl + " failed with response code: " + responseCode + " and body:" + response);
+            return gson.fromJson(response, responseType);
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP GET request", e);
             return null;
         } finally {
-            if (connection != null) {
+            if (connection != null)
                 connection.disconnect();
-            }
         }
     }
 
@@ -110,74 +84,28 @@ public class Networks {
     public static <T> T httpPostReq(String requestUrl, String postData, Class<T> responseType) {
         HttpURLConnection connection = null;
         try {
-            // Setup connection
             connection = setupConnection(requestUrl, "POST");
+            connection.setFixedLengthStreamingMode(postData.getBytes().length);
 
-            // Write data to the output stream
-            try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
+            try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
                 writer.write(postData);
-                writer.flush();
             }
-
             int responseCode = connection.getResponseCode();
-            Log.d(TAG, "Response Code: " + responseCode);
+            String response = readResponse(connection);
+            if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_CREATED)
+                throw new IOException("HTTP POST request to " + requestUrl + " failed with response code: " + responseCode + " and body: " + response);
 
-            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                if (sessionCookie == null) {
-                    saveCookies(connection);
-                }
-                // Read and parse the response
-                String response = readResponse(connection);
-                Log.d(TAG, "Response: " + response);
-                // Convert the response to the specified class type
-                return gson.fromJson(response, responseType);
-            } else {
-                Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
-                return null;
-            }
+            saveCookies(connection);
+
+            return responseType == Boolean.class ?
+                    responseType.cast(Boolean.TRUE) :
+                    gson.fromJson(response, responseType);
         } catch (Exception e) {
             Log.e(TAG, "Error in HTTP POST request", e);
             return null;
         } finally {
-            if (connection != null) {
+            if (connection != null)
                 connection.disconnect();
-            }
-        }
-    }
-
-    public static boolean httpPostReq(String requestUrl, String postData) {
-        HttpURLConnection connection = null;
-        try {
-            // Setup connection
-            connection = setupConnection(requestUrl, "POST");
-
-            // Write data to the output stream
-            try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
-                writer.write(postData);
-                writer.flush();
-            }
-
-            // Get the response code
-            int responseCode = connection.getResponseCode();
-            Log.d(TAG, "Response Code: " + responseCode);
-
-            // Check if the response is 200 OK or 201 Created
-            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                if (sessionCookie == null) {
-                    saveCookies(connection);
-                }
-                return true;
-            } else {
-                Log.e(TAG, "HTTP POST request failed with response code: " + responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error in HTTP POST request", e);
-            return false;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
         }
     }
 }
