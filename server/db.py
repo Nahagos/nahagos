@@ -1,8 +1,13 @@
+import os
+import requests
+from pathlib import Path
+import tempfile
 import sqlite3
 import hashlib
 from datetime import datetime
 import zipfile
-import os
+
+
 
 class Database:
     def __init__(self, db_name):
@@ -10,8 +15,8 @@ class Database:
         self.connection = sqlite3.connect(db_name)
         self.cursor = self.connection.cursor()
         if cool:
-            self.initialize_db(r"C:\Users\Epsilon\Downloads\israel-public-transportation.zip")
-        
+            self.download_and_init_gtfs()
+    
     def parse_file(self, path, file_name):
         """
         Parse the file and insert the data into the database
@@ -42,6 +47,30 @@ class Database:
 
             # Insert a row of data
             self.cursor.executemany(request, request_params)
+    
+    def download_and_init_gtfs(self):
+        """
+        Downloads the Israel public transportation GTFS file,
+        initializes the database, and cleans up the downloaded file.
+        """
+        # URL for GTFS data
+        url = "https://gtfs.mot.gov.il/gtfsfiles/israel-public-transportation.zip"
+        
+        # Temporary directory for downloading and extracting files
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "gtfs.zip")
+            
+            # Download GTFS ZIP file
+            response = requests.get(url, stream=True, verify=False)
+            if response.status_code == 200:
+                with open(zip_path, 'wb') as f:
+                    f.write(response.content)
+                print("GTFS file downloaded successfully.")
+            else:
+                raise Exception("Failed to download GTFS file. HTTP Status Code:", response.status_code)
+            
+            # Initialize database with extracted files
+            self.initialize_db(zip_path)
 
     def initialize_db(self, zip_path):
         self.create_tables()
@@ -54,7 +83,7 @@ class Database:
         self.add_things_to_schedule()
         self.open()
 
-        dir_path = zip_path.replace(".zip", "\\")
+        dir_path = zip_path.replace(".zip", "/")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(dir_path)
 
@@ -80,7 +109,7 @@ class Database:
         # Save (commit) the changes
         self.connection.commit()
         self.close()
-        
+    
     def create_tables(self):
         self.open()
         self.cursor.execute(

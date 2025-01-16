@@ -371,19 +371,12 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
     update_last_active(cookies_and_milk)
     try:
         list_lines = db.get_driver_schedule(connected_drivers[cookies_and_milk][0])
-        days = {
-            "sunday": [],
-            "monday": [],
-            "tuesday": [],
-            "wednesday": [],
-            "thursday": [],
-            "friday": [],
-            "saturday": []
-        }
+        days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+        schedule = [[] for day in days]
         for line in list_lines:
-            days[line[0]].append({"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]})
+            schedule[days.index(line[0])].append({"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]})
         drivers_lock.release()
-        return days
+        return schedule
     except Exception as e:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail=str(e))
