@@ -1,5 +1,6 @@
 package com.nahagos.nahagos.adapters;
 
+import com.nahagos.nahagos.datatypes.Line;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.activities.DriverSchedule.Line;
-
 import java.util.List;
 
 public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewHolder> {
@@ -33,8 +32,8 @@ public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewH
     @Override
     public void onBindViewHolder(@NonNull DriveViewHolder holder, int position) {
         Line drive = drives.get(position);
-        holder.titleTextView.setText(drive.lineNum + " - " + drive.lineDescription);
-        holder.subtitleTextView.setText("Departure time: " + drive.departureTime + "\nArrival time: " + drive.arrivalTime);
+        holder.titleTextView.setText(drive.line_num + " - " + drive.name);
+        holder.subtitleTextView.setText("Departure time: " + drive.departure);
     }
 
     @Override
