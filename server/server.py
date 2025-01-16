@@ -48,7 +48,8 @@ def driver_connectivity():
         del_drivers = []
         for driver, properties in connected_drivers.items():
             if (datetime.datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
-                del registered_trips[properties[2]]
+                if properties[2] is not None:
+                    del registered_trips[properties[2]]
                 del_drivers.append(driver)
         for driver in del_drivers:
             del connected_drivers[driver]
