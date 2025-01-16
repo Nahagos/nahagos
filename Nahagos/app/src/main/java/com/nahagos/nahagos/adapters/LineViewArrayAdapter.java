@@ -1,8 +1,9 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.media.Image;
+
+import com.nahagos.nahagos.activities.LineView;
+import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.datatypes.StopTime;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,12 +19,8 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import com.nahagos.nahagos.databinding.LineViewStopElementBinding;
-
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> {
     private final Context context;

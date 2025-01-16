@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.listeners;
 
 public interface StopButtonListener {
     boolean onButtonClicked(int stopId);

@@ -1,5 +1,8 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.activities;
 
+import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.listeners.StopButtonListener;
+import com.nahagos.nahagos.adapters.LineViewArrayAdapter;
 import com.nahagos.nahagos.server.ServerAPI;
 import com.nahagos.nahagos.datatypes.StopTime;
 
