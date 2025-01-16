@@ -90,8 +90,8 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
         raise HTTPException(status_code=401, detail="No trip to end")
     
     trips_lock.acquire()
-    del registered_trips[connected_drivers[cookies_and_milk]]
-    connected_drivers[cookies_and_milk] = None
+    del registered_trips[connected_drivers[cookies_and_milk][2]]
+    connected_drivers[cookies_and_milk][2] = None
     trips_lock.release()
     drivers_lock.release()
     return {"message": "The trip ended successfully"}
