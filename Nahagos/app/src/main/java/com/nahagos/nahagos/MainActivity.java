@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 import android.widget.TextView;
 import android.widget.CheckBox;
 
-
+import com.nahagos.nahagos.server.ServerAPI;
 
 
 public class MainActivity extends AppCompatActivity {

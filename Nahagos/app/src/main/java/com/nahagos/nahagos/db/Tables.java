@@ -1,14 +1,21 @@
 package com.nahagos.nahagos.db;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 public class Tables {
     @Entity(tableName = "stops")
-    public static class Stop {
+    public static class Stop implements ClusterItem, Serializable {
         @PrimaryKey
         @ColumnInfo(name = "stop_id")
         public int id;
@@ -43,6 +50,37 @@ public class Tables {
             name = "";
             description = "";
         }
+
+        public Stop(int id, @NonNull String name){
+            this();
+            this.id = id;
+            this.name = name;
+        }
+
+        @NonNull
+        public LatLng getPosition() {
+            return new LatLng(lat, lon);
+        }
+
+
+        @NonNull
+        @Override
+        public String getTitle() {
+            return name;
+        }
+
+        @Nullable
+        @Override
+        public String getSnippet() {
+            return description;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return name + " (" + id + ")";
+        }
+
     }
 }
 
