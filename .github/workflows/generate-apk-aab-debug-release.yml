@@ -6,10 +6,13 @@ env:
   subfolder: Nahagos
 
 on:
-
+  pull_request:
+    branches: 
+      - 'main'
+      - 'dev'
+      - 'app'
+      - 'application/**'
   push:
-    pull_request:
-      - '*'
     branches:
       - 'application/**'
       - 'app'
