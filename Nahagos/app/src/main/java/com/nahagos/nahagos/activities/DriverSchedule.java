@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DriverScreen extends AppCompatActivity {
+public class DriverSchedule extends AppCompatActivity {
     private List<List<Line>> schedule;
 
     private RecyclerView drivesView;
@@ -30,7 +30,7 @@ public class DriverScreen extends AppCompatActivity {
 
     private final List<String> daysOfWeek;
 
-    public DriverScreen() {
+    public DriverSchedule() {
         super();
         daysOfWeek = Arrays.asList("All", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
     }

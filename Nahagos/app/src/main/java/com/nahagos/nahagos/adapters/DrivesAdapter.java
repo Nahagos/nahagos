@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.activities.DriverScreen.Line;
+import com.nahagos.nahagos.activities.DriverSchedule.Line;
 
 import java.util.List;
 

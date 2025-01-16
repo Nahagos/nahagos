@@ -23,10 +23,10 @@
             android:value="AIzaSyAVP3301xjln7j0QfadNhBXgh2zQktvk48" />
 
         <activity
-            android:name=".activities.DriverScreen"
+            android:name=".activities.DriverSchedule"
             android:exported="true" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.Login"
             android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Nahagos" >
@@ -37,9 +37,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.PassengerUI"
+            android:name=".activities.StationsMap"
             android:exported="true"
-            android:label="@string/title_activity_passenger_ui" />
+            android:label="@string/title_activity_stations_map" />
     </application>
 
 </manifest>

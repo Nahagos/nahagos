@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PassengerUI extends FragmentActivity {
+public class StationsMap extends FragmentActivity {
 
     private static final int STOP_ID_NOT_FOUND = -1;
     private static final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
