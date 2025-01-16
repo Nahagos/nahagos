@@ -1,13 +1,10 @@
 <resources>
     <string name="app_name">nahagos</string>
-    <string name="server_ip">nahagos.lavirz.com</string>
 
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="server_ip">172.20.20.30</string>
     <!-- Strings used for fragments for navigation -->
 
     <string name="title_activity_main">MainActivity</string>
-    <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
     <string name="title_activity_register">register</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>

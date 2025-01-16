@@ -3,6 +3,7 @@ package com.nahagos.nahagos;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.Image;
+import com.nahagos.nahagos.datatypes.StopTime;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
