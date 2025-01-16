@@ -1,4 +1,4 @@
-package com.nahagos.nahagos.linechoose;
+package com.nahagos.nahagos.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
