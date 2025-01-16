@@ -51,9 +51,9 @@ public class Login extends AppCompatActivity {
                 new Thread(() -> {
                     if (isDriverGlobal) {
                         if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId)))
-                            runOnUiThread(() -> startActivity(stationsMapActivity));
+                            runOnUiThread(() -> startActivity(driverScheduleActivity));
                     } else if (ServerAPI.passengerLogin(username, password))
-                        runOnUiThread(() -> startActivity(driverScheduleActivity));
+                        runOnUiThread(() -> startActivity(stationsMapActivity));
                 }).start();
             } else {
                 emptyFields.setVisibility(TextView.VISIBLE);
