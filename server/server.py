@@ -48,7 +48,8 @@ def driver_connectivity():
         del_drivers = []
         for driver, properties in connected_drivers.items():
             if (datetime.datetime.now() - properties[1]) > datetime.timedelta(minutes=5):
-                del registered_trips[properties[2]]
+                if properties[2] is not None:
+                    del registered_trips[properties[2]]
                 del_drivers.append(driver)
         for driver in del_drivers:
             del connected_drivers[driver]
@@ -79,12 +80,12 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     """
     drivers_lock.acquire()
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+    if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     #checks if the driver was on a trip
-    if connected_drivers[cookies_and_milk] in None:
+    if connected_drivers[cookies_and_milk] is None:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="No trip to end")
     
@@ -102,7 +103,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     """ 
     users_lock.acquire()
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_users:
+    if cookies_and_milk not in connected_users:
         users_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
@@ -137,7 +138,7 @@ def passenger_wait_for_bus(wait_for : PassengerWait, cookies_and_milk:str = Cook
     """
     users_lock.acquire()
      # Validate user session
-    if not cookies_and_milk or cookies_and_milk not in connected_users:
+    if cookies_and_milk not in connected_users:
         users_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
@@ -171,7 +172,8 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     drivers_lock.acquire()
     db_lock.acquire()
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+
+    if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         db_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated") 
@@ -197,41 +199,6 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     return {"message": "Line registered successfully"}
 
 
-# @app.get("/update-station-list/{last_updated_date}")
-# def update_station_list(last_updated_date: str, cookies_and_milk: str = Cookie(None)):
-#     """
-#     Check whether or not the station list is up to date, and if not sending changes
-#     """
-#     try:
-#         # validate user
-#         if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
-#             raise HTTPException(status_code=401, detail="User not authenticated") 
-        
-#         # Validate date format
-#         try:
-#             last_updated_date = datetime.strptime(last_updated_date, "%Y-%m-%d")
-#         except ValueError:
-#             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
-
-
-#         # Query the database to check for diffs since the last_updated_date
-#         diffs = db.get_diffs_since_date(last_updated_date)  # Custom function to fetch diffs
-
-#         if not diffs:  # If no diffs are found, the station list is up-to-date
-#             return {"status": "Up to date"}
-
-#         return {"status": "Not up to date", "changes": diffs}
-
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-
-#         if not diffs:  # If no diffs are found, the station list is up-to-date
-#             return {"status": "Up to date"}
-
-#         return {"status": "Not up to date", "changes": diffs}
-
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.post("/driver/login/")
 def driver_login(driver: DriverLogin, response: Response):
@@ -268,7 +235,7 @@ def passenger_login(request: PassengerRequest, response: Response):
     
     if db.login_passenger(username, password):
         session_id = str(uuid.uuid4())
-        connected_users[session_id] = {"username": username}
+        connected_users[session_id] = username
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)
         users_lock.release()
         db_lock.release()
@@ -292,7 +259,7 @@ def passenger_signup(request: PassengerRequest, response: Response):
     
     if db.signup_passenger(username, password):
         session_id = str(uuid.uuid4())  # Generate a unique session ID
-        connected_users[session_id] = {"username": username}
+        connected_users[session_id] = username
         response.set_cookie(key="cookies_and_milk", value=session_id, httponly=True)  # Set session ID in a secure cookie
         users_lock.release()
         db_lock.release()
@@ -312,7 +279,7 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     users_lock.acquire()
     drivers_lock.acquire()
     # validate user
-    if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+    if cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users:
         users_lock.release()
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated") 
@@ -340,7 +307,7 @@ def where_to_stop(cookies_and_milk :str = Cookie(None)):
     """
     drivers_lock.acquire()
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+    if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
@@ -364,7 +331,7 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
     """ 
     drivers_lock.acquire()
     # validate user
-    if not cookies_and_milk or cookies_and_milk not in connected_drivers:
+    if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated") 
 
@@ -381,7 +348,6 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
         drivers_lock.release()
         raise HTTPException(status_code=401, detail=str(e))
 
-
 @app.get("/line-shape/{trip_id}")
 def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
     """
@@ -390,7 +356,7 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
     drivers_lock.acquire()
     users_lock.acquire()
     # validate user
-    if not cookies_and_milk or (cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users):
+    if cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users:
         drivers_lock.release()
         users_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated") 
