@@ -9,17 +9,12 @@ android {
     namespace 'com.nahagos.nahagos'
     compileSdk 34
 
-    buildFeatures {
-        buildConfig true
-    }
-
     defaultConfig {
         applicationId "com.nahagos.nahagos"
         minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
-        buildConfigField "String", "SERVER_IP", "\"172.20.20.27\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
