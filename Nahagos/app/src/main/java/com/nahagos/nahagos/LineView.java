@@ -98,9 +98,16 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
         trip_id = intent.getStringExtra("trip_id");
         if (trip_id == null || trip_id.isEmpty())
             trip_id = "5656648_311224";
-        stops.addAll(Arrays.stream(sapi.get_stops_by_line(trip_id)).map((st) -> {
-            return new Pair<StopTime, Boolean>(st, false);
-        }).collect(Collectors.toList()));
+        //stops.addAll(Arrays.stream(sapi.get_stops_by_line(trip_id)).map((st) -> {
+        //    return new Pair<StopTime, Boolean>(st, false);
+        //}).collect(Collectors.toList()));
+
+        stops.add(new Pair<>(new StopTime("10:00", 12330,"haifa", 12, 12), false));
+        stops.add(new Pair<>(new StopTime("10:00", 12330,"haifa", 12, 12), false));
+        stops.add(new Pair<>(new StopTime("10:00", 12330,"haifa", 12, 12), false));
+        stops.add(new Pair<>(new StopTime("10:00", 12330,"haifa", 12, 12), false));
+        stops.add(new Pair<>(new StopTime("10:00", 12330,"haifa", 12, 12), false));
+
 
         stationsAdapter = new LineViewArrayAdapter(this, R.layout.line_view_stop_element, stops, isDriver, myStop, trip_id);
         stopsList.setAdapter(stationsAdapter);
