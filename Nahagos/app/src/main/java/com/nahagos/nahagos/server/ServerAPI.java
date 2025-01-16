@@ -65,7 +65,7 @@ public class ServerAPI {
         GET_LINE_SHAPE("/line-shape/");
 
 
-        private static final String ROOT_URL = "http://172.20.20.27:8000";
+        private static final String ROOT_URL = "http://nahagos.lavirz.com:8000";
         private final String path;
 
         Endpoint(String path) {
