@@ -69,8 +69,6 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
 
         Intent intent = getIntent();
 
-        ServerAPI.passengerLogin("user1", "password123");
-
         backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         String lineColor = intent.getStringExtra("lineColor");
@@ -79,7 +77,7 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
 
         String lineName = intent.getStringExtra("lineName");
         if (lineName == null || lineName.isEmpty())
-            lineName = "יבנה 12";
+            lineName = "not found";
         title.setText(lineName);
 
         mainHandler = new Handler(Looper.getMainLooper());
