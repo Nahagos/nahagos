@@ -16,7 +16,38 @@ class Database:
         self.cursor = self.connection.cursor()
         if cool:
             self.download_and_init_gtfs()
-            
+    
+    def parse_file(self, path, file_name):
+        """
+        Parse the file and insert the data into the database
+        :param cursor: cursor object
+        :param path: path to the file to read data from
+        :param file_name: table name
+        :return: none
+        """
+        # Open the files in read mode and convert them to sql format
+        with open(path, 'r', encoding="utf8") as file:
+            # Read first line in the file
+            line1 = file.readline().strip()
+
+            # Read each line in the file and save list of params to insert:
+            request = ("INSERT INTO %s VALUES (" + ("?, " * len(line1.split(",")))[:-2] + ")") % (file_name)
+            request_params = []
+
+            print("line1", line1)
+            for line in file:
+                # parse each line
+
+                line = line.strip().split(",")
+                for var in line:
+                    if var == '':
+                        var = None
+
+                request_params += [line]
+
+            # Insert a row of data
+            self.cursor.executemany(request, request_params)
+    
     def download_and_init_gtfs(self):
         """
         Downloads the Israel public transportation GTFS file,
@@ -78,38 +109,7 @@ class Database:
         # Save (commit) the changes
         self.connection.commit()
         self.close()
-        
-    def parse_file(self, path, file_name):
-        """
-        Parse the file and insert the data into the database
-        :param cursor: cursor object
-        :param path: path to the file to read data from
-        :param file_name: table name
-        :return: none
-        """
-        # Open the files in read mode and convert them to sql format
-        with open(path, 'r', encoding="utf8") as file:
-            # Read first line in the file
-            line1 = file.readline().strip()
-
-            # Read each line in the file and save list of params to insert:
-            request = ("INSERT INTO %s VALUES (" + ("?, " * len(line1.split(",")))[:-2] + ")") % (file_name)
-            request_params = []
-
-            print("line1", line1)
-            for line in file:
-                # parse each line
-
-                line = line.strip().split(",")
-                for var in line:
-                    if var == '':
-                        var = None
-
-                request_params += [line]
-
-            # Insert a row of data
-            self.cursor.executemany(request, request_params)
-        
+    
     def create_tables(self):
         self.open()
         self.cursor.execute(
