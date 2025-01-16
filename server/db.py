@@ -1,8 +1,13 @@
+import os
+import requests
+from pathlib import Path
+import tempfile
 import sqlite3
 import hashlib
 from datetime import datetime
 import zipfile
-import os
+
+
 
 class Database:
     def __init__(self, db_name):
@@ -10,8 +15,8 @@ class Database:
         self.connection = sqlite3.connect(db_name)
         self.cursor = self.connection.cursor()
         if cool:
-            self.initialize_db(r"C:\Users\Epsilon\Downloads\israel-public-transportation.zip")
-        
+            self.download_and_init_gtfs()
+    
     def parse_file(self, path, file_name):
         """
         Parse the file and insert the data into the database
@@ -42,38 +47,43 @@ class Database:
 
             # Insert a row of data
             self.cursor.executemany(request, request_params)
+    
+    def download_and_init_gtfs(self):
+        """
+        Downloads the Israel public transportation GTFS file,
+        initializes the database, and cleans up the downloaded file.
+        """
+        # URL for GTFS data
+        url = "https://gtfs.mot.gov.il/gtfsfiles/israel-public-transportation.zip"
+        
+        # Temporary directory for downloading and extracting files
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "gtfs.zip")
+            
+            # Download GTFS ZIP file
+            response = requests.get(url, stream=True, verify=False)
+            if response.status_code == 200:
+                with open(zip_path, 'wb') as f:
+                    f.write(response.content)
+                print("GTFS file downloaded successfully.")
+            else:
+                raise Exception("Failed to download GTFS file. HTTP Status Code:", response.status_code)
+            
+            # Initialize database with extracted files
+            self.initialize_db(zip_path)
 
     def initialize_db(self, zip_path):
-        self.cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS passengers (
-                username TEXT NOT NULL PRIMARY KEY,
-                password TEXT NOT NULL
-            );
-            """
-        )
-        self.cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS drivers (
-                username TEXT NOT NULL,
-                password TEXT NOT NULL,
-                driver_id INTEGER NOT NULL PRIMARY KEY,
-                name TEXT NOT NULL,
-                license_plate TEXT NOT NULL
-            );
-            """
-        )
-        self.connection.commit()
-        self.close()
-
+        self.create_tables()
+        
         #adding default users        
         self.signup_passenger("user1", "password123")
-        self.add_driver("driver01", "password123", "6151181", "Alice Johnson", "ABC1234")
-        self.add_driver("driver02", "password123", "1455184", "Chris Lee", "XYZ5678")
-        self.add_driver("driver03", "password123", "1522484", "Maria Davis", "LMN3456")
+        self.add_driver("driver01", "password123", 6151181, "Alice Johnson", "ABC1234")
+        self.add_driver("driver02", "driver02", 1234567, "Chris Lee", "XYZ5678")
+        self.add_driver("driver03", "password123", 1522484, "Maria Davis", "LMN3456")
+        self.add_things_to_schedule()
         self.open()
 
-        dir_path = zip_path.replace(".zip", "\\")
+        dir_path = zip_path.replace(".zip", "/")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(dir_path)
 
@@ -99,11 +109,48 @@ class Database:
         # Save (commit) the changes
         self.connection.commit()
         self.close()
+    
+    def create_tables(self):
+        self.open()
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS passengers (
+                username TEXT NOT NULL PRIMARY KEY,
+                password TEXT NOT NULL
+            );
+            """
+        )
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS drivers (
+                username TEXT NOT NULL,
+                password TEXT NOT NULL,
+                driver_id INTEGER NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                license_plate TEXT NOT NULL
+            );
+            """
+        )
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS schedule (
+                name TEXT,
+                line TEXT,
+                trip_id TEXT,
+                driver_id INT,
+                day TEXT,
+                hour TEXT, -- hh:mm
+                PRIMARY KEY (line, trip_id, driver_id),
+                FOREIGN KEY (driver_id) REFERENCES drivers(driver_id)
+            );
+            """
+        )
+        self.connection.commit()
+        self.close()
         
     def add_driver(self, username, password, driver_id, name, license_plate):
         try:
             self.open()
-
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             self.cursor.execute("""
                 INSERT INTO drivers (username, password, driver_id, name, license_plate)
@@ -114,7 +161,38 @@ class Database:
             return True
         except sqlite3.IntegrityError:
             self.close()
+            return False
+        
+    def add_things_to_schedule(self):
+        self.add_to_schedule('fake_line', 6151181, '12', '5656648_311224', 'sunday', '06:40')
+        self.add_to_schedule('fake_line', 1234567, '8', '17332096_261224', 'sunday', '18:00')
+        self.add_to_schedule('fake_line', 1522484, '8', '2568376_261224', 'sunday', '17:20')
+        self.add_to_schedule('fake_line', 6151181, '8', '2568332_011224', 'sunday', '10:55')
+        self.add_to_schedule('fake_line', 1234567, '8', '17332309_261224', 'sunday', '07:50')
+        self.add_to_schedule('fake_line', 1522484, '8', '13077356_011224', 'sunday', '18:40')
+        self.add_to_schedule('fake_line', 6151181, '46', '27660227_261224', 'sunday', '08:30')
+        self.add_to_schedule('fake_line', 1234567, '46', '3148_261224', 'sunday', '08:05')
+        self.add_to_schedule('fake_line', 1522484, '46', '47974694_251224', 'sunday', '06:40')
+        self.add_to_schedule('fake_line', 6151181, '56', '26493025_311224', 'sunday', '15:45')
+        self.add_to_schedule('fake_line', 1234567, '57', '584632122_011224', 'sunday', '13:45')
+        self.add_to_schedule('fake_line', 1522484, '57', '585422673_011224', 'sunday', '10:45')
+        self.add_to_schedule('fake_line', 6151181, '57', '3559_261224', 'sunday', '12:35')
+        self.add_to_schedule('fake_line', 1234567, '57', '56445279_261224', 'sunday', '12:20')
 
+
+        
+    def add_to_schedule(self, name, driver_id, line, trip_id, day, hour):
+        try:
+            self.open()
+            self.cursor.execute("""
+                INSERT INTO schedule (name, driver_id, line, trip_id, day, hour)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (name, driver_id, line, trip_id, day, hour))
+            self.connection.commit()
+            self.close()
+            return True
+        except sqlite3.IntegrityError:
+            self.close()
             return False
         
     def close(self):
@@ -164,11 +242,8 @@ class Database:
 
     def get_lines_by_station(self, stop_id):
         self.open()
-        # Get current day and hour
         now = datetime.now()
-        current_day = now.weekday()  # Monday is 0, Sunday is 6
-
-        # Convert to the correct format for the SQL query
+        current_day = now.weekday()
         day_mapping = {
             0: 'monday',
             1: 'tuesday',
@@ -177,12 +252,9 @@ class Database:
             4: 'friday',
             5: 'saturday',
             6: 'sunday'
-        }
-        
+        }        
         day_column = day_mapping[current_day]
-        current_time = now.strftime("%H:%M:%S")  # Get current time in HH:MM:SS format
-
-        # Execute query with dynamic day and time
+        current_time = now.strftime("%H:%M:%S")
         self.cursor.execute(f"""
                             SELECT trip_id, departure_time, route_long_name, route_short_name, agency_name
                             FROM stop_times 
@@ -199,13 +271,16 @@ class Database:
         return lines    
     
     def check_stop_on_trip(self, trip_id, stop_id):
+        self.open()
         self.cursor.execute(f"""
                     SELECT stop_id
                     FROM stop_times
-                    WHERE stop_id = ?,
+                    WHERE stop_id = ? AND
                     trip_id = ?
                     """, (stop_id, trip_id))
-        return self.cursor.fetchall() is not None
+        res = self.cursor.fetchall()
+        self.close()
+        return res is not None
     
     def get_stops_by_trip_id(self, trip_id):
         self.open()
@@ -218,15 +293,39 @@ class Database:
         self.close()
         return stops
 
-
-        
-
-        
+    def get_driver_schedule(self, driver_id):
+        self.open()
+        self.cursor.execute('SELECT day, trip_id, line, hour, name FROM schedule WHERE driver_id = ?', (driver_id,))
+        schedule = self.cursor.fetchall()
+        self.close()
+        return schedule
+    
+    def get_trip_shape(self, trip_id):
+        self.open()
+        self.cursor.execute('SELECT shape_id FROM trips where trip_id = ?', (trip_id,))
+        shape_id = self.cursor.fetchone()
+        if shape_id:
+            self.cursor.execute('SELECT shape_pt_lat, shape_pt_lon FROM shapes where shape_id = ?', (shape_id[0],))
+            shape = self.cursor.fetchall()
+        else:
+            shape = []
+        self.close()
+        return shape
+    
+    def check_schedule(self, trip_id, driver_id):
+        self.open()
+        self.cursor.execute('SELECT day FROM schedule where trip_id = ? and driver_id = ?', (trip_id, driver_id))
+        res = self.cursor.fetchone()
+        self.close()
+        return res is not None
+        if not res:
+            return False
+        return res[0] == datetime.now().strftime("%A").lower()
         
 
 if __name__ == "__main__":
-    db = Database("users.db")
+    db = Database("db.sql")
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
-    print(db.lines_from_station(1234))
+    print(db.check_schedule('5656648_311224', 6151181))
     db.close()
