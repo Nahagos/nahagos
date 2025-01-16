@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.nahagos.nahagos'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.nahagos.nahagos"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -45,7 +45,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation libs.appcompat
     implementation libs.material
     implementation libs.play.services.maps
@@ -72,10 +71,9 @@ dependencies {
     debugImplementation libs.ui.tooling
     debugImplementation libs.ui.test.manifest
     implementation libs.android.maps.utils
-
-
-
-    def room_version = "2.6.1"
+    implementation libs.recyclerview
+    implementation libs.cardview
+    implementation libs.gson
 
     implementation libs.room.runtime
     annotationProcessor libs.room.compiler
