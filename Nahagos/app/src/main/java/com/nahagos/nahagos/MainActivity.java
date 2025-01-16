@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 if (isCheckedGlobal) {
                     if (!driverId.isEmpty()) {
                         emptyFields.setVisibility(TextView.GONE);
-                        ServerAPI.driverLogin(username, password, driverId);
+                        ServerAPI.driverLogin(username, password, Integer.parseInt(driverId));
                         ServerAPI.getDriverSchedule();
                         ServerAPI.getLineShape("5656648_311224");
                         ServerAPI.registerForLine("5656648_311224");
