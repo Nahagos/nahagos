@@ -22,12 +22,8 @@ import java.util.stream.Collectors;
 
 public class DriverSchedule extends AppCompatActivity {
     private List<List<Line>> schedule;
-
-    private RecyclerView drivesView;
-    private ArrayAdapter<String> spinnerAdapter;
     private DrivesAdapter drivesAdapter;
     private final List<Line> toBeDisplayed = new ArrayList<>();
-
     private final List<String> daysOfWeek;
 
     public DriverSchedule() {
@@ -41,7 +37,7 @@ public class DriverSchedule extends AppCompatActivity {
         setContentView(R.layout.activity_driver_screen);
 
         Spinner spinner = findViewById(R.id.spinner_days);
-        drivesView = findViewById(R.id.recycler_view_drives);
+        RecyclerView drivesView = findViewById(R.id.recycler_view_drives);
         drivesView.setLayoutManager(new LinearLayoutManager(this));
 
 
