@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
-    <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -16,14 +16,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Nahagos"
-        tools:targetApi="31">
-        
+        tools:targetApi="31" >
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAVP3301xjln7j0QfadNhBXgh2zQktvk48" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.DriverSchedule"
+            android:exported="true" />
+        <activity
+            android:name=".activities.Login"
             android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.Nahagos" >
@@ -39,9 +42,9 @@
             android:exported="true" />
 
         <activity
-            android:name=".PassengerUI"
+            android:name=".activities.StationsMap"
             android:exported="true"
-            android:label="@string/title_activity_passenger_ui" />
+            android:label="@string/title_activity_stations_map" />
     </application>
 
 </manifest>

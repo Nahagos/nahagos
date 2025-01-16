@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.activities;
 
 import androidx.annotation.NonNull;
 
@@ -31,16 +31,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm;
+import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.databinding.ActivityPassengerUiBinding;
 import com.nahagos.nahagos.db.DBManager;
 import com.nahagos.nahagos.db.Tables.Stop;
-import com.nahagos.nahagos.linechoose.LocationDetailsBottomSheet;
+import com.nahagos.nahagos.fragments.LocationDetailsBottomSheet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PassengerUI extends FragmentActivity {
+public class StationsMap extends FragmentActivity {
 
     private static final int STOP_ID_NOT_FOUND = -1;
     private static final LatLng ISRAEL = new LatLng(30.974998182290868, 34.69264616803752);
