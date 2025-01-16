@@ -11,10 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.ServerAPI;
+import com.nahagos.nahagos.server.ServerAPI;
+import com.nahagos.nahagos.adapters.LinesAdapter;
+import com.nahagos.nahagos.datatypes.Line;
 import com.nahagos.nahagos.db.Tables.Stop;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LocationDetailsBottomSheet extends BottomSheetDialogFragment {
@@ -46,25 +49,15 @@ public class LocationDetailsBottomSheet extends BottomSheetDialogFragment {
         locationName.setText(stop.getTitle());
         locationDetails.setText(getString(R.string.location_details, String.valueOf(stop.lat), String.valueOf(stop.lon)));
 
-        var lines = new ArrayList<LineData>();
+        var lines = new ArrayList<Line>();
         var linesAdapter = new LinesAdapter(lines);
 
         RecyclerView linesRecyclerView = view.findViewById(R.id.recycler_view);
         linesRecyclerView.setAdapter(linesAdapter);
         linesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         new Thread(() -> {
-            // TODO: Fetch lines from server
-            var fakeLines = List.of(
-                    new LineData("tripid1", "שדרות שז''ר/בנייני האומה-ירושלים<->אוניברסיטת אריאל/כביש 31-אריאל-21\n", 290, "10:12", "Egged", false),
-                    new LineData("tripid2", "ת. רכבת יבנה מערב-יבנה<->ת. רכבת יבנה מזרח-יבנה-1#\n", 3, "10:30", "Dan", true),
-                    new LineData("tripid3", "נווה זוהר/מועצה אזורית-נווה זוהר<->ת. מרכזית ירושלים/הורדה-ירושלים-15\n", 486, "10:57", "Kavim", true),
-                    new LineData("tripid4", "ת. רכבת יבנה מערב-יבנה<->ת. רכבת יבנה מזרח-יבנה-1#\n", 3, "11:30", "Dan", true),
-                    new LineData("tripid5", "ת. מרכזית המפרץ/רציפים בינעירוני-חיפה<->ת.מרכזית עפולה/הורדה-עפולה-13\n", 301, "11:32", "Kavim", false),
-                    new LineData("tripid6", "מכללת הרמלין/המחקר-נתניה<->ת. מרכזית חדרה/רציפים-חדרה-21\n", 57, "12:30", "Dan", true)
-            );
-
             lines.clear();
-            lines.addAll(fakeLines);
+            lines.addAll(Arrays.asList(ServerAPI.getLinesByStation(stop.id)));
 
             requireActivity().runOnUiThread(() -> {
                 linesAdapter.notifyItemRangeChanged(0, lines.size());

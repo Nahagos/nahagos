@@ -1,4 +1,4 @@
-package com.nahagos.nahagos.linechoose;
+package com.nahagos.nahagos.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.datatypes.Line;
 
 import java.util.List;
 
 public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHolder> {
 
-    private final List<LineData> lines;
+    private final List<Line> lines;
 
-    public LinesAdapter(List<LineData> lines) {
+    public LinesAdapter(List<Line> lines) {
         this.lines = lines;
     }
 
@@ -33,7 +34,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
 
     @Override
     public void onBindViewHolder(@NonNull LineViewHolder holder, int position) {
-        LineData line = lines.get(position);
+        Line line = lines.get(position);
         holder.lineNumber.setText(String.valueOf(line.line_num));
         holder.lineName.setText(line.name);
         holder.lineTime.setText(line.departure);
