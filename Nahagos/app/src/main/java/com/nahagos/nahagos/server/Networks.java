@@ -1,4 +1,4 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.server;
 
 import android.util.Log;
 

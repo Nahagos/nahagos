@@ -1,6 +1,7 @@
-package com.nahagos.nahagos;
+package com.nahagos.nahagos.server;
 import android.content.Context;
-import com.nahagos.nahagos.Networks;
+
+import com.nahagos.nahagos.R;
 
 public class ServerAPI {
     private String PASSENGER_LOGIN_URL = "/passenger/login/";
