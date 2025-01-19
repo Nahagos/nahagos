@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import sqlite3
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import zipfile
 
 
@@ -242,7 +242,8 @@ class Database:
 
     def get_lines_by_station(self, stop_id):
         self.open()
-        now = datetime.now()
+        gmt3 = timezone(timedelta(hours=2))
+        now = datetime.now(gmt3)
         current_day = now.weekday()
         day_mapping = {
             0: 'monday',
@@ -255,17 +256,21 @@ class Database:
         }        
         day_column = day_mapping[current_day]
         current_time = now.strftime("%H:%M:%S")
+        print(current_time)
         self.cursor.execute(f"""
-                            SELECT trip_id, departure_time, route_long_name, route_short_name, agency_name
-                            FROM stop_times 
-                            NATURAL JOIN trips 
-                            NATURAL JOIN calendar 
-                            NATURAL JOIN routes 
-                            NATURAL JOIN agency
-                            WHERE stop_id = {stop_id} 
-                            AND departure_time > "{current_time}" 
-                            AND {day_column} = 1
-                            """)
+            SELECT route_long_name, route_short_name, trip_id, MIN(departure_time) AS departure_time, agency_name
+            FROM stop_times
+            NATURAL JOIN trips
+            NATURAL JOIN calendar
+            NATURAL JOIN routes
+            NATURAL JOIN agency
+            WHERE stop_id = ? 
+            AND departure_time > ? 
+            AND {day_column} = 1
+            GROUP BY route_long_name, route_short_name
+            ORDER BY departure_time;
+
+        """, (stop_id, current_time))
         lines = self.cursor.fetchall()
         self.close()
         return lines    
@@ -317,7 +322,6 @@ class Database:
         self.cursor.execute('SELECT day FROM schedule where trip_id = ? and driver_id = ?', (trip_id, driver_id))
         res = self.cursor.fetchone()
         self.close()
-        return res is not None
         if not res:
             return False
         return res[0] == datetime.now().strftime("%A").lower()
@@ -327,5 +331,8 @@ if __name__ == "__main__":
     db = Database("db.sql")
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
-    print(db.check_schedule('5656648_311224', 6151181))
+    a=db.get_lines_by_station(45014)
+    for row in a:
+        print(row)
+    print(len(a))
     db.close()

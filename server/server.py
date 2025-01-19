@@ -105,7 +105,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     # validate user
     if cookies_and_milk not in connected_users:
         users_lock.release()
-        raise HTTPException(status_code=401, detail="User not authenticated")
+        raise HTTPException(status_code=403, detail="User not authenticated")
     
     db_lock.acquire()
     try:
@@ -119,7 +119,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     except Exception as e:
         db_lock.release()
         users_lock.release()
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=402, detail=str(e))
 
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
