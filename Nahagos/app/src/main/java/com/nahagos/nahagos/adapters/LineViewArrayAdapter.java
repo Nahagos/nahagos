@@ -5,6 +5,8 @@ import android.content.Context;
 import com.nahagos.nahagos.activities.LineView;
 import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.datatypes.StopTime;
+import com.nahagos.nahagos.server.ServerAPI;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
@@ -26,12 +28,14 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
     private final Context context;
     private final boolean isDriver;
     private final int enableStopButton;
+    private final String trip_id;
 
-    public LineViewArrayAdapter(@NonNull Context c, int resource, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String trip_id) {
+    public LineViewArrayAdapter(@NonNull Context c, int resource, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
         this.enableStopButton = stopId;
+        this.trip_id = tripId;
     }
 
     @NonNull
@@ -56,12 +60,12 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
 
         stopButton.setOnClickListener((v) -> {
            try {
-               if (((LineView) context).onButtonClicked(current.first.stop_id)) {
+               if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
                    stopButton.setVisibility(View.INVISIBLE);
                    handImg.setVisibility(View.VISIBLE);
                }
-           } catch(RuntimeException ignored) {
-               Log.d("Array adapter Error", Objects.requireNonNull(ignored.getMessage()));
+           } catch(RuntimeException e) {
+               Log.d("Array adapter Error", Objects.requireNonNull(e.getMessage()));
            }
         });
 

@@ -1,7 +1,6 @@
 package com.nahagos.nahagos.activities;
 
 import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.listeners.StopButtonListener;
 import com.nahagos.nahagos.adapters.LineViewArrayAdapter;
 import com.nahagos.nahagos.server.ServerAPI;
 import com.nahagos.nahagos.datatypes.StopTime;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class LineView extends AppCompatActivity implements StopButtonListener {
+public class LineView extends AppCompatActivity {
 
     private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
@@ -47,8 +46,6 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
 
     private Handler mainHandler;
     private Thread serverListeningThread;
-
-    private String trip_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +98,8 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
 
         StopTime[] stopsFromServer = null;
 
-        trip_id = intent.getStringExtra("tripId");
+        String trip_id = intent.getStringExtra("tripId");
+
         if (trip_id == null || trip_id.isEmpty())
             stopsFromServer = ServerAPI.getStopsByLine(trip_id);
         if (stopsFromServer != null) {
@@ -118,7 +116,7 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
             if (isDriver && canStartDrive) {
                 driveStarted = true;
                 worked = ServerAPI.registerForLine(finalTrip_id);
-                listenForStoppingUpdates(intent.getStringExtra("tripId"));
+                listenForStoppingUpdates();
 
                 if (worked)
                     nahagosImg.setVisibility(View.VISIBLE);
@@ -131,13 +129,7 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
         });
     }
 
-    private void listenForStoppingUpdates(String trip_id) {
-        String finalTrip_id = trip_id;
-        if (trip_id == null || trip_id.isEmpty()) {
-            finalTrip_id = trip_id;
-        }
-
-
+    private void listenForStoppingUpdates() {
         serverListeningThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {
@@ -176,10 +168,5 @@ public class LineView extends AppCompatActivity implements StopButtonListener {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
-    }
-
-    @Override
-    public boolean onButtonClicked(int stopId) {
-        return ServerAPI.waitForMe(trip_id, stopId);
     }
 }
