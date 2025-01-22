@@ -58,7 +58,7 @@ public class LineView extends AppCompatActivity {
         String lineColor = intent.getStringExtra("lineColor");
         String lineName = intent.getStringExtra("lineName");
         myStop = intent.getIntExtra("stopId", 0);
-        String trip_id = "3611_251224"; // intent.getStringExtra("tripId");
+        String trip_id = intent.getStringExtra("tripId");
 
         backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
