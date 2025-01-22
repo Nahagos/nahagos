@@ -44,27 +44,27 @@ public class SignUp extends AppCompatActivity {
             String password = passwordObj.getText().toString().trim();
             String confirmPassword = confirmPasswordObj.getText().toString().trim();
 
-            if (!username.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty()) {
-                if (password.equals(confirmPassword)) {
-                    new Thread(() -> {
-                        if (ServerAPI.passengerSignup(username, password)) {
-                            if(rememberMe.isChecked()){
-                                preferencesManager.saveUserCredentials(username, password, null);
-                                runOnUiThread(() -> startActivity(stationsMapActivity));
-                            }
-                        }
-                        else {
-                            runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
-                        }
-                    }).start();
-                }
-                else {
-                    Toast.makeText(SignUp.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                }
+            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(SignUp.this, "Make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
+                return;
             }
-            else {
-                Toast.makeText(SignUp.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
+
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(SignUp.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            new Thread(() -> {
+                if (ServerAPI.passengerSignup(username, password)) {
+                    if (rememberMe.isChecked()) {
+                        preferencesManager.saveUserCredentials(username, password, null);
+                    }
+                    runOnUiThread(() -> startActivity(stationsMapActivity));
+                } else {
+                    runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                }
+            }).start();
         });
+
     }
 }

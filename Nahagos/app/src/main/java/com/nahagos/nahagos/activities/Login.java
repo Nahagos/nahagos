@@ -80,34 +80,28 @@ public class Login extends AppCompatActivity {
             String password = passwordObj.getText().toString().trim();
             String driverId = driverIdObj.getText().toString().trim();
 
-            if (!username.isEmpty() && !password.isEmpty() && (!isDriverGlobal || !driverId.isEmpty())) {
-                Log.d("Login", Boolean.toString(isDriverGlobal));
-
-                new Thread(() -> {
-                    if (isDriverGlobal) {
-                        if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId))) {
-                            if (rememberMe.isChecked()) {
-                                preferencesManager.saveUserCredentials(username, password, Integer.parseInt(driverId));
-                            }
-                            runOnUiThread(() -> startActivity(driverScheduleActivity));
-                        }
-                        else {
-                            runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
-                        }
-                    }
-                    else if (ServerAPI.passengerLogin(username, password)) {
-                        if (rememberMe.isChecked()) {
-                            preferencesManager.saveUserCredentials(username, password, null);
-                        }
-                        runOnUiThread(() -> startActivity(stationsMapActivity));
-                    }
-                    else {
-                        runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
-                    }
-                }).start();
-            } else {
-                Toast.makeText(Login.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
+            if (username.isEmpty() || password.isEmpty() || (isDriverGlobal && driverId.isEmpty())) {
+                Toast.makeText(Login.this, "Make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            Log.d("Login", Boolean.toString(isDriverGlobal));
+
+            new Thread(() -> {
+                if (isDriverGlobal && ServerAPI.driverLogin(username, password, Integer.parseInt(driverId))) {
+                    if (rememberMe.isChecked()) {
+                        preferencesManager.saveUserCredentials(username, password, Integer.parseInt(driverId));
+                    }
+                    runOnUiThread(() -> startActivity(driverScheduleActivity));
+                } else if (ServerAPI.passengerLogin(username, password)) {
+                    if (rememberMe.isChecked()) {
+                        preferencesManager.saveUserCredentials(username, password, null);
+                    }
+                    runOnUiThread(() -> startActivity(stationsMapActivity));
+                } else {
+                    runOnUiThread(() -> Toast.makeText(Login.this, "Some fields are incorrect", Toast.LENGTH_SHORT).show());
+                }
+            }).start();
         });
     }
 }
