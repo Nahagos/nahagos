@@ -2,6 +2,15 @@ package com.nahagos.nahagos.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+
+import androidx.fragment.app.FragmentActivity;
+
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.FusedLocationProviderClient;
+
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -10,11 +19,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -54,9 +59,11 @@ public class StationsMap extends FragmentActivity {
         setContentView(binding.getRoot());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) mapFragment.getMapAsync(this::onMapReady);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.frag_map);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this::onMapReady);
         dbManager = new DBManager(this);
 
         suggestionList = findViewById(R.id.suggestions);
@@ -128,7 +135,7 @@ public class StationsMap extends FragmentActivity {
     }
 
     private void centerMapOnGps() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
