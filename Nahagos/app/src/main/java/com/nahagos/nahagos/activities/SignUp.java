@@ -1,8 +1,10 @@
 package com.nahagos.nahagos.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ public class SignUp extends AppCompatActivity {
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText confirmPasswordObj = findViewById(R.id.confirmPasswordField);
         Button button = findViewById(R.id.signupButton);
+        CheckBox rememberMe = findViewById(R.id.checkBoxRememberMe);
 
         button.setOnClickListener(view -> {
             String username = usernameObj.getText().toString().trim();
@@ -47,7 +50,13 @@ public class SignUp extends AppCompatActivity {
                 {
                     new Thread(() -> {
                         if (ServerAPI.passengerSignup(username, password))
+                        {
+                            SharedPreferences.Editor sharedPreferences = getSharedPreferences("user_info", 0).edit();
+                            sharedPreferences.putString("username", username);
+                            sharedPreferences.putString("password", password);
+                            sharedPreferences.apply();
                             runOnUiThread(() -> startActivity(stationsMapActivity));
+                        }
                         else
                             runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
                     }).start();
