@@ -95,8 +95,10 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
         raise HTTPException(status_code=401, detail="No trip to end")
     
     trips_lock.acquire()
+    print("registered_trips", registered_trips)
     del registered_trips[connected_drivers[cookies_and_milk][2]]
     connected_drivers[cookies_and_milk][2] = None
+    print("registered_trips", registered_trips)
     trips_lock.release()
     drivers_lock.release()
     return {"message": "The trip ended successfully"}
@@ -299,7 +301,7 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     drivers_lock.release()
     db_lock.acquire()
     trips_lock.acquire()
-    driver_coords = registered_trips[trip_id][1] if trip_id in registered_trips.keys else (0,0)
+    driver_coords = registered_trips[trip_id][1] if trip_id in registered_trips.keys() else (0,0)
     trips_lock.release()
     
     try:
