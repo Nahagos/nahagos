@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,12 +20,12 @@ import java.util.List;
 
 public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHolder> {
 
-    private final Stop stop;
+    private final Stop referringStop;
     private final List<Line> lines;
     private final Context context;
 
-    public LinesAdapter(Stop stop, List<Line> lines, Context context) {
-        this.stop = stop;
+    public LinesAdapter(Stop referringStop, List<Line> lines, Context context) {
+        this.referringStop = referringStop;
         this.lines = lines;
         this.context = context;
     }
@@ -50,7 +49,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
             var lineView = new Intent(context, LineView.class);
             lineView.putExtra("nahagosOnline", line.isNahagos);
             lineView.putExtra("lineName", line.name);
-            lineView.putExtra("stopId", stop.id);
+            lineView.putExtra("stopId", referringStop.id);
             lineView.putExtra("tripId", line.trip_id);
             context.startActivity(lineView);
         });
