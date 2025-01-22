@@ -5,17 +5,6 @@
     <!-- Strings used for fragments for navigation -->
 
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_register">register</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="title_activity_passenger_ui">PassengerUI</string>
     <string name="title_activity_stations_map">StationsMap</string>
     <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
     <string name="location_details">Latitude: %1$s, Longitude: %2$s</string>

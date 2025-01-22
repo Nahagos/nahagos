@@ -1,12 +1,8 @@
 package com.nahagos.nahagos.activities;
 
-import androidx.annotation.NonNull;
-
 import androidx.fragment.app.FragmentActivity;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
-
-import com.google.android.gms.maps.model.LatLngBounds;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -20,11 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -69,7 +60,7 @@ public class StationsMap extends FragmentActivity {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.passenger_map);
+                .findFragmentById(R.id.stations_map);
         if (mapFragment != null)
             mapFragment.getMapAsync(this::onMapReady);
         dbManager = new DBManager(this);
