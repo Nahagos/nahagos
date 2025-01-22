@@ -74,7 +74,7 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.cardview
     implementation libs.gson
-
+    implementation libs.play.services.maps
     implementation libs.room.runtime
     annotationProcessor libs.room.compiler
 }

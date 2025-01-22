@@ -1,6 +1,7 @@
 package com.nahagos.nahagos.activities;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -32,6 +33,13 @@ public class Login extends AppCompatActivity {
         EditText driverIdObj = findViewById(R.id.idDriver);
         TextView emptyFields = findViewById(R.id.emptyFields_id);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
+        TextView createAccountText = findViewById(R.id.createAccountText);
+        createAccountText.setPaintFlags(createAccountText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+        createAccountText.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SignUp.class);
+            startActivity(intent);
+        });
 
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isDriverGlobal = isChecked;

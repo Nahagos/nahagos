@@ -55,7 +55,7 @@ public class ServerAPI {
     private enum Endpoint {
         PASSENGER_LOGIN("/passenger/login/"),
         DRIVER_LOGIN("/driver/login/"),
-        REGISTER("/passenger/register/"),
+        REGISTER("/passenger/signup/"),
         GET_LINES_BY_STATION("/lines-by-station/"),
         WAIT_FOR_ME("/passenger/wait-for/"),
         REGISTER_FOR_LINE("/driver/drive/register/"),

@@ -7,6 +7,7 @@
     <string name="title_activity_stations_map">StationsMap</string>
     <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
     <string name="location_details">Latitude: %1$s, Longitude: %2$s</string>
+    <string name="welcome_text">Welcome to Nahagos!</string>
 
 
 </resources>
