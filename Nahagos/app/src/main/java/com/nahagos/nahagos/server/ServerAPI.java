@@ -45,8 +45,8 @@ public class ServerAPI {
         return Networks.httpGetReq(Endpoint.GET_DRIVER_SCHEDULE.getUrl(), Line[][].class);
     }
 
-    public static int[] getStoppingStations() {
-        return Networks.httpGetReq(Endpoint.GET_STOPPING_STATIONS.getUrl(), int[].class);
+    public static int[] getStoppingStations(double lat, double lon) {
+        return Networks.httpPostReq(Endpoint.GET_STOPPING_STATIONS.getUrl(), "{\"lat\": " + lat + ", \"lon\": " + lon + "}", int[].class);
     }
 
     public static StopTime[] getStopsByLine(String trip_id) {

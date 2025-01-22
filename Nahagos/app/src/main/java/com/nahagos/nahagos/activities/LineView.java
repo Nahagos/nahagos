@@ -122,7 +122,7 @@ public class LineView extends AppCompatActivity {
         serverListeningThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {
-                    ArrayList<Integer> toStopStations = Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toCollection(ArrayList::new));
+                    ArrayList<Integer> toStopStations = Arrays.stream(ServerAPI.getStoppingStations(0, 0)).boxed().collect(Collectors.toCollection(ArrayList::new));
                     for (AtomicInteger i = new AtomicInteger(0); i.get() < stops.size(); i.set(i.get()+1)) {
                         if (toStopStations.stream().anyMatch((j) -> j == stops.get(i.get()).first.stop_id)) {
                             Pair<StopTime, Boolean> newN = new Pair<>(stops.get(i.get()).first, true);
