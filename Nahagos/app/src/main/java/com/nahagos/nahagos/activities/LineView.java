@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class LineView extends AppCompatActivity {
@@ -115,13 +116,12 @@ public class LineView extends AppCompatActivity {
     private void startListeningForStoppingUpdates() {
         serverListeningThread = new Thread(() -> {
             try {
-                while (!Thread.currentThread().interrupted()) {
+                while (!Thread.interrupted()) {
                     ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toList()));
-                    for (int i = 0; i < stops.size(); i++) {
-                        int finalI = i;
+                    for (AtomicInteger i = new AtomicInteger(0); i.get() < stops.size(); i.set(i.get()+1)) {
                         if (toStopStations.stream().anyMatch((j) -> j == stops.get(finalI).first.stop_id)) {
                             Pair<StopTime, Boolean> newN = new Pair<>(stops.get(finalI).first, true);
-                            stops.set(i, newN);  // Update original list
+                            stops.set(i.get(), newN);  // Update original list
                         }
                     }
 
