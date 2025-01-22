@@ -314,6 +314,7 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     
     try:
         list_lines = db.get_stops_by_trip_id(trip_id)
+        print(list_lines)
         lines_json = []
         for line in list_lines:
             time = line[2]
