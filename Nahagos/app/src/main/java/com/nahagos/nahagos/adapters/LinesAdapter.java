@@ -1,5 +1,7 @@
 package com.nahagos.nahagos.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.activities.LineView;
 import com.nahagos.nahagos.datatypes.Line;
+import com.nahagos.nahagos.db.Tables.Stop;
 
 import java.util.List;
 
 public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHolder> {
 
+    private final Stop stop;
     private final List<Line> lines;
+    private final Context context;
 
-    public LinesAdapter(List<Line> lines) {
+    public LinesAdapter(Stop stop, List<Line> lines, Context context) {
+        this.stop = stop;
         this.lines = lines;
+        this.context = context;
     }
 
     @NonNull
@@ -39,7 +47,12 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Clicked on line " + line.line_num, Toast.LENGTH_SHORT).show();
+            var lineView = new Intent(context, LineView.class);
+            lineView.putExtra("nahagosOnline", line.isNahagos);
+            lineView.putExtra("lineName", line.name);
+            lineView.putExtra("stopId", stop.id);
+            lineView.putExtra("tripId", line.trip_id);
+            context.startActivity(lineView);
         });
     }
 
