@@ -45,14 +45,13 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
         holder.lineTime.setText(line.departure);
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
 
-        holder.itemView.setOnClickListener(v -> {
-            var lineView = new Intent(context, LineView.class);
-            lineView.putExtra("nahagosOnline", line.isNahagos);
-            lineView.putExtra("lineName", line.name);
-            lineView.putExtra("stopId", referringStop.id);
-            lineView.putExtra("tripId", line.trip_id);
-            context.startActivity(lineView);
-        });
+        holder.itemView.setOnClickListener(v -> context.startActivity(
+                new Intent(context, LineView.class)
+                        .putExtra("lineName", line.name)
+                        .putExtra("stopId", referringStop.id)
+                        .putExtra("tripId", line.trip_id)
+                        .putExtra("nahagosOnline", line.isNahagos)
+        ));
     }
 
     @Override
