@@ -96,6 +96,7 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     
     trips_lock.acquire()
     print("registered_trips", registered_trips)
+    print("connected_drivers[cookies_and_milk][2]", connected_drivers[cookies_and_milk][2])
     del registered_trips[connected_drivers[cookies_and_milk][2]]
     connected_drivers[cookies_and_milk][2] = None
     print("registered_trips", registered_trips)
