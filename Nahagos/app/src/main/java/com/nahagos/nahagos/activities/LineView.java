@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class LineView extends AppCompatActivity {
             layout.setBackgroundColor(Color.parseColor(lineColor));
 
         if (lineName == null || lineName.isEmpty())
-            lineName = "not found";
+            lineName = getString(R.string.line_not_found);
         title.setText(lineName);
 
         if (isDriver && canStartDrive) {
@@ -95,12 +96,20 @@ public class LineView extends AppCompatActivity {
 
         startDriveBtn.setOnClickListener((v) -> {
             if (isDriver && canStartDrive) {
-
                 startListeningForStoppingUpdates();
 
                 new Thread(()-> {
-                    if (!ServerAPI.registerForLine(trip_id))
-                        runOnUiThread(() -> nahagosImg.setVisibility(View.VISIBLE));
+                    if (ServerAPI.registerForLine(trip_id)) {
+                        runOnUiThread(() -> {
+                            nahagosImg.setVisibility(View.VISIBLE);
+                            startDriveBtn.setVisibility(View.INVISIBLE);
+                        });
+                    }
+                    else {
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, R.string.cant_start_drive, Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }).start();
 
             } else {

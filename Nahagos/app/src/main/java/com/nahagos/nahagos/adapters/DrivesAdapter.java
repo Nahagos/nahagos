@@ -1,7 +1,9 @@
 package com.nahagos.nahagos.adapters;
 
+import com.nahagos.nahagos.activities.LineView;
 import com.nahagos.nahagos.datatypes.Line;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,14 @@ public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewH
         Line drive = drives.get(position);
         holder.titleTextView.setText(drive.line_num + " - " + drive.name);
         holder.subtitleTextView.setText("Departure time: " + drive.departure);
+        holder.itemView.setOnClickListener(v -> {
+            Intent lineViewIntent = new Intent(context, LineView.class);
+            lineViewIntent.putExtra("isDriver", true);
+            lineViewIntent.putExtra("canStartDrive", true);
+            lineViewIntent.putExtra("lineName", drive.name);
+            lineViewIntent.putExtra("tripId", drive.trip_id);
+            context.startActivity(lineViewIntent);
+        });
     }
 
     @Override
