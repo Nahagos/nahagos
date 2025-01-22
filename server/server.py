@@ -204,12 +204,12 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     if not db.check_schedule(reg.trip_id, connected_drivers[cookies_and_milk][0]):
         drivers_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=401, detail="Line isn't schedualed for you")
+        raise HTTPException(status_code=402, detail="Line isn't schedualed for you")
     
     if connected_drivers[cookies_and_milk][2]:
         drivers_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=401, detail="You already registered for a trip")
+        raise HTTPException(status_code=403, detail="You already registered for a trip")
     
     trips_lock.acquire()
     connected_drivers[cookies_and_milk][2] = reg.trip_id
