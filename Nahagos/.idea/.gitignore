@@ -6,5 +6,6 @@ caches
 libraries
 modules.xml
 navEditor.xml
+misc.xml
 assetWizardSettings.xml
 deploymentTargetSelector.xml
