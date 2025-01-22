@@ -1,5 +1,7 @@
 package com.nahagos.nahagos.activities;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -120,42 +123,45 @@ public class StationsMap extends FragmentActivity {
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-        //TODO: this needs a callback, perms are async
-        map.setMyLocationEnabled(true);
+        else
+            centerMapOnGps();
+
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
-
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener((task) -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                // Get the location
-                Location location = task.getResult();
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-
-                startingPoint = new LatLng(latitude, longitude);
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
-
-            }
-        });
 
         clusterManager = new ClusterManager<>(this, map);
         map.setOnCameraIdleListener(clusterManager);
         clusterManager.setOnClusterItemClickListener(this::onStopClick);
 
-
-
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         clusterManager.setAlgorithm(new NonHierarchicalViewBasedAlgorithm<>(metrics.widthPixels, metrics.heightPixels));
 
-
         for (var stop : dbManager.stopsDao().getAll()) {
             clusterManager.addItem(stop);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        centerMapOnGps();
+    }
+
+    private void centerMapOnGps() {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null)
+                    centerMapOnLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+            });
+        }
+    }
+
+    private void centerMapOnLocation(LatLng location) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
 
     public boolean onStopClick(Stop stop) {
