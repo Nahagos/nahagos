@@ -95,13 +95,12 @@ public class LineView extends AppCompatActivity {
 
         startDriveBtn.setOnClickListener((v) -> {
             if (isDriver && canStartDrive) {
-                startListeningForStoppingUpdates();
-
                 new Thread(()-> {
                     if (ServerAPI.registerForLine(trip_id)) {
                         runOnUiThread(() -> {
                             nahagosImg.setVisibility(View.VISIBLE);
                             startDriveBtn.setVisibility(View.INVISIBLE);
+                            startListeningForStoppingUpdates();
                         });
                     }
                     else {
@@ -148,7 +147,6 @@ public class LineView extends AppCompatActivity {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
-        endTrip();
     }
 
     @Override
