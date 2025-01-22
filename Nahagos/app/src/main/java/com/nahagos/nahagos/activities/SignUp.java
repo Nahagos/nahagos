@@ -34,14 +34,12 @@ public class SignUp extends AppCompatActivity {
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText confirmPasswordObj = findViewById(R.id.confirmPasswordField);
-        TextView emptyFields = findViewById(R.id.emptyFields_id);
         Button button = findViewById(R.id.signupButton);
 
         button.setOnClickListener(view -> {
             String username = usernameObj.getText().toString().trim();
             String password = passwordObj.getText().toString().trim();
             String confirmPassword = confirmPasswordObj.getText().toString().trim();
-            emptyFields.setVisibility(TextView.GONE);
 
             if (!username.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty())
             {
@@ -59,7 +57,7 @@ public class SignUp extends AppCompatActivity {
             }
             else
             {
-                emptyFields.setVisibility(TextView.VISIBLE);
+                Toast.makeText(SignUp.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
             }
         });
     }

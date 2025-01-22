@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,7 +32,6 @@ public class Login extends AppCompatActivity {
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText driverIdObj = findViewById(R.id.idDriver);
-        TextView emptyFields = findViewById(R.id.emptyFields_id);
         CheckBox isDriver = findViewById(R.id.checkBoxIsDriver);
         TextView createAccountText = findViewById(R.id.createAccountText);
         createAccountText.setPaintFlags(createAccountText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -51,20 +51,33 @@ public class Login extends AppCompatActivity {
             String username = usernameObj.getText().toString().trim();
             String password = passwordObj.getText().toString().trim();
             String driverId = driverIdObj.getText().toString().trim();
-            emptyFields.setVisibility(TextView.GONE);
 
             if (!username.isEmpty() && !password.isEmpty() && (!isDriverGlobal || !driverId.isEmpty())) {
                 Log.d("Login", Boolean.toString(isDriverGlobal));
 
                 new Thread(() -> {
-                    if (isDriverGlobal) {
+                    if (isDriverGlobal)
+                    {
                         if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId)))
+                        {
                             runOnUiThread(() -> startActivity(driverScheduleActivity));
-                    } else if (ServerAPI.passengerLogin(username, password))
+                        }
+                        else
+                        {
+                            runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
+                        }
+                    }
+                    else if (ServerAPI.passengerLogin(username, password))
+                    {
                         runOnUiThread(() -> startActivity(stationsMapActivity));
+                    }
+                    else {
+                        runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
+                    }
+
                 }).start();
             } else {
-                emptyFields.setVisibility(TextView.VISIBLE);
+                Toast.makeText(Login.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
             }
         });
     }
