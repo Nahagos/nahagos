@@ -95,7 +95,7 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     print("ee")
 
     #checks if the driver was on a trip
-    if connected_drivers[cookies_and_milk] is None:
+    if not connected_drivers[cookies_and_milk] is None:
         print("ff")
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="No trip to end")
