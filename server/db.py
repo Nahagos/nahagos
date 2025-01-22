@@ -296,6 +296,7 @@ class Database:
             WHERE trip_id = ?
             """, (trip_id,))
         stops = self.cursor.fetchall()
+        print(trip_id, stops)
         self.close()
         return stops
 
