@@ -338,8 +338,11 @@ def where_to_stop(location: DriverLocation, cookies_and_milk :str = Cookie(None)
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
-    
     trips_lock.acquire()
+    if connected_drivers[cookies_and_milk][2] not in registered_trips.keys():
+        trips_lock.release()
+        drivers_lock.release()
+        raise HTTPException(status_code=402, detail="Need to start a trip first")
     update_last_active(cookies_and_milk)
     if connected_drivers[cookies_and_milk][2]:
         registered_trips[connected_drivers[cookies_and_milk][2]][1] = (location.lat, location.lon)
