@@ -118,11 +118,16 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         lines_json = []
         print("1:", list_lines[:5])
         for line in list_lines:
+            print("for line in list_lines:", line)
             isNahagos = line[0] in registered_trips.keys
+            print("isNahagos:", isNahagos)
             real_time = line[1]
+            print("real_time:", real_time)
             if isNahagos:
                 real_time = calculate_time_by_coordinates(line[5], line[6], registered_trips[line[0]][1][0], registered_trips[line[0]][1][1])
-            lines_json.append({"trip_id": line[0], "departure": real_time, "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : isNahagos})            
+                print("real_time2:", real_time)
+            lines_json.append({"trip_id": line[0], "departure": real_time, "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : isNahagos})
+            print("lines_json:", lines_json)
         db_lock.release()
         print("2:", lines_json[:5])
         users_lock.release()
