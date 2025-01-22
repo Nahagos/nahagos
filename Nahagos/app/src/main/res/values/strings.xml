@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">nahagos</string>
-
-    <string name="title_activity_maps">MapsActivity</string>
     <!-- Strings used for fragments for navigation -->
 
     <string name="title_activity_main">MainActivity</string>
