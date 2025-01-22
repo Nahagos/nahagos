@@ -27,7 +27,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
     @Override
     public LineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.line_list_element, parent, false);
+                .inflate(R.layout.list_element_stop_line, parent, false);
         System.out.println("LinesAdapter.onCreateViewHolder");
         return new LineViewHolder(view);
     }

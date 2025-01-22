@@ -1,9 +1,7 @@
 package com.nahagos.nahagos.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -24,14 +22,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm;
 import com.nahagos.nahagos.R;
-import com.nahagos.nahagos.databinding.ActivityPassengerUiBinding;
+import com.nahagos.nahagos.databinding.ActivityStationsMapBinding;
 import com.nahagos.nahagos.db.DBManager;
 import com.nahagos.nahagos.db.Tables.Stop;
-import com.nahagos.nahagos.fragments.LocationDetailsBottomSheet;
+import com.nahagos.nahagos.fragments.StopDetails;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class StationsMap extends FragmentActivity {
 
@@ -46,7 +42,6 @@ public class StationsMap extends FragmentActivity {
     private ArrayAdapter<Stop> adapter;
     private ListView suggestionList;
 
-    private LatLng startingPoint = ISRAEL;
 
     private ClusterManager<Stop> clusterManager;
 
@@ -55,7 +50,7 @@ public class StationsMap extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActivityPassengerUiBinding binding = ActivityPassengerUiBinding.inflate(getLayoutInflater());
+        ActivityStationsMapBinding binding = ActivityStationsMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -71,10 +66,7 @@ public class StationsMap extends FragmentActivity {
 
         suggestionList.setAdapter(adapter);
 
-        search.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
-            // Make search list visible or not based on whether the user is typing
-            suggestionList.setVisibility(hasFocus ? View.VISIBLE : View.INVISIBLE);
-        });
+        search.setOnQueryTextFocusChangeListener((v, hasFocus) -> suggestionList.setVisibility(hasFocus ? View.VISIBLE : View.INVISIBLE));
 
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -84,12 +76,9 @@ public class StationsMap extends FragmentActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Search for q in the SQL, and update suggestion list as needed.
-                var stops = searchStations(newText);
-                // This is the part of the code where we update the list of suggestions, based on the search results
-                if (stops.isEmpty()) {
+                var stops = dbManager.stopsDao().searchByName(newText);
+                if (stops.isEmpty())
                     stops.add(new Stop(STOP_ID_NOT_FOUND, getString(R.string.stop_not_found)));
-                }
 
                 adapter.clear();
                 adapter.addAll(stops);
@@ -98,7 +87,6 @@ public class StationsMap extends FragmentActivity {
             }
         });
 
-        // When a list item (i.e. search result) is clicked, move to its place.
         suggestionList.setOnItemClickListener((parent, view, position, id) -> {
             Stop stop = adapter.getItem(position);
             if (stop == null) return;
@@ -111,24 +99,15 @@ public class StationsMap extends FragmentActivity {
         });
     }
 
-    /*
-        The function searches for stations that have the q in their name, and returns their index in the list.
-    */
-    List<Stop> searchStations(String q) {
-        var res = dbManager.stopsDao().searchByName(q);
-        System.out.println("searched for " + q + " and found " + res.size() + " results");
-        return res;
-    }
-
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ISRAEL, START_ZOOM));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else
             centerMapOnGps();
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, START_ZOOM));
 
         clusterManager = new ClusterManager<>(this, map);
         map.setOnCameraIdleListener(clusterManager);
@@ -138,9 +117,8 @@ public class StationsMap extends FragmentActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         clusterManager.setAlgorithm(new NonHierarchicalViewBasedAlgorithm<>(metrics.widthPixels, metrics.heightPixels));
 
-        for (var stop : dbManager.stopsDao().getAll()) {
+        for (var stop : dbManager.stopsDao().getAll())
             clusterManager.addItem(stop);
-        }
     }
 
     @Override
@@ -165,7 +143,7 @@ public class StationsMap extends FragmentActivity {
     }
 
     public boolean onStopClick(Stop stop) {
-        LocationDetailsBottomSheet.newInstance(stop).show(getSupportFragmentManager(), "location_details");
+        StopDetails.newInstance(stop).show(getSupportFragmentManager(), "location_details");
         return false;
     }
 }

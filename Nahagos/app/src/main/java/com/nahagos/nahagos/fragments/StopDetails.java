@@ -18,14 +18,15 @@ import com.nahagos.nahagos.db.Tables.Stop;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class LocationDetailsBottomSheet extends BottomSheetDialogFragment {
+public class StopDetails extends BottomSheetDialogFragment {
 
     private static final String ARG_STOP_NAME = "stop";
 
-    public static LocationDetailsBottomSheet newInstance(Stop stop) {
-        LocationDetailsBottomSheet fragment = new LocationDetailsBottomSheet();
+    ArrayList<Line> lines = new ArrayList<>();
+
+    public static StopDetails newInstance(Stop stop) {
+        StopDetails fragment = new StopDetails();
         Bundle args = new Bundle();
         args.putSerializable(ARG_STOP_NAME, stop);
         fragment.setArguments(args);
@@ -33,40 +34,30 @@ public class LocationDetailsBottomSheet extends BottomSheetDialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.frag_bottom_sheet_layout, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.frag_stop_details, container, false);
 
-        // Retrieve data from arguments
-        assert getArguments() != null;
+        var args = getArguments();
+        assert args != null;
         Stop stop = (Stop) getArguments().getSerializable(ARG_STOP_NAME);
         assert stop != null;
 
-        // Bind data to views
-        TextView locationName = view.findViewById(R.id.location_name);
-        TextView locationDetails = view.findViewById(R.id.location_details);
+        TextView name = view.findViewById(R.id.stop_headline);
+        TextView description = view.findViewById(R.id.stop_description);
 
-        locationName.setText(stop.getTitle() + " (" + stop.id + ")");
-        locationDetails.setText(getString(R.string.location_details, String.valueOf(stop.lat), String.valueOf(stop.lon)));
+        name.setText(getString(R.string.stop_headline, stop.name, stop.id));
+        description.setText(getString(R.string.stop_description, String.valueOf(stop.lat), String.valueOf(stop.lon)));
 
-        var lines = new ArrayList<Line>();
         var linesAdapter = new LinesAdapter(lines);
 
-        RecyclerView linesRecyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView linesRecyclerView = view.findViewById(R.id.lines);
         linesRecyclerView.setAdapter(linesAdapter);
         linesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         new Thread(() -> {
-            lines.clear();
             lines.addAll(Arrays.asList(ServerAPI.getLinesByStation(stop.id)));
-
-            requireActivity().runOnUiThread(() -> {
-                linesAdapter.notifyItemRangeChanged(0, lines.size());
-            });
+            requireActivity().runOnUiThread(() -> linesAdapter.notifyItemRangeChanged(0, lines.size()));
         }).start();
 
         return view;
     }
-
-
 }
-

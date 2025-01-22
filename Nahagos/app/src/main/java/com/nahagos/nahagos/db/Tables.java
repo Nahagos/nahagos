@@ -48,16 +48,10 @@ public class Tables {
         public int zoneId;
 
         @Ignore
-        public Stop() {
-            name = "";
-            description = "";
-        }
-
-        @Ignore
         public Stop(int id, @NonNull String name){
-            this();
             this.id = id;
             this.name = name;
+            this.description = "";
         }
 
         public Stop(int id, @NonNull String name, @NonNull String description, double lat, double lon, boolean isCentral, Integer parentStation, int zoneId) {
