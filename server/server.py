@@ -83,6 +83,7 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     """
     The driver informs the server that the trip is over
     """
+    print("aaastart")
     drivers_lock.acquire()
     # validate user
     if cookies_and_milk not in connected_drivers:
