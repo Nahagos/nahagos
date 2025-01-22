@@ -85,16 +85,21 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     """
     print("sdsdafdafasd")
     drivers_lock.acquire()
+    print("aa")
     # validate user
     if cookies_and_milk not in connected_drivers:
+        print("bb")
         drivers_lock.release()
+        print("dd")
         raise HTTPException(status_code=401, detail="User not authenticated")
+    print("ee")
 
     #checks if the driver was on a trip
     if connected_drivers[cookies_and_milk] is None:
+        print("ff")
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="No trip to end")
-    print("aa")
+    print("gg")
     trips_lock.acquire()
     print("registered_trips", registered_trips)
     print("connected_drivers[cookies_and_milk][2]", connected_drivers[cookies_and_milk][2])
