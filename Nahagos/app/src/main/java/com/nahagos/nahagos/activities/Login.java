@@ -1,7 +1,6 @@
 package com.nahagos.nahagos.activities;
 
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
