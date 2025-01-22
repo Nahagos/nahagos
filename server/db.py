@@ -77,7 +77,8 @@ class Database:
         
         #adding default users        
         self.signup_passenger("user1", "password123")
-        self.add_driver("driver01", "password123", 6151181, "Alice Johnson", "ABC1234")
+        self.add_driver("d1", "p1", 12, "Alice Johnson", "ABC1234")
+        #self.add_driver("driver01", "password123", 6151181, "Alice Johnson", "ABC1234")
         self.add_driver("driver02", "driver02", 1234567, "Chris Lee", "XYZ5678")
         self.add_driver("driver03", "password123", 1522484, "Maria Davis", "LMN3456")
         self.add_things_to_schedule()
