@@ -326,7 +326,7 @@ class Database:
         self.close()
         if not res:
             return False
-        return res[0] == datetime.now().strftime("%A").lower()
+        return True
         
 
 if __name__ == "__main__":
