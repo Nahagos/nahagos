@@ -37,8 +37,6 @@ public class Login extends AppCompatActivity {
         CheckBox rememberMe = findViewById(R.id.checkBoxRememberMe);
         TextView createAccountText = findViewById(R.id.createAccountText);
 
-        createAccountText.setPaintFlags(createAccountText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-
         createAccountText.setOnClickListener(v -> startActivity(new Intent(this, SignUp.class)));
 
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
