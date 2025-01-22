@@ -116,6 +116,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     try:
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
+        print("1:", list_lines[:5])
         for line in list_lines:
             isNahagos = line[0] in registered_trips.keys
             real_time = line[1]
@@ -123,11 +124,13 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
                 real_time = calculate_time_by_coordinates(line[5], line[6], registered_trips[line[0]][1][0], registered_trips[line[0]][1][1])
             lines_json.append({"trip_id": line[0], "departure": real_time, "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : isNahagos})            
         db_lock.release()
+        print("2:", lines_json[:5])
         users_lock.release()
         return lines_json
     except Exception as e:
         db_lock.release()
         users_lock.release()
+        print("3:", e)
         raise HTTPException(status_code=402, detail=str(e))
 
 def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
