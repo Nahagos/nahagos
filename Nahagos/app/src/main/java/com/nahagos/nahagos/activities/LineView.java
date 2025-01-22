@@ -35,12 +35,12 @@ public class LineView extends AppCompatActivity {
 
     private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
-    private final int lineId = 0;
     private int myStop = -1;
 
     private boolean isDriver = false;
     private boolean canStartDrive = false;
-    private boolean driveStarted = false;
+
+    private boolean driveStarted = true;
 
     private LineViewArrayAdapter stationsAdapter;
 
@@ -84,7 +84,7 @@ public class LineView extends AppCompatActivity {
 
         isDriver = intent.getBooleanExtra("isDriver", false);
         if (isDriver) {
-            canStartDrive = intent.getBooleanExtra("canStartDrive", true);
+            canStartDrive = intent.getBooleanExtra("canStartDrive", false);
             if (canStartDrive) {
                 startDriveBtn.setVisibility(View.VISIBLE);
             }
@@ -103,11 +103,11 @@ public class LineView extends AppCompatActivity {
         if (trip_id == null || trip_id.isEmpty())
             stopsFromServer = ServerAPI.getStopsByLine(trip_id);
         if (stopsFromServer != null) {
-            stops.addAll(Arrays.stream(stopsFromServer).map((st) -> {
-                return new Pair<StopTime, Boolean>(st, false);
-            }).collect(Collectors.toList()));
+            stops.addAll(Arrays.stream(stopsFromServer).map(
+                    (st) -> new Pair<>(st, false)).collect(Collectors.toList())
+            );
         }
-        stationsAdapter = new LineViewArrayAdapter(this, R.layout.line_view_stop_element, stops, isDriver, myStop, trip_id);
+        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, trip_id);
         stopsList.setAdapter(stationsAdapter);
 
         String finalTrip_id = trip_id;
@@ -134,13 +134,13 @@ public class LineView extends AppCompatActivity {
             try {
                 while (!Thread.interrupted()) {
                     ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toList()));
-                    stops.forEach(n -> {
-                                if (toStopStations.stream().anyMatch((i) -> {
-                                return i == n.first.stop_id;})) {
-                                    Pair<StopTime, Boolean> newN = new Pair<>(n.first, true);
-                                    stops.set(stops.indexOf(n), newN);  // Update original list
-                                }
-                            });
+                    for (int i = 0; i < stops.size(); i++) {
+                        int finalI = i;
+                        if (toStopStations.stream().anyMatch((j) -> j == stops.get(finalI).first.stop_id)) {
+                            Pair<StopTime, Boolean> newN = new Pair<>(stops.get(finalI).first, true);
+                            stops.set(i, newN);  // Update original list
+                        }
+                    }
 
                     mainHandler.post(() -> stationsAdapter.notifyDataSetChanged());
 

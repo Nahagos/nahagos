@@ -2,7 +2,6 @@ package com.nahagos.nahagos.adapters;
 
 import android.content.Context;
 
-import com.nahagos.nahagos.activities.LineView;
 import com.nahagos.nahagos.R;
 import com.nahagos.nahagos.datatypes.StopTime;
 import com.nahagos.nahagos.server.ServerAPI;
@@ -27,14 +26,14 @@ import java.util.Objects;
 public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> {
     private final Context context;
     private final boolean isDriver;
-    private final int enableStopButton;
+    private final int myStop;
     private final String trip_id;
 
-    public LineViewArrayAdapter(@NonNull Context c, int resource, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
+    public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
-        this.enableStopButton = stopId;
+        this.myStop = stopId;
         this.trip_id = tripId;
     }
 
@@ -53,9 +52,9 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         if (current == null)
             return convertView;
 
-        if (isDriver || (!isDriver && current.first.stop_id != enableStopButton)) {
+        if (isDriver || (!isDriver && current.first.stop_id != myStop)) {
             stopButton.setVisibility(View.INVISIBLE);
-            handImg.setVisibility(current.second ? View.VISIBLE : View.INVISIBLE);
+            handImg.setVisibility(current.second && isDriver ? View.VISIBLE : View.INVISIBLE);
         }
 
         stopButton.setOnClickListener((v) -> {
