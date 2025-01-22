@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -44,30 +43,26 @@ public class SignUp extends AppCompatActivity {
             String password = passwordObj.getText().toString().trim();
             String confirmPassword = confirmPasswordObj.getText().toString().trim();
 
-            if (!username.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty())
-            {
-                if (password.equals(confirmPassword))
-                {
+            if (!username.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty()) {
+                if (password.equals(confirmPassword)) {
                     new Thread(() -> {
-                        if (ServerAPI.passengerSignup(username, password))
-                        {
-                            SharedPreferences.Editor sharedPreferences = getSharedPreferences("user_info", 0).edit();
-                            sharedPreferences.putString("username", username);
-                            sharedPreferences.putString("password", password);
-                            sharedPreferences.apply();
-                            runOnUiThread(() -> startActivity(stationsMapActivity));
+                        if (ServerAPI.passengerSignup(username, password)) {
+                            if(rememberMe.isChecked()){
+                                SharedPreferences.Editor sharedPreferences = getSharedPreferences("user_info", 0).edit();
+                                sharedPreferences.putString("username", username);
+                                sharedPreferences.putString("password", password);
+                                sharedPreferences.apply();
+                                runOnUiThread(() -> startActivity(stationsMapActivity));
+                            }
                         }
-                        else
-                            runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
                     }).start();
                 }
                 else
                     Toast.makeText(SignUp.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             }
             else
-            {
                 Toast.makeText(SignUp.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
-            }
         });
     }
 }

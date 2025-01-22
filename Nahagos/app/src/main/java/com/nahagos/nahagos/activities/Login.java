@@ -29,7 +29,7 @@ public class Login extends AppCompatActivity {
 
         Intent stationsMapActivity = new Intent(this, StationsMap.class),
                 driverScheduleActivity = new Intent(this, DriverSchedule.class);
-        ImageView imgPoint = (ImageView) findViewById(R.id.imageView2);
+        ImageView imgPoint = findViewById(R.id.imageView2);
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText driverIdObj = findViewById(R.id.idDriver);
@@ -83,10 +83,8 @@ public class Login extends AppCompatActivity {
                 Log.d("Login", Boolean.toString(isDriverGlobal));
 
                 new Thread(() -> {
-                    if (isDriverGlobal)
-                    {
-                        if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId)))
-                        {
+                    if (isDriverGlobal) {
+                        if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId))) {
                             if (rememberMe.isChecked()) {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("username", username);
@@ -96,13 +94,9 @@ public class Login extends AppCompatActivity {
                             }
                             runOnUiThread(() -> startActivity(driverScheduleActivity));
                         }
-                        else
-                        {
-                            runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
-                        }
+                        runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
                     }
-                    else if (ServerAPI.passengerLogin(username, password))
-                    {
+                    else if (ServerAPI.passengerLogin(username, password)) {
                         if (rememberMe.isChecked()) {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putString("username", username);
@@ -111,9 +105,7 @@ public class Login extends AppCompatActivity {
                         }
                         runOnUiThread(() -> startActivity(stationsMapActivity));
                     }
-                    else {
-                        runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
-                    }
+                    runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
 
                 }).start();
             } else {
