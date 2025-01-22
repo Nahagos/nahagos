@@ -7,21 +7,21 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/location_name"
+        android:id="@+id/stop_headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/location_details"
+        android:id="@+id/stop_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/recycler_view"
+        android:id="@+id/lines"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>

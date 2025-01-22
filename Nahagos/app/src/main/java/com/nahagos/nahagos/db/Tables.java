@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -46,15 +47,22 @@ public class Tables {
         @ColumnInfo(name = "zone_id")
         public int zoneId;
 
-        public Stop() {
-            name = "";
-            description = "";
-        }
-
+        @Ignore
         public Stop(int id, @NonNull String name){
-            this();
             this.id = id;
             this.name = name;
+            this.description = "";
+        }
+
+        public Stop(int id, @NonNull String name, @NonNull String description, double lat, double lon, boolean isCentral, Integer parentStation, int zoneId) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+            this.lat = lat;
+            this.lon = lon;
+            this.isCentral = isCentral;
+            this.parentStation = parentStation;
+            this.zoneId = zoneId;
         }
 
         @NonNull
