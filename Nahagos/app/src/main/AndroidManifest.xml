@@ -17,9 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nahagos"
         tools:targetApi="31">
-        <activity
-            android:name=".activities.SignUp"
-            android:exported="false" />
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -43,6 +41,9 @@
             android:name=".activities.StationsMap"
             android:exported="true"
             android:label="@string/title_activity_stations_map" />
+        <activity
+            android:name=".activities.SignUp"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -39,10 +39,7 @@ public class Login extends AppCompatActivity {
 
         createAccountText.setPaintFlags(createAccountText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-        createAccountText.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SignUp.class);
-            startActivity(intent);
-        });
+        createAccountText.setOnClickListener(v -> startActivity(new Intent(this, SignUp.class)));
 
         isDriver.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isDriverGlobal = isChecked;
