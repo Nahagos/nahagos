@@ -119,7 +119,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         print("1:", list_lines[:5])
         for line in list_lines:
             print("for line in list_lines:", line)
-            isNahagos = line[0] in registered_trips.keys
+            isNahagos = line[0] in registered_trips.keys()
             print("isNahagos:", isNahagos)
             real_time = line[1]
             print("real_time:", real_time)
