@@ -58,7 +58,7 @@ public class LineView extends AppCompatActivity {
         String lineColor = intent.getStringExtra("lineColor");
         String lineName = intent.getStringExtra("lineName");
         myStop = intent.getIntExtra("stopId", 0);
-        String trip_id = intent.getStringExtra("tripId");
+        String trip_id = "3611_251224"; // intent.getStringExtra("tripId");
 
         backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
@@ -105,9 +105,7 @@ public class LineView extends AppCompatActivity {
                         });
                     }
                     else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, R.string.cant_start_drive, Toast.LENGTH_SHORT).show();
-                        });
+                        runOnUiThread(() -> Toast.makeText(this, R.string.cant_start_drive, Toast.LENGTH_SHORT).show());
                     }
                 }).start();
 
@@ -125,7 +123,7 @@ public class LineView extends AppCompatActivity {
         serverListeningThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {
-                    ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toList()));
+                    ArrayList<Integer> toStopStations = Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toCollection(ArrayList::new));
                     for (AtomicInteger i = new AtomicInteger(0); i.get() < stops.size(); i.set(i.get()+1)) {
                         if (toStopStations.stream().anyMatch((j) -> j == stops.get(i.get()).first.stop_id)) {
                             Pair<StopTime, Boolean> newN = new Pair<>(stops.get(i.get()).first, true);
@@ -150,6 +148,7 @@ public class LineView extends AppCompatActivity {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
+        endTrip();
     }
 
     @Override
@@ -160,11 +159,24 @@ public class LineView extends AppCompatActivity {
         }
     }
 
+    protected void endTrip() {
+        new Thread(() -> {
+            if (ServerAPI.endTrip()) {
+                Toast.makeText(this, R.string.endedTrip, Toast.LENGTH_SHORT).show();
+                Log.d("OH", "IT WORKED");
+            }
+            else {
+                Log.d("OH NO", "IT DIDNT WORK");
+            }
+        }).start();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
+        endTrip();
     }
 }

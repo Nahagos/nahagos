@@ -8,5 +8,6 @@
     <string name="location_details">Latitude: %1$s, Longitude: %2$s</string>
     <string name="cant_start_drive">לא יכול להתחיל את הנסיעה</string>
     <string name="line_not_found">לא נמצא קו</string>
+    <string name="endedTrip">סיימת את הנסיעה</string>
 
 </resources>
