@@ -83,14 +83,13 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     """
     The driver informs the server that the trip is over
     """
-    print("aaastart")
+    print("sdsdafdafasd")
     drivers_lock.acquire()
     # validate user
     if cookies_and_milk not in connected_drivers:
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
 
-    print("start")
     #checks if the driver was on a trip
     if connected_drivers[cookies_and_milk] is None:
         drivers_lock.release()
