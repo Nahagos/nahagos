@@ -119,8 +119,8 @@ public class LineView extends AppCompatActivity {
                 while (!Thread.interrupted()) {
                     ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toList()));
                     for (AtomicInteger i = new AtomicInteger(0); i.get() < stops.size(); i.set(i.get()+1)) {
-                        if (toStopStations.stream().anyMatch((j) -> j == stops.get(finalI).first.stop_id)) {
-                            Pair<StopTime, Boolean> newN = new Pair<>(stops.get(finalI).first, true);
+                        if (toStopStations.stream().anyMatch((j) -> j == stops.get(i.get()).first.stop_id)) {
+                            Pair<StopTime, Boolean> newN = new Pair<>(stops.get(i.get()).first, true);
                             stops.set(i.get(), newN);  // Update original list
                         }
                     }
