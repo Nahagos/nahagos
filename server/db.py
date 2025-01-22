@@ -258,12 +258,13 @@ class Database:
         current_time = now.strftime("%H:%M:%S")
         print(current_time)
         self.cursor.execute(f"""
-            SELECT route_long_name, route_short_name, trip_id, MIN(departure_time) AS departure_time, agency_name
+            SELECT trip_id, departure_time, route_long_name, route_short_name, agency_name, stop_lat, stop_lon
             FROM stop_times
             NATURAL JOIN trips
             NATURAL JOIN calendar
             NATURAL JOIN routes
             NATURAL JOIN agency
+            NATURAL JOIN stops
             WHERE stop_id = ? 
             AND departure_time > ? 
             AND {day_column} = 1
@@ -331,7 +332,7 @@ if __name__ == "__main__":
     db = Database("db.sql")
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
-    a=db.get_lines_by_station(45014)
+    a=db.get_lines_by_station(12193)
     for row in a:
         print(row)
     print(len(a))

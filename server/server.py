@@ -28,6 +28,11 @@ class PassengerWait(BaseModel):
     trip_id: str
     stop_id: int
 
+class DriverLocation(BaseModel):
+    lon: float
+    lat: float
+    
+
 users_lock = threading.Lock()
 drivers_lock = threading.Lock()
 trips_lock = threading.Lock()
@@ -37,7 +42,7 @@ connected_users = {}
 
 connected_drivers = {}      # driver_cookie : driver_id, last_action, trip_id
 
-registered_trips = {}       # trip_id : [stops_list]
+registered_trips = {}       # trip_id : [[stops_list], None]
 
 db = Database("db.sql")
 
@@ -112,7 +117,11 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
         for line in list_lines:
-            lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : line[0] in registered_trips})            
+            isNahagos = line[0] in registered_trips.keys
+            real_time = line[1]
+            if isNahagos:
+                real_time = calculate_time_by_coordinates(line[5], line[6], registered_trips[line[0]][1][0], registered_trips[line[0]][1][1])
+            lines_json.append({"trip_id": line[0], "departure": real_time, "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : isNahagos})            
         db_lock.release()
         users_lock.release()
         return lines_json
@@ -121,6 +130,8 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
         users_lock.release()
         raise HTTPException(status_code=402, detail=str(e))
 
+def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
+    return '3.2'
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
 def update_arrival_time(station_id: int, bus_id: int):
@@ -148,7 +159,7 @@ def passenger_wait_for_bus(wait_for : PassengerWait, cookies_and_milk:str = Cook
     db_lock.acquire()
     if db.check_stop_on_trip(wait_for.trip_id, wait_for.stop_id):
         if wait_for.trip_id in registered_trips.keys():
-            registered_trips[wait_for.trip_id].add(wait_for.stop_id)
+            registered_trips[wait_for.trip_id][0].add(wait_for.stop_id)
             trips_lock.release()
             db_lock.release()
             return {"message": "Passenger wait request logged successfully"}
@@ -192,7 +203,7 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     
     trips_lock.acquire()
     connected_drivers[cookies_and_milk][2] = reg.trip_id
-    registered_trips[reg.trip_id] = set()
+    registered_trips[reg.trip_id] = [set(), None]
     trips_lock.release()
     drivers_lock.release()
     db_lock.release()
@@ -287,12 +298,18 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     users_lock.release()
     drivers_lock.release()
     db_lock.acquire()
+    trips_lock.acquire()
+    driver_coords = registered_trips[trip_id][1] if trip_id in registered_trips.keys else (0,0)
+    trips_lock.release()
     
     try:
         list_lines = db.get_stops_by_trip_id(trip_id)
         lines_json = []
         for line in list_lines:
-            lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": line[2], "stop_lat": line[3], "stop_lon": line[4]})            
+            time = line[2]
+            if driver_coords != (0,0):
+                time = calculate_time_by_coordinates(line[3], line[4], driver_coords[0], driver_coords[1])
+            lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": time, "stop_lat": line[3], "stop_lon": line[4], 'isNahagos': driver_coords != (0,0)})            
         db_lock.release()
         return lines_json
     except Exception as e:
@@ -300,8 +317,8 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         raise HTTPException(status_code=401, detail=str(e))
 
     
-@app.get("/driver/where-to-stop/")
-def where_to_stop(cookies_and_milk :str = Cookie(None)):
+@app.post("/driver/where-to-stop/")
+def where_to_stop(location: DriverLocation, cookies_and_milk :str = Cookie(None)):
     """
     Retrives the stops that a specific driver need to stop
     """
@@ -311,10 +328,12 @@ def where_to_stop(cookies_and_milk :str = Cookie(None)):
         drivers_lock.release()
         raise HTTPException(status_code=401, detail="User not authenticated")
     
+    
     trips_lock.acquire()
     update_last_active(cookies_and_milk)
     if connected_drivers[cookies_and_milk][2]:
-        res = registered_trips[connected_drivers[cookies_and_milk][2]]
+        registered_trips[connected_drivers[cookies_and_milk][2]][1] = (location.lat, location.lon)
+        res = registered_trips[connected_drivers[cookies_and_milk][2]][0]
         trips_lock.release()
         drivers_lock.release()
         return res
