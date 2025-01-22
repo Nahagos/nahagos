@@ -1,7 +1,6 @@
 package com.nahagos.nahagos.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -15,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.db.SharedPreferencesManager;
 import com.nahagos.nahagos.server.ServerAPI;
 
 public class SignUp extends AppCompatActivity {
@@ -30,6 +30,7 @@ public class SignUp extends AppCompatActivity {
             return insets;
         });
 
+        SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
         Intent stationsMapActivity = new Intent(this, StationsMap.class);
 
         EditText usernameObj = findViewById(R.id.usernameField);
@@ -48,21 +49,22 @@ public class SignUp extends AppCompatActivity {
                     new Thread(() -> {
                         if (ServerAPI.passengerSignup(username, password)) {
                             if(rememberMe.isChecked()){
-                                SharedPreferences.Editor sharedPreferences = getSharedPreferences("user_info", 0).edit();
-                                sharedPreferences.putString("username", username);
-                                sharedPreferences.putString("password", password);
-                                sharedPreferences.apply();
+                                preferencesManager.saveUserCredentials(username, password, null);
                                 runOnUiThread(() -> startActivity(stationsMapActivity));
                             }
                         }
-                        runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                        else {
+                            runOnUiThread(() -> Toast.makeText(SignUp.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                        }
                     }).start();
                 }
-                else
+                else {
                     Toast.makeText(SignUp.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                }
             }
-            else
+            else {
                 Toast.makeText(SignUp.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

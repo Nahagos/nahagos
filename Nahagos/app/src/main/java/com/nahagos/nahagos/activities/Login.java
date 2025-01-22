@@ -1,7 +1,6 @@
 package com.nahagos.nahagos.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.db.SharedPreferencesManager;
 import com.nahagos.nahagos.server.ServerAPI;
 
 
@@ -46,10 +46,11 @@ public class Login extends AppCompatActivity {
             driverIdObj.setVisibility(isChecked ? TextView.VISIBLE : TextView.GONE);
         });
 
-        SharedPreferences sharedPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
-        String storedUsername = sharedPreferences.getString("username", null);
-        String storedPassword = sharedPreferences.getString("password", null);
-        int storedDriverId = sharedPreferences.getInt("driverId", -1);
+        SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
+
+        String storedUsername = preferencesManager.getUsername();
+        String storedPassword = preferencesManager.getPassword();
+        int storedDriverId = preferencesManager.getDriverId();
 
         if (storedUsername != null && storedPassword != null) {
             new Thread(() -> {
@@ -64,7 +65,7 @@ public class Login extends AppCompatActivity {
                     runOnUiThread(() -> {
                         Intent intent = storedDriverId != -1 ? driverScheduleActivity : stationsMapActivity;
                         startActivity(intent);
-                        finish(); // Finish the login activity to prevent back navigation
+                        finish();
                     });
                 } else {
                     runOnUiThread(() -> Toast.makeText(Login.this, "Stored credentials are invalid. Please log in again.", Toast.LENGTH_SHORT).show());
@@ -86,27 +87,23 @@ public class Login extends AppCompatActivity {
                     if (isDriverGlobal) {
                         if (ServerAPI.driverLogin(username, password, Integer.parseInt(driverId))) {
                             if (rememberMe.isChecked()) {
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("username", username);
-                                editor.putString("password", password);
-                                editor.putInt("driverId", Integer.parseInt(driverId));
-                                editor.apply();
+                                preferencesManager.saveUserCredentials(username, password, Integer.parseInt(driverId));
                             }
                             runOnUiThread(() -> startActivity(driverScheduleActivity));
                         }
-                        runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
+                        else {
+                            runOnUiThread(() -> Toast.makeText(Login.this, "Username, id or password incorrect", Toast.LENGTH_SHORT).show());
+                        }
                     }
                     else if (ServerAPI.passengerLogin(username, password)) {
                         if (rememberMe.isChecked()) {
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("username", username);
-                            editor.putString("password", password);
-                            editor.apply();
+                            preferencesManager.saveUserCredentials(username, password, null);
                         }
                         runOnUiThread(() -> startActivity(stationsMapActivity));
                     }
-                    runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
-
+                    else {
+                        runOnUiThread(() -> Toast.makeText(Login.this, "Username or password incorrect", Toast.LENGTH_SHORT).show());
+                    }
                 }).start();
             } else {
                 Toast.makeText(Login.this, "make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
