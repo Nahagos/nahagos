@@ -5,9 +5,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_stations_map">StationsMap</string>
     <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
-    <string name="stop_headline">%1$s (%2$i)</string>
+    <string name="stop_headline">%1$s (%2$d)</string>
     <string name="stop_description">Latitude: %1$s, Longitude: %2$s</string>
     <string name="search_stop_hint">חפש תחנה</string>
-
-
 </resources>
