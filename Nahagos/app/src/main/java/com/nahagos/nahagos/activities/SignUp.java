@@ -22,15 +22,17 @@ public class SignUp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up);
 
-        SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
-        Intent stationsMapActivity = new Intent(this, StationsMap.class);
 
         EditText usernameObj = findViewById(R.id.usernameField);
         EditText passwordObj = findViewById(R.id.passwordField);
         EditText confirmPasswordObj = findViewById(R.id.confirmPasswordField);
         Button button = findViewById(R.id.signupButton);
         CheckBox rememberMe = findViewById(R.id.checkBoxRememberMe);
+
+        SharedPreferencesManager preferencesManager = new SharedPreferencesManager(this);
+        Intent stationsMapActivity = new Intent(this, StationsMap.class);
 
         button.setOnClickListener(view -> {
             String username = usernameObj.getText().toString().trim();
