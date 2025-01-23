@@ -1,10 +1,21 @@
 <resources>
     <string name="app_name">nahagos</string>
-    <!-- Strings used for fragments for navigation -->
-
+    <string name="server_ip">172.20.20.30</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_stations_map">StationsMap</string>
     <string name="stop_not_found">לא נמצאה תחנה מתאימה</string>
+    <string name="welcome_text">Welcome to Nahagos!</string>
+    <string name="create_username">Create Username</string>
+    <string name="create_password">Create Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="signup">Signup</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="login">Login</string>
+    <string name="driver">driver?</string>
+    <string name="enter_driver_id">Enter driver id</string>
+    <string name="new_to_nahagos_create_account"><u>New to Nahagos? Create account</u></string>
     <string name="location_details">Latitude: %1$s, Longitude: %2$s</string>
     <string name="cant_start_drive">לא יכול להתחיל את הנסיעה</string>
     <string name="line_not_found">לא נמצא קו</string>
