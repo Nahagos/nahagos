@@ -90,15 +90,15 @@ public class StopDetails extends BottomSheetDialogFragment {
     }
 
     private List<Line> mergeLines(List<Line> lines) {
-        // group by line name + number. merge the arrival time to a concatenated string, showing only the next 3 arrivals.
         return lines.stream().collect(Collectors.groupingBy(l -> l.name + l.num))
                 .values().stream().map(group -> {
                     Line line = group.get(0);
-//                    Log.d("StopDetails", "Merging line " + line);
                     line.departure = group.stream().sorted(Comparator.comparing(l -> l.departure))
                             .limit(3).map(l -> l.isLive ? calcTimeFromNow(l.departure) : l.departure).collect(Collectors.joining(", "));
                     return line;
                 }).sorted((l1, l2) -> {
+                    if(l1.isNahagos && !l2.isNahagos) return -1;
+                    if(!l1.isNahagos && l2.isNahagos) return 1;
                     if (l1.isLive && !l2.isLive) return -1;
                     if (!l1.isLive && l2.isLive) return 1;
                     if (l1.isLive)
@@ -111,12 +111,6 @@ public class StopDetails extends BottomSheetDialogFragment {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Calculate the time from now to the given time
-     *
-     * @param time format is "HH:mm:ss"
-     * @return "in x minutes"
-     */
     private String calcTimeFromNow(String time) {
         String[] parts = time.split(":");
         Calendar cal = Calendar.getInstance();
