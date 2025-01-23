@@ -39,6 +39,8 @@ LineView extends AppCompatActivity {
 
     private Thread serverListeningThread;
 
+    private boolean driveStarted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +103,7 @@ LineView extends AppCompatActivity {
                         runOnUiThread(() -> {
                             nahagosImg.setVisibility(View.VISIBLE);
                             startDriveBtn.setVisibility(View.INVISIBLE);
+                            driveStarted = true;
                             startListeningForStoppingUpdates();
                         });
                     }
@@ -176,6 +179,6 @@ LineView extends AppCompatActivity {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
-        endTrip();
+        if (isDriver && driveStarted) endTrip();
     }
 }

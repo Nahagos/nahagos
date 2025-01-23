@@ -3,6 +3,8 @@ package com.nahagos.nahagos.adapters;
 import android.content.Context;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.activities.LineView;
+import com.nahagos.nahagos.datatypes.Line;
 import com.nahagos.nahagos.datatypes.StopTime;
 import com.nahagos.nahagos.server.ServerAPI;
 
@@ -23,13 +25,14 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> {
-    private final Context context;
+    private final LineView context;
     private final boolean isDriver;
     private final int myStop;
+    private boolean hasRequestedToStop;
     private final String trip_id;
     private final boolean nahagosOnline;
 
-    public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId, boolean nahagos_online) {
+    public LineViewArrayAdapter(@NonNull LineView c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId, boolean nahagos_online) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
@@ -54,17 +57,25 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         if (current == null)
             return convertView;
 
-        if (isDriver || (!isDriver && (current.first.stop_id != myStop || !nahagosOnline))) {
+        if (isDriver) {
             stopButton.setVisibility(View.INVISIBLE);
-            handImg.setVisibility(current.second && isDriver ? View.VISIBLE : View.INVISIBLE);
+            handImg.setVisibility(current.second ? View.VISIBLE : View.INVISIBLE);
+        } else if (myStop != current.first.stop_id) {
+            stopButton.setVisibility(View.INVISIBLE);
+            handImg.setVisibility(View.INVISIBLE);
+        } else if (nahagosOnline && hasRequestedToStop) {
+            handImg.setVisibility(View.VISIBLE);
         }
 
         stopButton.setOnClickListener((v) -> {
            try {
                new Thread(() -> {
                    if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
-                       stopButton.setVisibility(View.INVISIBLE);
-                       handImg.setVisibility(View.VISIBLE);
+                       hasRequestedToStop = true;
+                       context.runOnUiThread(() -> {
+                           stopButton.setVisibility(View.INVISIBLE);
+                           handImg.setVisibility(View.VISIBLE);
+                       });
                    }
                }).start();
            } catch(RuntimeException e) {
