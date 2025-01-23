@@ -9,5 +9,7 @@
     <string name="cant_start_drive">לא יכול להתחיל את הנסיעה</string>
     <string name="line_not_found">לא נמצא קו</string>
     <string name="endedTrip">סיימת את הנסיעה</string>
-
+    <string name="stop_headline">%1$s (%2$d)</string>
+    <string name="stop_description">Latitude: %1$s, Longitude: %2$s</string>
+    <string name="search_stop_hint">חפש תחנה</string>
 </resources>
