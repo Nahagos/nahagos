@@ -246,6 +246,7 @@ class Database:
         }        
         day_column = day_mapping[current_day]
         current_time = now.strftime("%H:%M:%S")
+        max_time = (now + timedelta(hours=3)).strftime("%H:%M:%S")
         print(current_time)
         self.cursor.execute(f"""
             SELECT trip_id, departure_time, route_long_name, route_short_name, agency_name, stop_lat, stop_lon
@@ -256,11 +257,12 @@ class Database:
             NATURAL JOIN agency
             NATURAL JOIN stops
             WHERE stop_id = ? 
-            AND departure_time > ? 
+            AND departure_time > ?
+            AND departure_time < ?
             AND {day_column} = 1
             ORDER BY departure_time;
 
-        """, (stop_id, current_time))
+        """, (stop_id, current_time, max_time))
         lines = self.cursor.fetchall()
         self.close()
         return lines    

@@ -230,8 +230,15 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     try:
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
+        trips = []
+        uniqe_lines = []
+        for trip in registered_trips.keys():
+            trips.append(trip.split("_")[0])
         for line in list_lines:
-            lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : line[0] in registered_trips.keys(), "isLive" : False})
+            real_trip_id = line[0].split("_")[0]
+            if real_trip_id not in uniqe_lines:
+                uniqe_lines.append(real_trip_id)
+                lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
         get_realtime(stop_id, lines_json)
         db_lock.release()
         users_lock.release()
@@ -252,7 +259,7 @@ def get_realtime(stop_id, line_lst):
                 continue
             for line in line_lst:
                 if line_name == line['line_num'] and not line['isLive']:
-                    line['trip_id'] = f"{values['arrival_time'][3]}:{values['arrival_time'][4]}"
+                    line['departure'] = f"{str(values['arrival_time'][3]).zfill(2)}:{str(values['arrival_time'][4]).zfill(2)}"
                     line['isLive'] = True
                     break
     print(line_lst[:5])
