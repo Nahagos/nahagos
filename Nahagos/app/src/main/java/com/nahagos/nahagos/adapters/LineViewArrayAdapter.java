@@ -60,12 +60,16 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         if (isDriver) {
             stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(current.second ? View.VISIBLE : View.INVISIBLE);
-        } else if (myStop != current.first.stop_id) {
+        } else if (myStop != current.first.stop_id || !nahagosOnline) {
             stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(View.INVISIBLE);
-        } else if (nahagosOnline && hasRequestedToStop) {
+        } else if (hasRequestedToStop) {
             stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(View.VISIBLE);
+        }
+        else {
+            stopButton.setVisibility(View.VISIBLE);
+            handImg.setVisibility(View.INVISIBLE);
         }
 
         stopButton.setOnClickListener((v) -> {
