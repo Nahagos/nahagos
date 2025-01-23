@@ -171,8 +171,10 @@ def get_realtime_lines_mot(stop_code: int, cookies_and_milk :str = Cookie(None))
             for monitored_stop_visit in root.xpath(".//siri:MonitoredStopVisit", namespaces=namespaces): # iterating over the scopes
                 
                 line = OnlineLineData(monitored_stop_visit)
-                data.append({line.get_published_line_name(): {"license_plate": line.get_license_plate(),
-                                                         "location"     : line.get_vehicle_location(),
+                location = line.get_vehicle_location()
+                if location != None:
+                    data.append({line.get_published_line_name(): {"license_plate": line.get_license_plate(),
+                                                         "location"     : location,
                                                          "arrival_time" : line.get_expected_arrival_time(),
                                                          "reliable"     : line.get_confidence_level(),
                                                          "destination"  : line.get_destination_ref(),
@@ -255,8 +257,6 @@ def get_realtime(stop_id, line_lst):
     data = get_realtime_lines_mot(stop_code)
     for i in data:
         for line_name, values in i.items():
-            if 'location' not in values.keys() or values['location'] == 'null':
-                continue
             for line in line_lst:
                 if line_name == line['num'] and not line['isLive']:
                     line['departure'] = f"{str(values['arrival_time'][3]).zfill(2)}:{str(values['arrival_time'][4]).zfill(2)}"
