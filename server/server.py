@@ -238,7 +238,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
             real_trip_id = line[0].split("_")[0]
             if real_trip_id not in uniqe_lines:
                 uniqe_lines.append(real_trip_id)
-                lines_json.append({"trip_id": line[0], "departure": line[1][:5], "name": line[2].replace("<->", "->"), "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
+                lines_json.append({"tripId": line[0], "departure": line[1][:5], "name": line[2].replace("<->", "->"), "num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
         get_realtime(stop_id, lines_json)
         db_lock.release()
         users_lock.release()
@@ -488,7 +488,7 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
         days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
         schedule = [[] for day in days]
         for line in list_lines:
-            schedule[days.index(line[0])].append({"trip_id" : line[1], "line_num" : line[2], "departure" : line[3], "name" : line[4]})
+            schedule[days.index(line[0])].append({"tripId" : line[1], "num" : line[2], "departure" : line[3], "name" : line[4]})
         drivers_lock.release()
         return schedule
     except Exception as e:
@@ -503,10 +503,10 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
     drivers_lock.acquire()
     users_lock.acquire()
     # validate user
-    # if cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users:
-    #     drivers_lock.release()
-    #     users_lock.release()
-    #     raise HTTPException(status_code=401, detail="User not authenticated") 
+    if cookies_and_milk not in connected_drivers and cookies_and_milk not in connected_users:
+        drivers_lock.release()
+        users_lock.release()
+        raise HTTPException(status_code=401, detail="User not authenticated") 
     drivers_lock.release()
     users_lock.release()
     
