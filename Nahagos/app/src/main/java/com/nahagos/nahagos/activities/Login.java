@@ -51,12 +51,7 @@ public class Login extends AppCompatActivity {
 
         if (storedUsername != null && storedPassword != null) {
             new Thread(() -> {
-                boolean loginSuccess;
-                if (storedDriverId != -1) {
-                    loginSuccess = ServerAPI.driverLogin(storedUsername, storedPassword, storedDriverId);
-                } else {
-                    loginSuccess = ServerAPI.passengerLogin(storedUsername, storedPassword);
-                }
+                boolean loginSuccess = storedDriverId != -1 ? ServerAPI.driverLogin(storedUsername, storedPassword, storedDriverId) : ServerAPI.passengerLogin(storedUsername, storedPassword);
 
                 if (loginSuccess) {
                     runOnUiThread(() -> {
@@ -65,6 +60,7 @@ public class Login extends AppCompatActivity {
                         finish();
                     });
                 } else {
+                    preferencesManager.clearUserCredentials();
                     runOnUiThread(() -> Toast.makeText(Login.this, "Stored credentials are invalid. Please log in again.", Toast.LENGTH_SHORT).show());
                 }
             }).start();
@@ -81,8 +77,6 @@ public class Login extends AppCompatActivity {
                 Toast.makeText(Login.this, "Make sure you fill all of your fields ಥ_ಥ", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            Log.d("Login", Boolean.toString(isDriverGlobal));
 
             new Thread(() -> {
                 if (isDriverGlobal && ServerAPI.driverLogin(username, password, Integer.parseInt(driverId))) {

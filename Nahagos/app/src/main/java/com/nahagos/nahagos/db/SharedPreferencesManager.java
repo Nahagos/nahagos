@@ -34,8 +34,6 @@ public class SharedPreferencesManager {
     }
 
     public void clearUserCredentials() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        sharedPreferences.edit().clear().apply();
     }
 }
