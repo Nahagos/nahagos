@@ -103,8 +103,8 @@ public class StopDetails extends BottomSheetDialogFragment {
                     if (!l1.isLive && l2.isLive) return 1;
                     if (l1.isLive)
                         return
-                                Integer.parseInt(l1.departure.replaceAll("[^0-9]", "")) -
-                                        Integer.parseInt(l2.departure.replaceAll("[^0-9]", ""));
+                                Integer.parseInt(l1.departure.split(",")[0].replaceAll("[^0-9]", "")) -
+                                        Integer.parseInt(l2.departure.split(",")[0].replaceAll("[^0-9]", ""));
                     return l1.departure.compareTo(l2.departure);
 
                 })
