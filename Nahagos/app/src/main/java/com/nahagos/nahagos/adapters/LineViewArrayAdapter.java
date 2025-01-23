@@ -3,6 +3,8 @@ package com.nahagos.nahagos.adapters;
 import android.content.Context;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.activities.LineView;
+import com.nahagos.nahagos.datatypes.Line;
 import com.nahagos.nahagos.datatypes.StopTime;
 import com.nahagos.nahagos.server.ServerAPI;
 
@@ -17,24 +19,26 @@ import android.widget.Button;
 import android.util.Pair;
 
 
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> {
-    private final Context context;
+    private final LineView context;
     private final boolean isDriver;
     private final int myStop;
+    private boolean hasRequestedToStop;
     private final String tripId;
+    private final boolean nahagosOnline;
 
-    public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
+    public LineViewArrayAdapter(@NonNull LineView c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId, boolean nahagos_online) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
         this.myStop = stopId;
         this.tripId = tripId;
+        this.nahagosOnline = nahagos_online;
     }
 
     @NonNull
@@ -53,17 +57,32 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         if (current == null)
             return convertView;
 
-        if (isDriver || (!isDriver && current.first.stop_id != myStop)) {
+        if (isDriver) {
             stopButton.setVisibility(View.INVISIBLE);
-            handImg.setVisibility(current.second && isDriver ? View.VISIBLE : View.INVISIBLE);
+            handImg.setVisibility(current.second ? View.VISIBLE : View.INVISIBLE);
+        } else if (myStop != current.first.stop_id || !nahagosOnline) {
+            stopButton.setVisibility(View.INVISIBLE);
+            handImg.setVisibility(View.INVISIBLE);
+        } else if (hasRequestedToStop) {
+            stopButton.setVisibility(View.INVISIBLE);
+            handImg.setVisibility(View.VISIBLE);
+        }
+        else {
+            stopButton.setVisibility(View.VISIBLE);
+            handImg.setVisibility(View.INVISIBLE);
         }
 
         stopButton.setOnClickListener((v) -> {
            try {
-               if (ServerAPI.waitForMe(tripId, current.first.stop_id)) {
-                   stopButton.setVisibility(View.INVISIBLE);
-                   handImg.setVisibility(View.VISIBLE);
-               }
+               new Thread(() -> {
+                   if (ServerAPI.waitForMe(tripId, current.first.stop_id)) {
+                       hasRequestedToStop = true;
+                       context.runOnUiThread(() -> {
+                           stopButton.setVisibility(View.INVISIBLE);
+                           handImg.setVisibility(View.VISIBLE);
+                       });
+                   }
+               }).start();
            } catch(RuntimeException e) {
                Log.d("Array adapter Error", Objects.requireNonNull(e.getMessage()));
            }

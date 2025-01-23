@@ -38,6 +38,8 @@ public class LineView extends AppCompatActivity {
 
     private Thread serverListeningThread;
 
+    private boolean driveStarted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,7 @@ public class LineView extends AppCompatActivity {
             nahagosImg.setVisibility(nahagosOnline ? View.VISIBLE : View.INVISIBLE);
         }
 
-        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, tripId);
+        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, tripId, nahagosOnline);
         stopsList.setAdapter(stationsAdapter);
 
         if (tripId != null) {
@@ -100,6 +102,7 @@ public class LineView extends AppCompatActivity {
                         runOnUiThread(() -> {
                             nahagosImg.setVisibility(View.VISIBLE);
                             startDriveBtn.setVisibility(View.INVISIBLE);
+                            driveStarted = true;
                             startListeningForStoppingUpdates();
                         });
                     }
@@ -175,6 +178,6 @@ public class LineView extends AppCompatActivity {
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
-        endTrip();
+        if (isDriver && driveStarted) endTrip();
     }
 }

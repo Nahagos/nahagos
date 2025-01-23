@@ -30,12 +30,12 @@
         android:id="@+id/start_drive_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginBottom="30dp"
         android:text="התחל נסיעה"
         android:visibility="invisible"
         map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent" />
+        map:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/nahagos_img"
