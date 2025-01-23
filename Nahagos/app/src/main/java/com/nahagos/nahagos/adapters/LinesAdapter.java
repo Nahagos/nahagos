@@ -44,12 +44,13 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
         holder.lineName.setText(line.name);
         holder.lineTime.setText(line.departure);
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
+        holder.lineLiveIndicator.setVisibility(line.isLive ? View.VISIBLE : View.GONE);
 
         holder.itemView.setOnClickListener(v -> context.startActivity(
                 new Intent(context, LineView.class)
                         .putExtra("lineName", line.name)
                         .putExtra("stopId", referringStop.id)
-                        .putExtra("tripId", line.trip_id)
+                        .putExtra("tripId", line.tripId)
                         .putExtra("nahagosOnline", line.isNahagos)
         ));
     }
@@ -65,6 +66,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
         public final TextView lineName;
         public final TextView lineTime;
         public final ImageView lineLive;
+        public final View lineLiveIndicator;
 
         public LineViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,6 +74,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
             lineName = itemView.findViewById(R.id.line_name);
             lineTime = itemView.findViewById(R.id.line_time);
             lineLive = itemView.findViewById(R.id.line_live);
+            lineLiveIndicator = itemView.findViewById(R.id.line_live_indicator);
         }
     }
 }

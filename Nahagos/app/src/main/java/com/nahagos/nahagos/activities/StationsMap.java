@@ -31,6 +31,7 @@ import com.nahagos.nahagos.databinding.ActivityStationsMapBinding;
 import com.nahagos.nahagos.db.DBManager;
 import com.nahagos.nahagos.db.Tables.Stop;
 import com.nahagos.nahagos.fragments.StopDetails;
+import com.nahagos.nahagos.renderers.StopRenderer;
 
 import java.util.ArrayList;
 
@@ -123,6 +124,8 @@ public class StationsMap extends FragmentActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         clusterManager.setAlgorithm(new NonHierarchicalViewBasedAlgorithm<>(metrics.widthPixels, metrics.heightPixels));
+
+        clusterManager.setRenderer(new StopRenderer(this, map, clusterManager));
 
         for (var stop : dbManager.stopsDao().getAll())
             clusterManager.addItem(stop);

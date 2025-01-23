@@ -1,37 +1,28 @@
 package com.nahagos.nahagos.datatypes;
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.Gson;
 
 public class Line {
-    @SerializedName("tripId")
-    public String trip_id;
+    public String tripId;
     public String name;
     public String num;
     public String departure;
     public String operator;
     public boolean isNahagos;
+    public boolean isLive;
 
-    // Constructor
-    public Line(String trip_id, String name, String line_num, String departure, String operator, boolean isNahagos) {
-        this.trip_id = trip_id;
+    public Line(String tripId, String name, String num, String departure, String operator, boolean isNahagos, boolean isLive) {
+        this.tripId = tripId;
         this.name = name;
-        this.num = line_num;
+        this.num = num;
         this.departure = departure;
         this.operator = operator;
         this.isNahagos = isNahagos;
+        this.isLive = isLive;
     }
 
-
-    // toString method
     @Override
     public String toString() {
-        return "Line{" +
-                "trip_id='" + trip_id + '\'' +
-                ", name='" + name + '\'' +
-                ", num=" + num +
-                ", departure='" + departure + '\'' +
-                ", operator='" + operator + '\'' +
-                ", isNahagos=" + isNahagos +
-                '}';
+        return new Gson().toJson(this);
     }
 }

@@ -29,7 +29,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
     private final boolean isDriver;
     private final int myStop;
     private boolean hasRequestedToStop;
-    private final String trip_id;
+    private final String tripId;
     private final boolean nahagosOnline;
 
     public LineViewArrayAdapter(@NonNull LineView c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId, boolean nahagos_online) {
@@ -37,7 +37,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         this.context = c;
         this.isDriver = isDriver;
         this.myStop = stopId;
-        this.trip_id = tripId;
+        this.tripId = tripId;
         this.nahagosOnline = nahagos_online;
     }
 

@@ -41,7 +41,7 @@ public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewH
             lineViewIntent.putExtra("isDriver", true);
             lineViewIntent.putExtra("canStartDrive", true);
             lineViewIntent.putExtra("lineName", drive.name);
-            lineViewIntent.putExtra("tripId", drive.trip_id);
+            lineViewIntent.putExtra("tripId", drive.tripId);
             context.startActivity(lineViewIntent);
         });
     }

@@ -47,7 +47,6 @@ public class Networks {
                 responseBuilder.append(line);
             return responseBuilder.toString();
         } catch (IOException e) {
-            Log.e(TAG, "Error reading response", e);
             return null;
         }
     }
