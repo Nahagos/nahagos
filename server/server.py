@@ -210,29 +210,33 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     drivers_lock.release()
     return {"message": "The trip ended successfully"}
 
-@app.get("/lines-byx-station/{stop_id}")
+@app.get("/lines-by-station/{stop_id}")
 def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     """
     Retrives real-time arriving times at given station
     """ 
     users_lock.acquire()
     # validate user
-    if cookies_and_milk not in connected_users:
-        users_lock.release()
-        raise HTTPException(status_code=403, detail="User not authenticated")
+    # if cookies_and_milk not in connected_users:
+    #     users_lock.release()
+    #     raise HTTPException(status_code=403, detail="User not authenticated")
     
     db_lock.acquire()
+    print("hola")
     try:
         list_lines = db.get_lines_by_station(stop_id)
         lines_json = []
         for line in list_lines:
             lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : line[0] in registered_trips})            
+        
         db_lock.release()
         users_lock.release()
         return lines_json
+    
     except Exception as e:
         db_lock.release()
         users_lock.release()
+
         raise HTTPException(status_code=402, detail=str(e))
 
 
