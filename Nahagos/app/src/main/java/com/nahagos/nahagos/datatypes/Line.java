@@ -7,15 +7,17 @@ public class Line {
     public String departure;
     public String operator;
     public boolean isNahagos;
+    public boolean isLive;
 
     // Constructor
-    public Line(String trip_id, String name, String line_num, String departure, String operator, boolean isNahagos) {
+    public Line(String trip_id, String name, String line_num, String departure, String operator, boolean isNahagos, boolean isLive) {
         this.trip_id = trip_id;
         this.name = name;
         this.line_num = line_num;
         this.departure = departure;
         this.operator = operator;
         this.isNahagos = isNahagos;
+        this.isLive = isLive;
     }
 
 

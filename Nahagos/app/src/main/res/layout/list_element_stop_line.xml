@@ -49,4 +49,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <View
+        android:id="@+id/line_live_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/green_circle"
+        app:layout_constraintStart_toEndOf="@id/line_live"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
