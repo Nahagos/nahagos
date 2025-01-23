@@ -6,7 +6,7 @@ import sqlite3
 import hashlib
 from datetime import datetime, timedelta, timezone
 import zipfile
-
+import random
 
 
 class Database:
@@ -80,7 +80,6 @@ class Database:
         self.add_driver("d1", "p1", 6151181, "Alice Johnson", "ABC1234")
         self.add_driver("driver02", "driver02", 1234567, "Chris Lee", "XYZ5678")
         self.add_driver("driver03", "password123", 1522484, "Maria Davis", "LMN3456")
-        self.add_things_to_schedule()
         self.open()
 
         dir_path = zip_path.replace(".zip", "/")
@@ -108,6 +107,7 @@ class Database:
 
         # Save (commit) the changes
         self.connection.commit()
+        self.add_things_to_schedule()
         self.close()
     
     def create_tables(self):
@@ -164,21 +164,11 @@ class Database:
             return False
         
     def add_things_to_schedule(self):
-        self.add_to_schedule('fake_line', 6151181, '12', '5656648_311224', 'sunday', '06:40')
-        self.add_to_schedule('fake_line', 1234567, '8', '17332096_261224', 'sunday', '18:00')
-        self.add_to_schedule('fake_line', 1522484, '8', '2568376_261224', 'sunday', '17:20')
-        self.add_to_schedule('fake_line', 6151181, '8', '2568332_011224', 'sunday', '10:55')
-        self.add_to_schedule('fake_line', 1234567, '8', '17332309_261224', 'sunday', '07:50')
-        self.add_to_schedule('fake_line', 1522484, '8', '13077356_011224', 'sunday', '18:40')
-        self.add_to_schedule('fake_line', 6151181, '46', '27660227_261224', 'sunday', '08:30')
-        self.add_to_schedule('fake_line', 1234567, '46', '3148_261224', 'sunday', '08:05')
-        self.add_to_schedule('fake_line', 1522484, '46', '47974694_251224', 'sunday', '06:40')
-        self.add_to_schedule('fake_line', 6151181, '56', '26493025_311224', 'sunday', '15:45')
-        self.add_to_schedule('fake_line', 1234567, '57', '584632122_011224', 'sunday', '13:45')
-        self.add_to_schedule('fake_line', 1522484, '57', '585422673_011224', 'sunday', '10:45')
-        self.add_to_schedule('fake_line', 6151181, '57', '3559_261224', 'sunday', '12:35')
-        self.add_to_schedule('fake_line', 1234567, '57', '56445279_261224', 'sunday', '12:20')
-
+        ids = [6151181,1522484, 1234567]
+        lines = self.get_lines_by_station(21155)     #trip_id, departure_time, route_long_name, route_short_name, agency_name, stop_lat, stop_lon
+        for line in lines:
+            index = random.randint(0,2)
+            self.add_to_schedule(line[2], ids[index], line[3], line[0], 'thursday', line[1])
 
         
     def add_to_schedule(self, name, driver_id, line, trip_id, day, hour):
@@ -326,7 +316,15 @@ class Database:
         if not res:
             return False
         return True
-        
+    
+    def convert_stop_id_to_code(self, stop_id):
+        self.open()
+        self.cursor.execute('SELECT stop_code FROM stops where stop_id = ?', (stop_id,))
+        res = self.cursor.fetchone()
+        self.close()
+        if not res:
+            return None
+        return res[0]
 
 if __name__ == "__main__":
     db = Database("db.sql")
