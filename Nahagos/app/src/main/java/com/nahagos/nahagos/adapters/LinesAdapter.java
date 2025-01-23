@@ -1,26 +1,33 @@
 package com.nahagos.nahagos.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nahagos.nahagos.R;
+import com.nahagos.nahagos.activities.LineView;
 import com.nahagos.nahagos.datatypes.Line;
+import com.nahagos.nahagos.db.Tables.Stop;
 
 import java.util.List;
 
 public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHolder> {
 
+    private final Stop referringStop;
     private final List<Line> lines;
+    private final Context context;
 
-    public LinesAdapter(List<Line> lines) {
+    public LinesAdapter(Stop referringStop, List<Line> lines, Context context) {
+        this.referringStop = referringStop;
         this.lines = lines;
+        this.context = context;
     }
 
     @NonNull
@@ -38,9 +45,13 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
         holder.lineTime.setText(line.departure);
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
 
-        holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Clicked on line " + line.line_num, Toast.LENGTH_SHORT).show();
-        });
+        holder.itemView.setOnClickListener(v -> context.startActivity(
+                new Intent(context, LineView.class)
+                        .putExtra("lineName", line.name)
+                        .putExtra("stopId", referringStop.id)
+                        .putExtra("tripId", line.trip_id)
+                        .putExtra("nahagosOnline", line.isNahagos)
+        ));
     }
 
     @Override
