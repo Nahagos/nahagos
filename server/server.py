@@ -3,8 +3,10 @@ from pydantic import BaseModel
 import datetime 
 import uuid
 from db import Database
+import requests
 import threading
 import time
+from lxml import etree
 
 app = FastAPI()
 class Station(BaseModel):
@@ -41,6 +43,82 @@ registered_trips = {}       # trip_id : [stops_list]
 
 db = Database("db.sql")
 
+MOT_API_URL = "http://moran.mot.gov.il:110/Channels/HTTPChannel/SmQuery/2.8/xml?Key=LA353500&MonitoringRef="
+PROXY_URL   = "http://gp.lavirz.com:8043/"
+
+class OnlineLineData:
+    def __init__(self, scope):
+        self.namespaces = {'siri': 'http://www.siri.org.uk/siri'}
+        self.scope      = scope
+
+    def get_recorded_at_time(self):
+        return self.scope.find(".//siri:RecordedAtTime", namespaces=self.namespaces).text
+
+    def get_item_identifier(self):
+        return self.scope.find(".//siri:ItemIdentifier", namespaces=self.namespaces).text
+
+    def get_monitoring_ref(self, monitored_stop_visit):
+        return self.scope.find(".//siri:MonitoringRef", namespaces=self.namespaces).text
+
+    def get_line_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:LineRef", namespaces=self.namespaces).text
+
+    def get_direction_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:DirectionRef", namespaces=self.namespaces).text
+
+    def get_data_frame_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef", namespaces=self.namespaces).text
+
+    def get_dated_vehicle_journey_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef", namespaces=self.namespaces).text
+
+    def get_published_line_name(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:PublishedLineName", namespaces=self.namespaces).text
+
+    def get_operator_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:OperatorRef", namespaces=self.namespaces).text
+
+    def get_destination_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:DestinationRef", namespaces=self.namespaces).text
+
+    def get_origin_aimed_departure_time(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:OriginAimedDepartureTime", namespaces=self.namespaces).text
+
+    def get_confidence_level(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:ConfidenceLevel", namespaces=self.namespaces).text
+
+    def get_vehicle_location(self) -> list:
+        if vehicle_journey := self.scope.find(".//siri:MonitoredVehicleJourney", namespaces=self.namespaces):
+            if vehicle_location := vehicle_journey.find(".//siri:VehicleLocation", namespaces=self.namespaces):
+                longitude = vehicle_location.find(".//siri:Longitude", namespaces=self.namespaces).text
+                latitude = vehicle_location.find(".//siri:Latitude", namespaces=self.namespaces).text
+                return [longitude, latitude]
+            
+        return None
+
+    def get_bearing(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:Bearing", namespaces=self.namespaces).text
+
+    def get_velocity(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:Velocity", namespaces=self.namespaces).text
+
+    def get_license_plate(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:VehicleRef", namespaces=self.namespaces).text
+
+    def get_stop_point_ref(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef", namespaces=self.namespaces).text
+
+    def get_order(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:Order", namespaces=self.namespaces).text
+
+    def get_expected_arrival_time(self):
+        end_time = datetime.datetime.fromisoformat(self.scope.find(".//siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedArrivalTime", namespaces=self.namespaces).text)
+        return [end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute]
+    
+    def get_distance_from_stop(self):
+        return self.scope.find(".//siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DistanceFromStop", namespaces=self.namespaces).text
+
+
 def driver_connectivity():
     while True:
         drivers_lock.acquire()
@@ -70,6 +148,42 @@ def root():
     return {"message": "Server Is Legit, V1.0.0"}
 
 
+@app.get("/get-realtime-lines-mot/{stop_code}")
+def get_realtime_lines_mot(stop_code: int, cookies_and_milk :str = Cookie(None)):
+    
+    proxies = {
+        "http": PROXY_URL
+    }
+
+    try:
+        response = requests.get(MOT_API_URL + str(stop_code), proxies=proxies)
+        root = etree.fromstring(response.text.encode("utf-8"))
+
+        if response.status_code == 200:
+            namespaces = {'siri': 'http://www.siri.org.uk/siri'}
+
+            for monitored_stop_visit in root.xpath(".//siri:MonitoredStopVisit", namespaces=namespaces): # iterating over the scopes
+                
+                line = OnlineLineData(monitored_stop_visit)
+                data = {line.get_published_line_name(): {"license_plate": line.get_license_plate(),
+                                                         "location"     : line.get_vehicle_location(),
+                                                         "arrival_time" : line.get_expected_arrival_time(),
+                                                         "reliable"     : line.get_confidence_level(),
+                                                         "destination"  : line.get_destination_ref()},
+                                                         "trip_id"      : line.get_dated_vehicle_journey_ref()
+                                                         }
+
+                return data
+            
+
+        else:
+            raise HTTPException(status_code=401, detail="Couldn't get data")
+
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=401, detail="Couldn't reach data")
+
+
+
 def update_last_active(driver_cookie):
     connected_drivers[driver_cookie][1] = datetime.datetime.now()
  
@@ -90,13 +204,13 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
         raise HTTPException(status_code=401, detail="No trip to end")
     
     trips_lock.acquire()
-    del registered_trips[connected_drivers[cookies_and_milk]]
-    connected_drivers[cookies_and_milk] = None
+    del registered_trips[connected_drivers[cookies_and_milk][2]]
+    connected_drivers[cookies_and_milk][2] = None
     trips_lock.release()
     drivers_lock.release()
     return {"message": "The trip ended successfully"}
 
-@app.get("/lines-by-station/{stop_id}")
+@app.get("/lines-byx-station/{stop_id}")
 def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     """
     Retrives real-time arriving times at given station
@@ -105,7 +219,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     # validate user
     if cookies_and_milk not in connected_users:
         users_lock.release()
-        raise HTTPException(status_code=401, detail="User not authenticated")
+        raise HTTPException(status_code=403, detail="User not authenticated")
     
     db_lock.acquire()
     try:
@@ -119,7 +233,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     except Exception as e:
         db_lock.release()
         users_lock.release()
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=402, detail=str(e))
 
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
