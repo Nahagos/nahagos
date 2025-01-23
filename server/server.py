@@ -245,14 +245,14 @@ def get_realtime(stop_id, line_lst):
     stop_code = db.convert_stop_id_to_code(stop_id)
     if not stop_code:
         return
-    data = get_realtime_lines_mot(stop_code)
-    print(data)
-    for line_name, values in data.items():
-        for line in line_lst:
-            if line_name == line[2]:
-                line[1] = f'{values['arrival_time'][3]}:{values['arrival_time'][4]}'
-                line[6] = True
-                break
+    # data = get_realtime_lines_mot(stop_code)
+    # print(data)
+    # for line_name, values in data.items():
+    #     for line in line_lst:
+    #         if line_name == line[2]:
+    #             line[1] = f'{values['arrival_time'][3]}:{values['arrival_time'][4]}'
+    #             line[6] = True
+    #             break
 
 def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
     return '3.2'
