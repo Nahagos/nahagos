@@ -27,14 +27,14 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
     private final Context context;
     private final boolean isDriver;
     private final int myStop;
-    private final String trip_id;
+    private final String tripId;
 
     public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
         this.myStop = stopId;
-        this.trip_id = tripId;
+        this.tripId = tripId;
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
 
         stopButton.setOnClickListener((v) -> {
            try {
-               if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
+               if (ServerAPI.waitForMe(tripId, current.first.stop_id)) {
                    stopButton.setVisibility(View.INVISIBLE);
                    handImg.setVisibility(View.VISIBLE);
                }

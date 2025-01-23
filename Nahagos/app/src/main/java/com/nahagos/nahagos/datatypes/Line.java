@@ -1,36 +1,28 @@
 package com.nahagos.nahagos.datatypes;
 
+import com.google.gson.Gson;
+
 public class Line {
-    public String trip_id;
+    public String tripId;
     public String name;
-    public String line_num;
+    public String num;
     public String departure;
     public String operator;
     public boolean isNahagos;
     public boolean isLive;
 
-    // Constructor
-    public Line(String trip_id, String name, String line_num, String departure, String operator, boolean isNahagos, boolean isLive) {
-        this.trip_id = trip_id;
+    public Line(String tripId, String name, String num, String departure, String operator, boolean isNahagos, boolean isLive) {
+        this.tripId = tripId;
         this.name = name;
-        this.line_num = line_num;
+        this.num = num;
         this.departure = departure;
         this.operator = operator;
         this.isNahagos = isNahagos;
         this.isLive = isLive;
     }
 
-
-    // toString method
     @Override
     public String toString() {
-        return "Line{" +
-                "trip_id='" + trip_id + '\'' +
-                ", name='" + name + '\'' +
-                ", line_num=" + line_num +
-                ", departure='" + departure + '\'' +
-                ", operator='" + operator + '\'' +
-                ", isNahagos=" + isNahagos +
-                '}';
+        return new Gson().toJson(this);
     }
 }
