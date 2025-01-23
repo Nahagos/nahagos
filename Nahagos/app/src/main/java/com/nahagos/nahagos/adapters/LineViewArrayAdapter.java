@@ -64,6 +64,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
             stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(View.INVISIBLE);
         } else if (nahagosOnline && hasRequestedToStop) {
+            stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(View.VISIBLE);
         }
 
