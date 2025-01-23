@@ -34,7 +34,7 @@ public class DrivesAdapter extends RecyclerView.Adapter<DrivesAdapter.DriveViewH
     @Override
     public void onBindViewHolder(@NonNull DriveViewHolder holder, int position) {
         Line drive = drives.get(position);
-        holder.titleTextView.setText(drive.line_num + " - " + drive.name);
+        holder.titleTextView.setText(drive.num + " - " + drive.name);
         holder.subtitleTextView.setText("Departure time: " + drive.departure);
         holder.itemView.setOnClickListener(v -> {
             Intent lineViewIntent = new Intent(context, LineView.class);

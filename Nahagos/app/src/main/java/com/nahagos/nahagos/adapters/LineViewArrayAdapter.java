@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.util.Pair;
 
 
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -28,13 +27,15 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
     private final boolean isDriver;
     private final int myStop;
     private final String trip_id;
+    private final boolean nahagosOnline;
 
-    public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId) {
+    public LineViewArrayAdapter(@NonNull Context c, @NonNull ArrayList<Pair<StopTime, Boolean>> stops, boolean isDriver, int stopId, String tripId, boolean nahagos_online) {
         super(c, R.layout.line_view_stop_element, stops);
         this.context = c;
         this.isDriver = isDriver;
         this.myStop = stopId;
         this.trip_id = tripId;
+        this.nahagosOnline = nahagos_online;
     }
 
     @NonNull
@@ -53,17 +54,19 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         if (current == null)
             return convertView;
 
-        if (isDriver || (!isDriver && current.first.stop_id != myStop)) {
+        if (isDriver || (!isDriver && (current.first.stop_id != myStop || !nahagosOnline))) {
             stopButton.setVisibility(View.INVISIBLE);
             handImg.setVisibility(current.second && isDriver ? View.VISIBLE : View.INVISIBLE);
         }
 
         stopButton.setOnClickListener((v) -> {
            try {
-               if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
-                   stopButton.setVisibility(View.INVISIBLE);
-                   handImg.setVisibility(View.VISIBLE);
-               }
+               new Thread(() -> {
+                   if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
+                       stopButton.setVisibility(View.INVISIBLE);
+                       handImg.setVisibility(View.VISIBLE);
+                   }
+               }).start();
            } catch(RuntimeException e) {
                Log.d("Array adapter Error", Objects.requireNonNull(e.getMessage()));
            }

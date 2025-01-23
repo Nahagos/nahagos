@@ -51,6 +51,7 @@
         android:id="@+id/stopping_img"
         android:layout_width="80dp"
         android:layout_height="31dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
         app:layout_constraintEnd_toEndOf="@+id/stop_btn"
         app:layout_constraintStart_toStartOf="@+id/stop_btn"
@@ -59,9 +60,11 @@
 
     <Button
         android:id="@+id/stop_btn"
-        android:layout_width="59dp"
-        android:layout_height="30dp"
+        android:layout_width="72dp"
+        android:layout_height="32dp"
         android:foregroundGravity="center|fill"
+        android:text="stop"
+        android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.045"

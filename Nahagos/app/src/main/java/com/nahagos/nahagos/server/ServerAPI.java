@@ -1,5 +1,7 @@
 package com.nahagos.nahagos.server;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.nahagos.nahagos.datatypes.Line;
 import com.nahagos.nahagos.datatypes.StopTime;
@@ -33,6 +35,7 @@ public class ServerAPI {
 
     public static boolean waitForMe(String tripId, int stopId) {
         String jsonBody = "{\"trip_id\": \"" + tripId + "\", \"stop_id\":" + stopId + "}";
+        Log.d("SERVER WAIT FOR ME", tripId + ": " + stopId);
         return Boolean.TRUE.equals(Networks.httpPostReq(Endpoint.WAIT_FOR_ME.getUrl(), jsonBody, Boolean.class));
     }
 

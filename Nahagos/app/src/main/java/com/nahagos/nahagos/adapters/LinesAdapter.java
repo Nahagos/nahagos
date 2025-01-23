@@ -40,7 +40,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
     @Override
     public void onBindViewHolder(@NonNull LineViewHolder holder, int position) {
         Line line = lines.get(position);
-        holder.lineNumber.setText(String.valueOf(line.line_num));
+        holder.lineNumber.setText(String.valueOf(line.num));
         holder.lineName.setText(line.name);
         holder.lineTime.setText(line.departure);
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
