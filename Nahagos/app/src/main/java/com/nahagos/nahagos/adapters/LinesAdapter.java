@@ -40,7 +40,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
     @Override
     public void onBindViewHolder(@NonNull LineViewHolder holder, int position) {
         Line line = lines.get(position);
-        holder.lineNumber.setText(String.valueOf(line.line_num));
+        holder.lineNumber.setText(String.valueOf(line.num));
         holder.lineName.setText(line.name);
         holder.lineTime.setText(line.departure);
         holder.lineLive.setVisibility(line.isNahagos ? View.VISIBLE : View.GONE);
@@ -50,7 +50,7 @@ public class LinesAdapter extends RecyclerView.Adapter<LinesAdapter.LineViewHold
                 new Intent(context, LineView.class)
                         .putExtra("lineName", line.name)
                         .putExtra("stopId", referringStop.id)
-                        .putExtra("tripId", line.trip_id)
+                        .putExtra("tripId", line.tripId)
                         .putExtra("nahagosOnline", line.isNahagos)
         ));
     }

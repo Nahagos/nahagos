@@ -25,8 +25,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class
-LineView extends AppCompatActivity {
+public class LineView extends AppCompatActivity {
 
     private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
@@ -59,7 +58,7 @@ LineView extends AppCompatActivity {
         String lineColor = intent.getStringExtra("lineColor");
         String lineName = intent.getStringExtra("lineName");
         myStop = intent.getIntExtra("stopId", 0);
-        String trip_id = intent.getStringExtra("tripId");
+        String tripId = intent.getStringExtra("tripId");
 
         backBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
@@ -78,13 +77,13 @@ LineView extends AppCompatActivity {
             nahagosImg.setVisibility(nahagosOnline ? View.VISIBLE : View.INVISIBLE);
         }
 
-        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, trip_id);
+        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, tripId);
         stopsList.setAdapter(stationsAdapter);
 
-        if (trip_id != null) {
-            if (!trip_id.isEmpty())
+        if (tripId != null) {
+            if (!tripId.isEmpty())
                 new Thread(()->{
-                    StopTime[] stopsFromServer = ServerAPI.getStopsByLine(trip_id);
+                    StopTime[] stopsFromServer = ServerAPI.getStopsByLine(tripId);
                     if (stopsFromServer != null) {
                         stops.addAll(Arrays.stream(stopsFromServer).map(
                                 (st) -> new Pair<>(st, false)).collect(Collectors.toList())
@@ -97,7 +96,7 @@ LineView extends AppCompatActivity {
         startDriveBtn.setOnClickListener((v) -> {
             if (isDriver && canStartDrive) {
                 new Thread(()-> {
-                    if (ServerAPI.registerForLine(trip_id)) {
+                    if (ServerAPI.registerForLine(tripId)) {
                         runOnUiThread(() -> {
                             nahagosImg.setVisibility(View.VISIBLE);
                             startDriveBtn.setVisibility(View.INVISIBLE);

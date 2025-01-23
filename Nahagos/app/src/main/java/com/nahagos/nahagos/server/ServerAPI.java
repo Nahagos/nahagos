@@ -49,12 +49,12 @@ public class ServerAPI {
         return Networks.httpPostReq(Endpoint.GET_STOPPING_STATIONS.getUrl(), "{\"lat\": " + lat + ", \"lon\": " + lon + "}", int[].class);
     }
 
-    public static StopTime[] getStopsByLine(String trip_id) {
-        return Networks.httpGetReq(Endpoint.GET_STOPS_BY_LINE.getUrl() + trip_id, StopTime[].class);
+    public static StopTime[] getStopsByLine(String tripId) {
+        return Networks.httpGetReq(Endpoint.GET_STOPS_BY_LINE.getUrl() + tripId, StopTime[].class);
     }
 
-    public static LatLng[] getLineShape(String trip_id) {
-        return Networks.httpGetReq(Endpoint.GET_LINE_SHAPE.getUrl() + trip_id, LatLng[].class);
+    public static LatLng[] getLineShape(String tripId) {
+        return Networks.httpGetReq(Endpoint.GET_LINE_SHAPE.getUrl() + tripId, LatLng[].class);
     }
 
     private enum Endpoint {
