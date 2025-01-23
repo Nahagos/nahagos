@@ -258,7 +258,7 @@ def get_realtime(stop_id, line_lst):
             if 'location' not in values.keys() or values['location'] == 'null':
                 continue
             for line in line_lst:
-                if line_name == line['line_num'] and not line['isLive']:
+                if line_name == line['num'] and not line['isLive']:
                     line['departure'] = f"{str(values['arrival_time'][3]).zfill(2)}:{str(values['arrival_time'][4]).zfill(2)}"
                     line['isLive'] = True
                     break
