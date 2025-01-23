@@ -53,7 +53,9 @@ public class Login extends AppCompatActivity {
             usernameObj.setText(storedUsername);
             passwordObj.setText(storedPassword);
             rememberMe.setChecked(true);
-            if (isDriverGlobal && storedDriverId != -1) {
+            if (storedDriverId != -1) {
+                isDriver.setChecked(true);
+                driverIdObj.setVisibility(TextView.VISIBLE);
                 driverIdObj.setText(String.valueOf(storedDriverId));
             }
         }
