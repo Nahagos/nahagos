@@ -6,27 +6,46 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/stop_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
+        android:id="@+id/stop_time"
+        android:layout_width="84dp"
+        android:layout_height="23dp"
         android:text="TextView"
-        android:textColor="#000000"
-        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
-        app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="15dp"
+        android:textColor="#001142"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.825"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop_name"
+        app:layout_constraintVertical_bias="0.009" />
 
     <TextView
-        android:id="@+id/stop_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/stop_num"
+        android:layout_width="84dp"
+        android:layout_height="23dp"
+        android:text="TextView"
+        android:textSize="15dp"
+        android:textColor="#001142"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.299"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop_name"
+        app:layout_constraintVertical_bias="0.009" />
+
+    <TextView
+        android:id="@+id/stop_name"
+        android:layout_width="256dp"
+        android:layout_height="27dp"
         android:text="TextView"
         android:textColor="#000000"
-        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
-        app:layout_constraintEnd_toStartOf="@+id/stop_name"
-        app:layout_constraintStart_toEndOf="@+id/stop_btn"
-        app:layout_constraintTop_toTopOf="@+id/stop_btn" />
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.627"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022" />
 
     <ImageView
         android:id="@+id/stopping_img"
@@ -40,24 +59,26 @@
 
     <Button
         android:id="@+id/stop_btn"
-        android:layout_width="99dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="5dp"
+        android:layout_width="59dp"
+        android:layout_height="30dp"
         android:foregroundGravity="center|fill"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.038" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="43dp"
-        android:layout_height="27dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        android:layout_width="31dp"
+        android:layout_height="26dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/stop_btn"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.957"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.039"
         app:srcCompat="@drawable/station" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BFFBBBBE"
+    android:background="#92DCE7"
     tools:context=".activities.DriverSchedule">
 
     <!-- Guidelines for responsive layout -->
