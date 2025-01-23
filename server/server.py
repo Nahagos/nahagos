@@ -50,7 +50,6 @@ db = Database("db.sql")
 
 
 MOT_API_URL = "http://moran.mot.gov.il:110/Channels/HTTPChannel/SmQuery/2.8/xml?Key=LA353500&MonitoringRef="
-PROXY_URL   = "http://gp.lavirz.com:8043/"
 
 class OnlineLineData:
     def __init__(self, scope):
@@ -156,13 +155,8 @@ def root():
 
 @app.get("/get-realtime-lines-mot/{stop_code}")
 def get_realtime_lines_mot(stop_code: int, cookies_and_milk :str = Cookie(None)):
-    
-    proxies = {
-        "http": PROXY_URL
-    }
-
     try:
-        response = requests.get(MOT_API_URL + str(stop_code), proxies=proxies)
+        response = requests.get(MOT_API_URL + str(stop_code))
         root = etree.fromstring(response.text.encode("utf-8"))
 
         if response.status_code == 200:
