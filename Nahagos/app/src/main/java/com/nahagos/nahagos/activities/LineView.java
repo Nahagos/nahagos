@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.Log;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +66,7 @@ public class LineView extends AppCompatActivity {
             layout.setBackgroundColor(Color.parseColor(lineColor));
 
         if (lineName == null || lineName.isEmpty())
-            lineName = "not found";
+            lineName = getString(R.string.line_not_found);
         title.setText(lineName);
 
         if (isDriver && canStartDrive) {
@@ -95,12 +95,17 @@ public class LineView extends AppCompatActivity {
 
         startDriveBtn.setOnClickListener((v) -> {
             if (isDriver && canStartDrive) {
-
-                startListeningForStoppingUpdates();
-
                 new Thread(()-> {
-                    if (!ServerAPI.registerForLine(trip_id))
-                        runOnUiThread(() -> nahagosImg.setVisibility(View.VISIBLE));
+                    if (ServerAPI.registerForLine(trip_id)) {
+                        runOnUiThread(() -> {
+                            nahagosImg.setVisibility(View.VISIBLE);
+                            startDriveBtn.setVisibility(View.INVISIBLE);
+                            startListeningForStoppingUpdates();
+                        });
+                    }
+                    else {
+                        runOnUiThread(() -> Toast.makeText(this, R.string.cant_start_drive, Toast.LENGTH_SHORT).show());
+                    }
                 }).start();
 
             } else {
@@ -117,7 +122,7 @@ public class LineView extends AppCompatActivity {
         serverListeningThread = new Thread(() -> {
             try {
                 while (!Thread.interrupted()) {
-                    ArrayList<Integer> toStopStations = new ArrayList<>(Arrays.stream(ServerAPI.getStoppingStations()).boxed().collect(Collectors.toList()));
+                    ArrayList<Integer> toStopStations = Arrays.stream(ServerAPI.getStoppingStations(0, 0)).boxed().collect(Collectors.toCollection(ArrayList::new));
                     for (AtomicInteger i = new AtomicInteger(0); i.get() < stops.size(); i.set(i.get()+1)) {
                         if (toStopStations.stream().anyMatch((j) -> j == stops.get(i.get()).first.stop_id)) {
                             Pair<StopTime, Boolean> newN = new Pair<>(stops.get(i.get()).first, true);
@@ -152,11 +157,24 @@ public class LineView extends AppCompatActivity {
         }
     }
 
+    protected void endTrip() {
+        new Thread(() -> {
+            if (ServerAPI.endTrip()) {
+                Toast.makeText(this, R.string.endedTrip, Toast.LENGTH_SHORT).show();
+                Log.d("OH", "IT WORKED");
+            }
+            else {
+                Log.d("OH NO", "IT DIDNT WORK");
+            }
+        }).start();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (serverListeningThread != null) {
             serverListeningThread.interrupt();
         }
+        endTrip();
     }
 }
