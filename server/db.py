@@ -268,7 +268,6 @@ class Database:
             WHERE stop_id = ? 
             AND departure_time > ? 
             AND {day_column} = 1
-            GROUP BY route_long_name, route_short_name
             ORDER BY departure_time;
 
         """, (stop_id, current_time))
