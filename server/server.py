@@ -238,7 +238,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
             real_trip_id = line[0].split("_")[0]
             if real_trip_id not in uniqe_lines:
                 uniqe_lines.append(real_trip_id)
-                lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2], "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
+                lines_json.append({"trip_id": line[0], "departure": line[1], "name": line[2].replace("<->", "<-"), "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
         get_realtime(stop_id, lines_json)
         db_lock.release()
         users_lock.release()
@@ -263,9 +263,6 @@ def get_realtime(stop_id, line_lst):
                     line['isLive'] = True
                     break
     print(line_lst[:5])
-
-def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
-    return '3.2'
 
 @app.get("/update-arrival-time/{station_id, bus_id}")
 def update_arrival_time(station_id: int, bus_id: int):
@@ -432,18 +429,12 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
     users_lock.release()
     drivers_lock.release()
     db_lock.acquire()
-    trips_lock.acquire()
-    driver_coords = registered_trips[trip_id][1] if trip_id in registered_trips.keys() else (0,0)
-    trips_lock.release()
     
     try:
         list_lines = db.get_stops_by_trip_id(trip_id)
         lines_json = []
         for line in list_lines:
-            time = line[2]
-            if driver_coords != (0,0):
-                time = calculate_time_by_coordinates(line[3], line[4], driver_coords[0], driver_coords[1])
-            lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": time, "stop_lat": line[3], "stop_lon": line[4], 'isNahagos': driver_coords != (0,0)})            
+            lines_json.append({"stop_id": line[0], "stop_name": line[1], "time": line[2], "stop_lat": line[3], "stop_lon": line[4], 'isNahagos': trip_id in registered_trips.keys()})            
         db_lock.release()
         return lines_json
     except Exception as e:
