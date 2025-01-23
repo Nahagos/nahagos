@@ -167,20 +167,20 @@ def get_realtime_lines_mot(stop_code: int, cookies_and_milk :str = Cookie(None))
 
         if response.status_code == 200:
             namespaces = {'siri': 'http://www.siri.org.uk/siri'}
-
+            data = []
             for monitored_stop_visit in root.xpath(".//siri:MonitoredStopVisit", namespaces=namespaces): # iterating over the scopes
                 
                 line = OnlineLineData(monitored_stop_visit)
-                data = {line.get_published_line_name(): {"license_plate": line.get_license_plate(),
+                data.append({line.get_published_line_name(): {"license_plate": line.get_license_plate(),
                                                          "location"     : line.get_vehicle_location(),
                                                          "arrival_time" : line.get_expected_arrival_time(),
                                                          "reliable"     : line.get_confidence_level(),
                                                          "destination"  : line.get_destination_ref(),
-                                                         "name"         : line.get_published_line_name()},
+                                                         "name"         : line.get_published_line_name(),
                                                          "trip_id"      : line.get_dated_vehicle_journey_ref()
-                                                         }
+                                                         }})
 
-                return data
+            return data
             
 
         else:
@@ -246,12 +246,16 @@ def get_realtime(stop_id, line_lst):
     if not stop_code:
         return
     data = get_realtime_lines_mot(stop_code)
-    for line_name, values in data.items():
-        for line in line_lst:
-            if line_name == line['name']:
-                line['trip_id'] = f"{values['arrival_time'][3]}:{values['arrival_time'][4]}"
-                line['isLive'] = True
-                break
+    for i in data:
+        for line_name, values in i.items():
+            if 'location' not in values.keys() or values['location'] == 'null':
+                continue
+            for line in line_lst:
+                if line_name == line['line_num'] and not line['isLive']:
+                    line['trip_id'] = f"{values['arrival_time'][3]}:{values['arrival_time'][4]}"
+                    line['isLive'] = True
+                    break
+    print(line_lst[:5])
 
 def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
     return '3.2'
