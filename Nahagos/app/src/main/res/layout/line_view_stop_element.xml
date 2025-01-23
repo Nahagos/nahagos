@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/stop_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="TextView"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/stop_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        app:layout_constraintEnd_toStartOf="@+id/stop_name"
+        app:layout_constraintStart_toEndOf="@+id/stop_btn"
+        app:layout_constraintTop_toTopOf="@+id/stop_btn" />
+
+    <ImageView
+        android:id="@+id/stopping_img"
+        android:layout_width="80dp"
+        android:layout_height="31dp"
+        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        app:layout_constraintEnd_toEndOf="@+id/stop_btn"
+        app:layout_constraintStart_toStartOf="@+id/stop_btn"
+        app:layout_constraintTop_toTopOf="@+id/stop_btn"
+        app:srcCompat="@drawable/hand" />
+
+    <Button
+        android:id="@+id/stop_btn"
+        android:layout_width="99dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:foregroundGravity="center|fill"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="43dp"
+        android:layout_height="27dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/stop_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/stop_btn"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/station" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
