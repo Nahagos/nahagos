@@ -83,30 +83,20 @@ def end_trip_by_cookie(cookies_and_milk :str = Cookie(None)):
     """
     The driver informs the server that the trip is over
     """
-    print("sdsdafdafasd")
     drivers_lock.acquire()
-    print("aa")
     # validate user
     if cookies_and_milk not in connected_drivers:
-        print("bb")
         drivers_lock.release()
-        print("dd")
         raise HTTPException(status_code=401, detail="User not authenticated")
-    print("ee")
 
     #checks if the driver was on a trip
     if connected_drivers[cookies_and_milk][2] is None:
-        print("ff")
         drivers_lock.release()
-        raise HTTPException(status_code=401, detail="No trip to end")
-    print("gg")
+        raise HTTPException(status_code=404, detail="No trip to end")
     trips_lock.acquire()
-    print("registered_trips", registered_trips)
-    print("connected_drivers[cookies_and_milk][2]", connected_drivers[cookies_and_milk][2])
+
     del registered_trips[connected_drivers[cookies_and_milk][2]]
-    print("bb")
     connected_drivers[cookies_and_milk][2] = None
-    print("registered_trips", registered_trips)
     trips_lock.release()
     drivers_lock.release()
     return {"message": "The trip ended successfully"}
@@ -120,7 +110,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     # validate user
     if cookies_and_milk not in connected_users:
         users_lock.release()
-        raise HTTPException(status_code=403, detail="User not authenticated")
+        raise HTTPException(status_code=401, detail="User not authenticated")
     
     db_lock.acquire()
     try:
@@ -138,7 +128,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
     except Exception as e:
         db_lock.release()
         users_lock.release()
-        raise HTTPException(status_code=402, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 def calculate_time_by_coordinates(lat1, lon1, lat2, lon2):
     return '3.2'
@@ -175,11 +165,11 @@ def passenger_wait_for_bus(wait_for : PassengerWait, cookies_and_milk:str = Cook
             return {"message": "Passenger wait request logged successfully"}
         trips_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=401, detail="No Nahagos!")
+        raise HTTPException(status_code=404, detail="Trip not found")
 
     trips_lock.release()
     db_lock.release()
-    raise HTTPException(status_code=401, detail="Stop is not in this lines route") 
+    raise HTTPException(status_code=400, detail="Stop is not in this line's route") 
 
 
 
@@ -204,12 +194,12 @@ def register_for_line(reg: DriverRegister, cookies_and_milk: str = Cookie(None))
     if not db.check_schedule(reg.trip_id, connected_drivers[cookies_and_milk][0]):
         drivers_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=402, detail="Line isn't schedualed for you")
+        raise HTTPException(status_code=403, detail="Line isn't scheduled for you")
     
     if connected_drivers[cookies_and_milk][2]:
         drivers_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=403, detail="You already registered for a trip")
+        raise HTTPException(status_code=409, detail="You already registered for a trip")
     
     trips_lock.acquire()
     connected_drivers[cookies_and_milk][2] = reg.trip_id
@@ -239,7 +229,7 @@ def driver_login(driver: DriverLogin, response: Response):
     else:
         db_lock.release()
         drivers_lock.release()
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=403, detail="Invalid credentials")
 
 
 @app.post("/passenger/login/")
@@ -264,7 +254,7 @@ def passenger_login(request: PassengerRequest, response: Response):
     else:
         users_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=403, detail="Invalid credentials")
 
 
 @app.post("/passenger/signup/")
@@ -288,7 +278,7 @@ def passenger_signup(request: PassengerRequest, response: Response):
     else:
         users_lock.release()
         db_lock.release()
-        raise HTTPException(status_code=401, detail="Invalid signup")
+        raise HTTPException(status_code=400, detail="Signup failed, username might already exist")
 
 
 @app.get("/stops-by-line/{trip_id}")
@@ -324,7 +314,7 @@ def get_stops_by_line(trip_id : str, cookies_and_milk :str = Cookie(None)):
         return lines_json
     except Exception as e:
         db_lock.release()
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
     
 @app.post("/driver/where-to-stop/")
@@ -342,7 +332,7 @@ def where_to_stop(location: DriverLocation, cookies_and_milk :str = Cookie(None)
     if connected_drivers[cookies_and_milk][2] not in registered_trips.keys():
         trips_lock.release()
         drivers_lock.release()
-        raise HTTPException(status_code=402, detail="Need to start a trip first")
+        raise HTTPException(status_code=400, detail="Need to start a trip first")
     update_last_active(cookies_and_milk)
     if connected_drivers[cookies_and_milk][2]:
         registered_trips[connected_drivers[cookies_and_milk][2]][1] = (location.lat, location.lon)
@@ -378,7 +368,7 @@ def get_schedule(cookies_and_milk :str = Cookie(None)):
         return schedule
     except Exception as e:
         drivers_lock.release()
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/line-shape/{trip_id}")
 def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
@@ -406,7 +396,7 @@ def get_shape(trip_id : str, cookies_and_milk :str = Cookie(None)):
         return lines_json
     except Exception as e:
         db_lock.release()
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     
     
     
