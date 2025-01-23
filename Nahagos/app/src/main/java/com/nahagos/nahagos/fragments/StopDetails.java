@@ -48,7 +48,7 @@ public class StopDetails extends BottomSheetDialogFragment {
         name.setText(getString(R.string.stop_headline, stop.name, stop.id));
         description.setText(getString(R.string.stop_description, String.valueOf(stop.lat), String.valueOf(stop.lon)));
 
-        var linesAdapter = new LinesAdapter(lines);
+        var linesAdapter = new LinesAdapter(stop, lines, requireContext());
 
         RecyclerView linesRecyclerView = view.findViewById(R.id.lines);
         linesRecyclerView.setAdapter(linesAdapter);

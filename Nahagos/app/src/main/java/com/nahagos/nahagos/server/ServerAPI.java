@@ -26,6 +26,11 @@ public class ServerAPI {
         return Networks.httpGetReq(Endpoint.GET_LINES_BY_STATION.getUrl() + stopId, Line[].class);
     }
 
+    public static boolean endTrip() {
+        return Boolean.TRUE.equals(Networks.httpGetReq(Endpoint.END_TRIP.getUrl(), boolean.class));
+    }
+
+
     public static boolean waitForMe(String tripId, int stopId) {
         String jsonBody = "{\"trip_id\": \"" + tripId + "\", \"stop_id\":" + stopId + "}";
         return Boolean.TRUE.equals(Networks.httpPostReq(Endpoint.WAIT_FOR_ME.getUrl(), jsonBody, Boolean.class));
@@ -40,8 +45,8 @@ public class ServerAPI {
         return Networks.httpGetReq(Endpoint.GET_DRIVER_SCHEDULE.getUrl(), Line[][].class);
     }
 
-    public static int[] getStoppingStations() {
-        return Networks.httpGetReq(Endpoint.GET_STOPPING_STATIONS.getUrl(), int[].class);
+    public static int[] getStoppingStations(double lat, double lon) {
+        return Networks.httpPostReq(Endpoint.GET_STOPPING_STATIONS.getUrl(), "{\"lat\": " + lat + ", \"lon\": " + lon + "}", int[].class);
     }
 
     public static StopTime[] getStopsByLine(String trip_id) {
@@ -62,7 +67,8 @@ public class ServerAPI {
         GET_DRIVER_SCHEDULE("/driver/schedule/"),
         GET_STOPPING_STATIONS("/driver/where-to-stop/"),
         GET_STOPS_BY_LINE("/stops-by-line/"),
-        GET_LINE_SHAPE("/line-shape/");
+        GET_LINE_SHAPE("/line-shape/"),
+        END_TRIP("/end-trip/");
 
 
         private static final String ROOT_URL = "http://nahagos.lavirz.com:8000";
