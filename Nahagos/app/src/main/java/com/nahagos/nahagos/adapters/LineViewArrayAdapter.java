@@ -45,6 +45,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
 
         TextView stopName = convertView.findViewById(R.id.stop_name);
         TextView stopTime = convertView.findViewById(R.id.stop_time);
+        TextView stopNum = convertView.findViewById(R.id.stop_num);
         Button stopButton = convertView.findViewById(R.id.stop_btn);
         ImageView handImg = convertView.findViewById(R.id.stopping_img);
 
@@ -68,9 +69,11 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
            }
         });
 
-        String stopNameId = current.first.stop_name + " | " + current.first.stop_id;
-        stopName.setText(stopNameId);
+        String stopNameStr = current.first.stop_name;
+        String stopIdStr = "" + current.first.stop_id;
+        stopName.setText(stopNameStr);
         stopTime.setText(current.first.time);
+        stopNum.setText(stopIdStr);
         return convertView;
     }
 }

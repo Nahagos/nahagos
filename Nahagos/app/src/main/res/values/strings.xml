@@ -15,7 +15,7 @@
     <string name="login">Login</string>
     <string name="driver">driver?</string>
     <string name="enter_driver_id">Enter driver id</string>
-    <string name="new_to_nahagos_create_account"><u>New to Nahagos? Create account</u></string>
+    <string name="new_to_nahagos_create_account"><u>New in Nahagos? Create account</u></string>
     <string name="location_details">Latitude: %1$s, Longitude: %2$s</string>
     <string name="cant_start_drive">לא יכול להתחיל את הנסיעה</string>
     <string name="line_not_found">לא נמצא קו</string>

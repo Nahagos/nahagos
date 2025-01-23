@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class LineView extends AppCompatActivity {
+public class
+LineView extends AppCompatActivity {
 
     private final ArrayList<Pair<StopTime, Boolean>> stops = new ArrayList<>();
 
