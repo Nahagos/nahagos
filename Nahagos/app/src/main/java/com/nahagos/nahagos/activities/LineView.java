@@ -79,7 +79,7 @@ public class LineView extends AppCompatActivity {
             nahagosImg.setVisibility(nahagosOnline ? View.VISIBLE : View.INVISIBLE);
         }
 
-        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, trip_id, true); // nahagosOnline);
+        stationsAdapter = new LineViewArrayAdapter(this, stops, isDriver, myStop, tripId, nahagosOnline);
         stopsList.setAdapter(stationsAdapter);
 
         if (tripId != null) {

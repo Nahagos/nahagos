@@ -70,7 +70,7 @@ public class LineViewArrayAdapter extends ArrayAdapter<Pair<StopTime, Boolean>> 
         stopButton.setOnClickListener((v) -> {
            try {
                new Thread(() -> {
-                   if (ServerAPI.waitForMe(trip_id, current.first.stop_id)) {
+                   if (ServerAPI.waitForMe(tripId, current.first.stop_id)) {
                        hasRequestedToStop = true;
                        context.runOnUiThread(() -> {
                            stopButton.setVisibility(View.INVISIBLE);
