@@ -50,20 +50,12 @@ public class Login extends AppCompatActivity {
         int storedDriverId = preferencesManager.getDriverId();
 
         if (storedUsername != null && storedPassword != null) {
-            new Thread(() -> {
-                boolean loginSuccess = storedDriverId != -1 ? ServerAPI.driverLogin(storedUsername, storedPassword, storedDriverId) : ServerAPI.passengerLogin(storedUsername, storedPassword);
-
-                if (loginSuccess) {
-                    runOnUiThread(() -> {
-                        Intent intent = storedDriverId != -1 ? driverScheduleActivity : stationsMapActivity;
-                        startActivity(intent);
-                        finish();
-                    });
-                } else {
-                    preferencesManager.clearUserCredentials();
-                    runOnUiThread(() -> Toast.makeText(Login.this, "Stored credentials are invalid. Please log in again.", Toast.LENGTH_SHORT).show());
-                }
-            }).start();
+            usernameObj.setText(storedUsername);
+            passwordObj.setText(storedPassword);
+            rememberMe.setChecked(true);
+            if (isDriverGlobal && storedDriverId != -1) {
+                driverIdObj.setText(String.valueOf(storedDriverId));
+            }
         }
 
 
