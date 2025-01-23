@@ -249,7 +249,7 @@ def get_realtime(stop_id, line_lst):
     for line_name, values in data.items():
         for line in line_lst:
             if line_name == line['name']:
-                line['trip_id'] = f'{values['arrival_time'][3]}:{values['arrival_time'][4]}'
+                line['trip_id'] = f"{values['arrival_time'][3]}:{values['arrival_time'][4]}"
                 line['isLive'] = True
                 break
 
