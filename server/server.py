@@ -238,7 +238,7 @@ def get_real_time_lines(stop_id: int, cookies_and_milk :str = Cookie(None)):
             real_trip_id = line[0].split("_")[0]
             if real_trip_id not in uniqe_lines:
                 uniqe_lines.append(real_trip_id)
-                lines_json.append({"trip_id": line[0], "departure": line[1][:4], "name": line[2].replace("<->", "->"), "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
+                lines_json.append({"trip_id": line[0], "departure": line[1][:5], "name": line[2].replace("<->", "->"), "line_num": line[3], "operator": line[4], "isNahagos" : real_trip_id in trips, "isLive" : False})
         get_realtime(stop_id, lines_json)
         db_lock.release()
         users_lock.release()
