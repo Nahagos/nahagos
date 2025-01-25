@@ -107,7 +107,7 @@ class Database:
 
         # Save (commit) the changes
         self.connection.commit()
-        self.add_things_to_schedule()
+        self.add_things_to_schedule('sunday')
         self.close()
     
     def create_tables(self):
@@ -162,13 +162,26 @@ class Database:
         except sqlite3.IntegrityError:
             self.close()
             return False
-        
-    def add_things_to_schedule(self):
+  
+    def add_things_to_schedule(self, day):
+        self.open()
         ids = [6151181,1522484, 1234567]
-        lines = self.get_lines_by_station(21155)     #trip_id, departure_time, route_long_name, route_short_name, agency_name, stop_lat, stop_lon
-        for line in lines:
+        self.cursor.execute(f"""
+            SELECT trip_id, departure_time, route_long_name, route_short_name
+            FROM stop_times
+            NATURAL JOIN trips
+            NATURAL JOIN calendar
+            NATURAL JOIN routes
+            WHERE stop_id = 45016
+            AND stop_sequence != 1
+            AND {day} = 1
+            LIMIT 30;
+        """)
+        trips = self.cursor.fetchall()
+        for trip in trips:
             index = random.randint(0,2)
-            self.add_to_schedule(line[2], ids[index], line[3], line[0], 'thursday', line[1])
+            self.add_to_schedule(trip[2], ids[index], trip[3], trip[0], day, trip[1])
+        self.close()
 
         
     def add_to_schedule(self, name, driver_id, line, trip_id, day, hour):
@@ -332,8 +345,5 @@ if __name__ == "__main__":
     db = Database("db.sql")
     # print(db.sign_up("testuser", "testpass"))
     # print(db.check_user("testuser", "testpass"))
-    a=db.get_lines_by_station(12193)
-    for row in a:
-        print(row)
-    print(len(a))
-    db.close()
+    a=db.add_things_to_schedule('sunday')
+
