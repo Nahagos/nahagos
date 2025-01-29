@@ -107,7 +107,7 @@ class Database:
 
         # Save (commit) the changes
         self.connection.commit()
-        self.add_things_to_schedule('wednesday')
+        self.add_things_to_schedule()
         self.close()
     
     def create_tables(self):
@@ -166,21 +166,23 @@ class Database:
     def add_things_to_schedule(self, day):
         self.open()
         ids = [6151181,1522484, 1234567]
-        self.cursor.execute(f"""
-            SELECT trip_id, departure_time, route_long_name, route_short_name
-            FROM stop_times
-            NATURAL JOIN trips
-            NATURAL JOIN calendar
-            NATURAL JOIN routes
-            WHERE stop_id = 45016
-            AND stop_sequence != 1
-            AND {day} = 1
-            LIMIT 30;
-        """)
-        trips = self.cursor.fetchall()
-        for trip in trips:
-            index = random.randint(0,2)
-            self.add_to_schedule(trip[2], ids[index], trip[3], trip[0], day, trip[1])
+        days =['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+        for day in days:
+            self.cursor.execute(f"""
+                SELECT trip_id, departure_time, route_long_name, route_short_name
+                FROM stop_times
+                NATURAL JOIN trips
+                NATURAL JOIN calendar
+                NATURAL JOIN routes
+                WHERE stop_id = 45016
+                AND stop_sequence != 1
+                AND {day} = 1
+                LIMIT 15;
+            """)
+            trips = self.cursor.fetchall()
+            for trip in trips:
+                index = random.randint(0,2)
+                self.add_to_schedule(trip[2], ids[index], trip[3], trip[0], day, trip[1])
         self.close()
 
         
