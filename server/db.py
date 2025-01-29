@@ -165,7 +165,7 @@ class Database:
   
     def add_things_to_schedule(self):
         ids = [6151181,1522484, 1234567]
-        days =['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+        days =['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
         for day in days:
             self.open()
             self.cursor.execute(f"""
