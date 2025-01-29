@@ -165,7 +165,7 @@ class Database:
   
     def add_things_to_schedule(self):
         ids = [6151181,1522484, 1234567]
-        days =['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
+        days =['wednesday', 'monday','tuesday','sunday','thursday','friday','saturday']
         for day in days:
             self.open()
             self.cursor.execute(f"""
@@ -177,7 +177,8 @@ class Database:
                 WHERE stop_id = 45016
                 AND stop_sequence != 1
                 AND {day} = 1
-                LIMIT 15;
+                AND departure_time > '11:30:59'
+                LIMIT 30;
             """)
             trips = self.cursor.fetchall()
             for trip in trips:
