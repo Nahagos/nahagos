@@ -178,6 +178,7 @@ class Database:
                 AND stop_sequence != 1
                 AND {day} = 1
                 AND departure_time > '11:30:59'
+                AND departure_time < '16:30:59'
                 LIMIT 30;
             """)
             trips = self.cursor.fetchall()
