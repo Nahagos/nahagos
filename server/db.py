@@ -107,7 +107,7 @@ class Database:
 
         # Save (commit) the changes
         self.connection.commit()
-        self.add_things_to_schedule('sunday')
+        self.add_things_to_schedule('wednesday')
         self.close()
     
     def create_tables(self):
