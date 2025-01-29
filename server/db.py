@@ -164,10 +164,10 @@ class Database:
             return False
   
     def add_things_to_schedule(self):
-        self.open()
         ids = [6151181,1522484, 1234567]
         days =['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
         for day in days:
+            self.open()
             self.cursor.execute(f"""
                 SELECT trip_id, departure_time, route_long_name, route_short_name
                 FROM stop_times
@@ -183,7 +183,7 @@ class Database:
             for trip in trips:
                 index = random.randint(0,2)
                 self.add_to_schedule(trip[2], ids[index], trip[3], trip[0], day, trip[1])
-        self.close()
+            self.close()
 
         
     def add_to_schedule(self, name, driver_id, line, trip_id, day, hour):
