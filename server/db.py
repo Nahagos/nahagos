@@ -163,7 +163,7 @@ class Database:
             self.close()
             return False
   
-    def add_things_to_schedule(self, day):
+    def add_things_to_schedule(self):
         self.open()
         ids = [6151181,1522484, 1234567]
         days =['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
